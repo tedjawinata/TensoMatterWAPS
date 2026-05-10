@@ -9,7 +9,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open TensoMatterWAPS.html",
-            "file": "c:\\Users\\Galuh Kresnadian T\\Documents\\01. Research\\09. TensoMatterWAPS\\TensoMatterWAPS\\TensoMatterWAPS.html"
+            "file": "c:\\Users\\Galuh Kresnadian T\\Documents\\01. Research\\09. TensoMatterWAPS\\TensoMatterWAPS\\index.html"
         }
     ]
 }
