@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #1a1a1a; color: #e2e8f0; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; }
         .pointer-events-auto { pointer-events: auto; }
@@ -19,7 +19,7 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(26, 26, 26, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -42,7 +42,7 @@
         <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto">
             <div class="p-5 border-b border-slate-700/50">
                 <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-300">Tensomatter</h1>
-                <p class="text-xs text-slate-400 mt-1">oleh Tedjawinata</p>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh K. Tedjawinata, Anastasia Maurina, Alvin F. Komar, Amir Ramadhan dan Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
@@ -66,6 +66,23 @@
                                 <span id="val-stiffness">0.8</span>
                             </div>
                             <input type="range" id="ctrl-stiffness" min="0.1" max="2" step="0.1" value="0.8" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Multi-Masa -->
+                <div>
+                    <h2 class="text-sm font-semibold text-yellow-300 uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        Multi-Masa (Pemberat)
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Beban Tambahan (Kg)</span>
+                                <span id="val-extramass">0.5</span>
+                            </div>
+                            <input type="range" id="ctrl-extramass" min="0.1" max="3.0" step="0.1" value="0.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
@@ -102,6 +119,30 @@
                     </div>
                 </div>
 
+                <!-- Section: Modifikasi Jaring (Truss) -->
+                <div>
+                    <h2 class="text-sm font-semibold text-pink-300 uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                        Modifikasi Truss
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs mb-1">Mode Interaksi Kursor</label>
+                            <select id="ctrl-mode" class="w-full bg-slate-800 border border-slate-600 rounded text-sm p-1.5 focus:ring-blue-500 focus:border-blue-500 text-white">
+                                <option value="drag">Geser Anchor & Tambah Massa</option>
+                                <option value="draw">Gambar Jaring Interaktif (Drag-Drop)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Ketebalan Jaring (Truss)</span>
+                                <span id="val-truss-size">0.05</span>
+                            </div>
+                            <input type="range" id="ctrl-truss-size" min="0.01" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section: View Options -->
                 <div>
                     <h2 class="text-sm font-semibold text-purple-300 uppercase tracking-wider mb-3">Tampilan & Interaksi</h2>
@@ -109,6 +150,10 @@
                         <label class="flex items-center space-x-2 text-sm cursor-pointer">
                             <input type="checkbox" id="view-surface" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
                             <span>Tampilkan Permukaan Kain</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-truss" class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
+                            <span>Tampilkan Jaring (Truss)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-sm cursor-pointer">
                             <input type="checkbox" id="view-stress" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
@@ -124,6 +169,8 @@
                         <p><strong class="text-blue-300">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
                         <p><strong class="text-green-300">Dbl-Klik Kain:</strong> Tambah titik anchor baru.</p>
                         <p><strong class="text-red-300">Dbl-Klik Anchor:</strong> Hapus titik anchor.</p>
+                        <p><strong class="text-yellow-300">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
+                        <p><strong class="text-pink-300">Mode Gambar:</strong> Tarik garis antar titik untuk buat jaring baru.</p>
                     </div>
                 </div>
             </div>
@@ -189,7 +236,7 @@
         // --- 1. SETUP THREE.JS SCENE ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
+        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.02);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 15, 25);
@@ -249,10 +296,43 @@
             }
         }
 
+        // Variabel dan Fungsi Multi-Masa
+        const massMeshes = [];
+        let extraMassValue = 0.5;
+        const massGeo = new THREE.SphereGeometry(0.15);
+        const massMat = new THREE.MeshStandardMaterial({color: 0x3b82f6, roughness: 0.4, metalness: 0.8}); // Warna biru untuk pemberat
+
+        function toggleMass(particle) {
+            if (particle.pinned) return; // Anchor tidak bisa diberi pemberat
+            
+            if (particle.hasExtraMass) {
+                // Hapus beban
+                particle.hasExtraMass = false;
+                particle.mass = physicsConfig.mass;
+                particle.invMass = 1 / particle.mass;
+                if (particle.massMesh) {
+                    scene.remove(particle.massMesh);
+                    const idx = massMeshes.indexOf(particle.massMesh);
+                    if (idx > -1) massMeshes.splice(idx, 1);
+                    particle.massMesh = null;
+                }
+            } else {
+                // Tambah beban
+                particle.hasExtraMass = true;
+                particle.mass = physicsConfig.mass + extraMassValue;
+                particle.invMass = 1 / particle.mass;
+                const mesh = new THREE.Mesh(massGeo, massMat);
+                mesh.position.copy(particle.position);
+                scene.add(mesh);
+                massMeshes.push(mesh);
+                particle.massMesh = mesh;
+            }
+        }
+
         // --- 2. PHYSICS PARAMETERS & STATE ---
-        const DIMS = 10; // 10x10 area
-        const SEGMENTS = 25; // Grid resolution
-        const restDistance = DIMS / SEGMENTS;
+        const DIMS = 10; // Base size
+        const EXT_DIMS = DIMS * 1.2; // Extended boundary for meshing
+        const GRID_RES = 35; // Grid resolution for physics
         
         let physicsConfig = {
             upwardForce: 1.5,
@@ -268,6 +348,17 @@
             visible: true
         };
 
+        let trussConfig = {
+            thickness: 0.05
+        };
+
+        let interactionMode = 'drag'; // 'drag' or 'draw'
+        let drawStartParticle = null;
+        let tempDrawLine = null;
+        let dummyObj = new THREE.Object3D();
+        let dummyColor = new THREE.Color();
+        const MAX_TRUSSES = 15000;
+
         // --- 3. CLOTH / FORM-FINDING SIMULATION ---
         class Particle {
             constructor(x, y, z, mass) {
@@ -278,7 +369,10 @@
                 this.mass = mass;
                 this.invMass = 1 / mass;
                 this.pinned = false;
-                this.stress = 0; // For stress lines
+                this.stress = 0; 
+                this.index = 0; // For Geometry linking
+                this.hasExtraMass = false; // Flag untuk multimasa
+                this.massMesh = null;
             }
             addForce(force) {
                 this.acceleration.addScaledVector(force, this.invMass);
@@ -298,111 +392,155 @@
 
         const particles = [];
         const constraints = [];
+        let gridMap = [];
+        let clothGeometry, clothMesh;
+        let trussMesh; // Menggunakan InstancedMesh untuk ketebalan interaktif
 
-        // Initialize Particles
-        for (let v = 0; v <= SEGMENTS; v++) {
-            for (let u = 0; u <= SEGMENTS; u++) {
-                const x = (u / SEGMENTS) * DIMS - DIMS / 2;
-                const z = (v / SEGMENTS) * DIMS - DIMS / 2;
-                const p = new Particle(x, 0, z, physicsConfig.mass);
-                particles.push(p);
+        // Initialize Dynamic Topology (Square Base Version)
+        function initSimulation() {
+            // 1. Cleanup Old
+            anchorMeshes.forEach(m => scene.remove(m));
+            massMeshes.forEach(m => scene.remove(m));
+            anchorMeshes.length = 0;
+            massMeshes.length = 0;
+            particles.length = 0;
+            constraints.length = 0;
+            if (clothMesh) {
+                scene.remove(clothMesh);
+                if(clothGeometry) clothGeometry.dispose();
             }
-        }
+            if (trussMesh) {
+                scene.remove(trussMesh);
+                if(trussMesh.geometry) trussMesh.geometry.dispose();
+            }
+            draggedParticle = null;
 
-        function getParticleIndex(u, v) { return u + v * (SEGMENTS + 1); }
+            // 2. Generate Particles (Square Grid)
+            const cellDist = EXT_DIMS / GRID_RES;
+            gridMap = Array(GRID_RES + 1).fill(null).map(() => Array(GRID_RES + 1).fill(null));
+            let pIndex = 0;
 
-        // Setup Initial Anchors
-        for (let v = 0; v <= SEGMENTS; v++) {
-            for (let u = 0; u <= SEGMENTS; u++) {
-                if ((u === 0 && v === 0) || (u === SEGMENTS && v === 0) || 
-                    (u === 0 && v === SEGMENTS) || (u === SEGMENTS && v === SEGMENTS) ||
-                    (u === Math.floor(SEGMENTS/2) && v === 0) || (u === Math.floor(SEGMENTS/2) && v === SEGMENTS) ||
-                    (u === 0 && v === Math.floor(SEGMENTS/2)) || (u === SEGMENTS && v === Math.floor(SEGMENTS/2))) {
+            for (let v = 0; v <= GRID_RES; v++) {
+                for (let u = 0; u <= GRID_RES; u++) {
+                    const x = (u / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
+                    const z = (v / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
                     
-                    const idx = getParticleIndex(u, v);
-                    createAnchor(particles[idx]);
+                    const p = new Particle(x, 0, z, physicsConfig.mass);
+                    p.index = pIndex++;
+                    particles.push(p);
+                    gridMap[v][u] = p;
                 }
             }
-        }
 
-        // Initialize Structural Constraints (Springs)
-        for (let v = 0; v < SEGMENTS; v++) {
-            for (let u = 0; u < SEGMENTS; u++) {
-                constraints.push([particles[getParticleIndex(u, v)], particles[getParticleIndex(u, v + 1)], restDistance]);
-                constraints.push([particles[getParticleIndex(u, v)], particles[getParticleIndex(u + 1, v)], restDistance]);
+            // 3. Create Constraints (Springs)
+            for (let v = 0; v <= GRID_RES; v++) {
+                for (let u = 0; u <= GRID_RES; u++) {
+                    const p = gridMap[v][u];
+                    if (!p) continue;
+                    
+                    const right = u < GRID_RES ? gridMap[v][u + 1] : null;
+                    const bottom = v < GRID_RES ? gridMap[v + 1][u] : null;
+                    const br = (v < GRID_RES && u < GRID_RES) ? gridMap[v + 1][u + 1] : null;
+                    const bl = (v < GRID_RES && u > 0) ? gridMap[v + 1][u - 1] : null;
+
+                    if (right) constraints.push([p, right, cellDist]);
+                    if (bottom) constraints.push([p, bottom, cellDist]);
+                    if (br) constraints.push([p, br, cellDist * 1.414]);
+                    if (bl) constraints.push([p, bl, cellDist * 1.414]);
+                }
             }
-        }
-        // Right and Bottom edges
-        for (let u = 0; u < SEGMENTS; u++) {
-            constraints.push([particles[getParticleIndex(u, SEGMENTS)], particles[getParticleIndex(u + 1, SEGMENTS)], restDistance]);
-        }
-        for (let v = 0; v < SEGMENTS; v++) {
-            constraints.push([particles[getParticleIndex(SEGMENTS, v)], particles[getParticleIndex(SEGMENTS, v + 1)], restDistance]);
-        }
 
-        // --- 4. CLOTH VISUALS ---
-        const clothGeometry = new THREE.PlaneGeometry(DIMS, DIMS, SEGMENTS, SEGMENTS);
-        clothGeometry.rotateX(-Math.PI / 2);
-        
-        // Add vertex colors attribute
-        const colors = new Float32Array(particles.length * 3);
-        clothGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            // 4. Place Default Anchors (Square Corners)
+            createAnchor(gridMap[0][0]);
+            createAnchor(gridMap[0][GRID_RES]);
+            createAnchor(gridMap[GRID_RES][0]);
+            createAnchor(gridMap[GRID_RES][GRID_RES]);
 
-        const clothMaterial = new THREE.MeshStandardMaterial({
-            side: THREE.DoubleSide,
-            vertexColors: true,
-            roughness: 0.8,
-            metalness: 0.1,
-            wireframe: false
-        });
-        
-        const clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
-        scene.add(clothMesh);
+            // 5. Build Geometry indices for WebGL
+            const indices = [];
+            for (let v = 0; v < GRID_RES; v++) {
+                for (let u = 0; u < GRID_RES; u++) {
+                    const p00 = gridMap[v][u];
+                    const p10 = gridMap[v][u + 1];
+                    const p01 = gridMap[v + 1][u];
+                    const p11 = gridMap[v + 1][u + 1];
+                    
+                    indices.push(p00.index, p01.index, p10.index);
+                    indices.push(p10.index, p01.index, p11.index);
+                }
+            }
+
+            clothGeometry = new THREE.BufferGeometry();
+            clothGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(particles.length * 3), 3));
+            clothGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(particles.length * 3), 3));
+            clothGeometry.setIndex(indices);
+
+            const clothMaterial = new THREE.MeshStandardMaterial({
+                side: THREE.DoubleSide, vertexColors: true, roughness: 0.8, metalness: 0.1
+            });
+            clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
+            scene.add(clothMesh);
+
+            // 6. Build Truss Geometry (InstancedMesh untuk Ketebalan yang bisa diubah)
+            const trussMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff, roughness: 0.5, metalness: 0.3
+            });
+            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 5); // Segi-5 agar lebih efisien
+            
+            trussMesh = new THREE.InstancedMesh(cylinderGeo, trussMaterial, MAX_TRUSSES);
+            trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            if (trussMesh.instanceColor) trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+            scene.add(trussMesh);
+
+            // 7. Setup Visual Bantuan Gambar Interaktif
+            if (!tempDrawLine) {
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0xec4899, linewidth: 3, dashSize: 0.2, gapSize: 0.2 });
+                tempDrawLine = new THREE.Line(lineGeo, lineMat);
+                tempDrawLine.visible = false;
+                scene.add(tempDrawLine);
+            }
+
+            // Re-apply visibility setting from UI
+            const showSurface = document.getElementById('view-surface');
+            if(showSurface) clothMesh.visible = showSurface.checked;
+            
+            const showTruss = document.getElementById('view-truss');
+            if(showTruss) trussMesh.visible = showTruss.checked;
+        }
 
         // --- 5. WINDING GENERATOR ---
         let windingGroup = new THREE.Group();
         scene.add(windingGroup);
 
         const windingMaterial = new THREE.LineBasicMaterial({
-            color: 0x06b6d4, // Cyan
-            linewidth: 2,
-            transparent: true,
-            opacity: 0.9
+            color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9
         });
 
-        // Helper to get Y height on the cloth surface given X, Z
+        // Helper to get Y height dynamically from the square gridMap
         function getSurfaceY(x, z) {
-            // Map x, z to grid indices
-            let u = (x + DIMS/2) / DIMS * SEGMENTS;
-            let v = (z + DIMS/2) / DIMS * SEGMENTS;
+            let u = (x + EXT_DIMS / 2) / EXT_DIMS * GRID_RES;
+            let v = (z + EXT_DIMS / 2) / EXT_DIMS * GRID_RES;
             
-            // Clamp
-            u = Math.max(0, Math.min(SEGMENTS, u));
-            v = Math.max(0, Math.min(SEGMENTS, v));
-            
+            if(u < 0 || u > GRID_RES || v < 0 || v > GRID_RES) return null;
+
             const u0 = Math.floor(u), u1 = Math.ceil(u);
             const v0 = Math.floor(v), v1 = Math.ceil(v);
             
-            // Bilinear interpolation
+            const p00 = gridMap[v0][u0];
+            const p10 = gridMap[v0][u1] || p00;
+            const p01 = gridMap[v1] ? gridMap[v1][u0] : p00;
+            const p11 = gridMap[v1] ? (gridMap[v1][u1] || p01) : p10;
+            
             const mu = u - u0;
             const mv = v - v0;
-            
-            const p00 = particles[getParticleIndex(u0, v0)]?.position.y || 0;
-            const p10 = particles[getParticleIndex(u1, v0)]?.position.y || 0;
-            const p01 = particles[getParticleIndex(u0, v1)]?.position.y || 0;
-            const p11 = particles[getParticleIndex(u1, v1)]?.position.y || 0;
-            
-            const y0 = p00 * (1 - mu) + p10 * mu;
-            const y1 = p01 * (1 - mu) + p11 * mu;
-            
+            const y0 = p00.position.y * (1 - mu) + p10.position.y * mu;
+            const y1 = p01.position.y * (1 - mu) + p11.position.y * mu;
             return y0 * (1 - mv) + y1 * mv;
         }
 
         function generateWinding() {
-            // Clear old
-            while(windingGroup.children.length > 0){ 
-                windingGroup.remove(windingGroup.children[0]); 
-            }
+            while(windingGroup.children.length > 0) windingGroup.remove(windingGroup.children[0]); 
             if(!windingConfig.visible) return;
 
             const density = windingConfig.density;
@@ -411,7 +549,6 @@
             let minBendRadius = 9999;
             
             const createStrand = (points) => {
-                // Calculate minimum bend radius (simplified discrete curvature)
                 for(let i=1; i<points.length-1; i++) {
                     const v1 = new THREE.Vector3().subVectors(points[i], points[i-1]);
                     const v2 = new THREE.Vector3().subVectors(points[i+1], points[i]);
@@ -422,57 +559,57 @@
                         if(bendR < minBendRadius) minBendRadius = bendR;
                     }
                 }
-
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                const line = new THREE.Line(geometry, windingMaterial);
-                windingGroup.add(line);
+                windingGroup.add(new THREE.Line(geometry, windingMaterial));
             };
 
             const pointsPerLoop = 60;
             
             if (windingConfig.pattern === 'helical') {
-                const pts = [];
-                const totalLoops = density;
-                for(let i=0; i <= pointsPerLoop * totalLoops; i++) {
+                let pts = [];
+                for(let i=0; i <= pointsPerLoop * density; i++) {
                     const t = i / pointsPerLoop;
-                    const r = (t / totalLoops) * radius; // Spiral out
+                    const r = (t / density) * radius; 
                     const angle = t * Math.PI * 2;
                     const x = Math.cos(angle) * r;
                     const z = Math.sin(angle) * r;
-                    const y = getSurfaceY(x, z) + 0.05; // slightly above surface
-                    pts.push(new THREE.Vector3(x, y, z));
+                    const y = getSurfaceY(x, z);
+                    
+                    if (y !== null) {
+                        pts.push(new THREE.Vector3(x, y + 0.05, z));
+                    } else {
+                        // Break line if going out of bounds
+                        if(pts.length > 1) createStrand([...pts]);
+                        pts = [];
+                    }
                 }
-                createStrand(pts);
+                if(pts.length > 1) createStrand(pts);
             } 
             else if (windingConfig.pattern === 'cross') {
-                // Spiral 1
-                const pts1 = [];
-                for(let i=0; i <= pointsPerLoop * density; i++) {
-                    const t = i / pointsPerLoop;
-                    const r = (t / density) * radius;
-                    const angle = t * Math.PI * 2;
-                    const x = Math.cos(angle) * r;
-                    const z = Math.sin(angle) * r;
-                    pts1.push(new THREE.Vector3(x, getSurfaceY(x, z) + 0.05, z));
+                for(let dir of [1, -1]) {
+                    let pts = [];
+                    for(let i=0; i <= pointsPerLoop * density; i++) {
+                        const t = i / pointsPerLoop;
+                        const r = (t / density) * radius;
+                        const angle = dir * t * Math.PI * 2;
+                        const x = Math.cos(angle) * r;
+                        const z = Math.sin(angle) * r;
+                        const y = getSurfaceY(x, z);
+                        
+                        if (y !== null) {
+                            pts.push(new THREE.Vector3(x, y + 0.05 + (dir<0?0.02:0), z));
+                        } else {
+                            if(pts.length > 1) createStrand([...pts]);
+                            pts = [];
+                        }
+                    }
+                    if(pts.length > 1) createStrand(pts);
                 }
-                createStrand(pts1);
-                
-                // Spiral 2 (Reverse)
-                const pts2 = [];
-                for(let i=0; i <= pointsPerLoop * density; i++) {
-                    const t = i / pointsPerLoop;
-                    const r = (t / density) * radius;
-                    const angle = -t * Math.PI * 2; // reverse direction
-                    const x = Math.cos(angle) * r;
-                    const z = Math.sin(angle) * r;
-                    pts2.push(new THREE.Vector3(x, getSurfaceY(x, z) + 0.07, z)); // slightly higher to avoid z-fighting
-                }
-                createStrand(pts2);
             }
             else if (windingConfig.pattern === 'multi') {
                 const strands = 3;
                 for(let s=0; s<strands; s++) {
-                    const pts = [];
+                    let pts = [];
                     const rOffset = (s - 1) * offset;
                     for(let i=0; i <= pointsPerLoop * density; i++) {
                         const t = i / pointsPerLoop;
@@ -481,9 +618,16 @@
                         const angle = t * Math.PI * 2;
                         const x = Math.cos(angle) * r;
                         const z = Math.sin(angle) * r;
-                        pts.push(new THREE.Vector3(x, getSurfaceY(x, z) + 0.05, z));
+                        const y = getSurfaceY(x, z);
+                        
+                        if (y !== null) {
+                            pts.push(new THREE.Vector3(x, y + 0.05, z));
+                        } else {
+                            if(pts.length > 1) createStrand([...pts]);
+                            pts = [];
+                        }
                     }
-                    createStrand(pts);
+                    if(pts.length > 1) createStrand(pts);
                 }
             }
 
@@ -517,20 +661,26 @@
         let globalMaxStress = 0;
 
         function simulate() {
+            if (!clothGeometry) return; // Wait until geometry is ready
+
             // Apply forces
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
-                // Wind / Upward pull (Form-finding principle)
-                const windForce = new THREE.Vector3(0, physicsConfig.upwardForce, 0);
+                const netForce = new THREE.Vector3(0, 0, 0);
                 
-                // Add slight noise to simulate natural tension
-                windForce.x += (Math.random() - 0.5) * 0.1;
-                windForce.z += (Math.random() - 0.5) * 0.1;
+                // 1. Gaya tarik ke atas (Upward Force / Tekanan Form-finding)
+                netForce.y += physicsConfig.upwardForce;
                 
-                // Gravity pulling down slightly
-                windForce.y -= 0.5;
+                // 2. Sedikit noise untuk simulasi lingkungan natural
+                netForce.x += (Math.random() - 0.5) * 0.1;
+                netForce.z += (Math.random() - 0.5) * 0.1;
+                
+                // 3. Gaya Gravitasi SEBENARNYA (Tergantung pada Massa)
+                // F = m * g (Kita menggunakan g = 10 untuk skala visual yang pas)
+                const gravityConstant = 10.0;
+                netForce.y -= p.mass * gravityConstant;
 
-                p.addForce(windForce);
+                p.addForce(netForce);
                 p.integrate(sqTimeStep);
                 p.stress = 0; // Reset stress for recalculation
             }
@@ -573,9 +723,10 @@
 
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
-                positions[i * 3] = p.position.x;
-                positions[i * 3 + 1] = p.position.y;
-                positions[i * 3 + 2] = p.position.z;
+                const idx3 = p.index * 3;
+                positions[idx3] = p.position.x;
+                positions[idx3 + 1] = p.position.y;
+                positions[idx3 + 2] = p.position.z;
 
                 // Color mapping: White (neutral) -> Red (high tension)
                 if (useStressLines) {
@@ -584,19 +735,52 @@
                     // Map stress to color (white to red)
                     const tensionIntensity = Math.min(1, avgStress * 15); // Adjust multiplier for visual scale
                     
-                    colorAttr[i * 3] = 1.0; // R
-                    colorAttr[i * 3 + 1] = 1.0 - tensionIntensity; // G goes down as tension goes up
-                    colorAttr[i * 3 + 2] = 1.0 - tensionIntensity; // B goes down as tension goes up
+                    colorAttr[idx3] = 1.0; // R
+                    colorAttr[idx3 + 1] = 1.0 - tensionIntensity; // G goes down as tension goes up
+                    colorAttr[idx3 + 2] = 1.0 - tensionIntensity; // B goes down as tension goes up
                 } else {
-                    colorAttr[i * 3] = 0.9;
-                    colorAttr[i * 3 + 1] = 0.9;
-                    colorAttr[i * 3 + 2] = 0.9;
+                    colorAttr[idx3] = 0.9;
+                    colorAttr[idx3 + 1] = 0.9;
+                    colorAttr[idx3 + 2] = 0.9;
+                }
+                
+                // Sinkronisasi posisi bola pemberat jika ada
+                if (p.hasExtraMass && p.massMesh) {
+                    p.massMesh.position.copy(p.position);
                 }
             }
 
             clothGeometry.attributes.position.needsUpdate = true;
             clothGeometry.attributes.color.needsUpdate = true;
             clothGeometry.computeVertexNormals();
+
+            // UPDATE TRUSS VISUALS (InstancedMesh)
+            if (trussMesh && trussMesh.visible) {
+                trussMesh.count = constraints.length; // Hanya render sebanyak constraint yang aktif
+                for (let j = 0; j < constraints.length; j++) {
+                    const [p1, p2, restDist] = constraints[j];
+                    const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
+                    const currentDist = diff.length();
+                    
+                    if (currentDist === 0) continue;
+
+                    // Posisikan silinder di tengah, sejajarkan, dan scale berdasarkan panjang & slider ketebalan
+                    const mid = new THREE.Vector3().addVectors(p1.position, p2.position).multiplyScalar(0.5);
+                    dummyObj.position.copy(mid);
+                    dummyObj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), diff.clone().normalize());
+                    dummyObj.scale.set(trussConfig.thickness, currentDist, trussConfig.thickness);
+                    dummyObj.updateMatrix();
+                    trussMesh.setMatrixAt(j, dummyObj.matrix);
+                    
+                    // Stress color mapping for truss
+                    const strain = Math.abs(currentDist - restDist) / restDist;
+                    const tensionIntensity = Math.min(1, strain * 15);
+                    dummyColor.setRGB(1.0, 1.0 - tensionIntensity, 1.0 - tensionIntensity);
+                    trussMesh.setColorAt(j, dummyColor);
+                }
+                trussMesh.instanceMatrix.needsUpdate = true;
+                if (trussMesh.instanceColor) trussMesh.instanceColor.needsUpdate = true;
+            }
 
             // Update UI Stress Evaluation
             const displayStress = (globalMaxStress * 100).toFixed(2);
@@ -636,7 +820,29 @@
 
         bindSlider('ctrl-force', 'upwardForce', physicsConfig, 'val-force');
         bindSlider('ctrl-stiffness', 'stiffness', physicsConfig, 'val-stiffness');
-        
+        bindSlider('ctrl-truss-size', 'thickness', trussConfig, 'val-truss-size');
+
+        document.getElementById('ctrl-mode').addEventListener('change', (e) => {
+            interactionMode = e.target.value;
+            // Reset interaksi aktif
+            drawStartParticle = null;
+            if (tempDrawLine) tempDrawLine.visible = false;
+        });
+
+        // Binding untuk beban massa dinamis
+        document.getElementById('ctrl-extramass').addEventListener('input', (e) => {
+            extraMassValue = parseFloat(e.target.value);
+            document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
+            
+            // Perbarui massa secara live pada partikel yang sudah diberi pemberat
+            particles.forEach(p => {
+                if (p.hasExtraMass) {
+                    p.mass = physicsConfig.mass + extraMassValue;
+                    p.invMass = 1 / p.mass;
+                }
+            });
+        });
+
         document.getElementById('ctrl-density').addEventListener('input', (e) => {
             windingConfig.density = parseInt(e.target.value);
             document.getElementById('val-density').innerText = windingConfig.density;
@@ -651,7 +857,10 @@
         });
 
         document.getElementById('view-surface').addEventListener('change', (e) => {
-            clothMesh.visible = e.target.checked;
+            if (clothMesh) clothMesh.visible = e.target.checked;
+        });
+        document.getElementById('view-truss').addEventListener('change', (e) => {
+            if (trussMesh) trussMesh.visible = e.target.checked;
         });
         // view-stress handled in simulation loop
         document.getElementById('view-winding').addEventListener('change', (e) => {
@@ -660,6 +869,7 @@
 
         // START
         window.onload = () => {
+            initSimulation(); // Mulai dengan grid segi empat
             animate();
         };
 
@@ -669,11 +879,69 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         }
 
+        // Helper untuk mencari node (particle) terdekat
+        function getClosestParticle(hitPoint, maxDist = 1.5) {
+            let closest = null;
+            let minDist = maxDist;
+            for (let i = 0; i < particles.length; i++) {
+                const d = particles[i].position.distanceTo(hitPoint);
+                if (d < minDist) { 
+                    minDist = d; 
+                    closest = particles[i]; 
+                }
+            }
+            return closest;
+        }
+
         renderer.domElement.addEventListener('pointerdown', (event) => {
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
-            // Cek apakah user menekan/klik pada sebuah anchor
+            // Cek jika menahan tombol Shift untuk Mode Multi-Masa
+            if (event.shiftKey && interactionMode === 'drag') {
+                if (clothMesh) {
+                    const clothIntersects = raycaster.intersectObject(clothMesh);
+                    if (clothIntersects.length > 0) {
+                        const closestParticle = getClosestParticle(clothIntersects[0].point);
+                        if (closestParticle) toggleMass(closestParticle);
+                    }
+                }
+                return; // Batalkan aksi lain agar kamera/anchor tidak bereaksi
+            }
+
+            // MODE GAMBAR TRUSS
+            if (interactionMode === 'draw') {
+                if (clothMesh) {
+                    const intersects = raycaster.intersectObject(clothMesh);
+                    if (intersects.length > 0) {
+                        const hitPoint = intersects[0].point;
+                        drawStartParticle = getClosestParticle(hitPoint);
+                        if (drawStartParticle) {
+                            controls.enabled = false; // Disable orbit rotasi saat menggambar
+                            tempDrawLine.visible = true;
+                            
+                            // Set titik awal garis sementara
+                            const positions = tempDrawLine.geometry.attributes.position.array;
+                            positions[0] = drawStartParticle.position.x;
+                            positions[1] = drawStartParticle.position.y;
+                            positions[2] = drawStartParticle.position.z;
+                            positions[3] = hitPoint.x;
+                            positions[4] = hitPoint.y;
+                            positions[5] = hitPoint.z;
+                            tempDrawLine.geometry.attributes.position.needsUpdate = true;
+                            
+                            // Setup Drag Plane untuk sumbu pergerakan mouse di ruang 3D
+                            dragPlane.setFromNormalAndCoplanarPoint(
+                                camera.getWorldDirection(new THREE.Vector3()).negate(),
+                                drawStartParticle.position
+                            );
+                        }
+                    }
+                }
+                return;
+            }
+
+            // MODE DRAG ANCHOR
             const intersects = raycaster.intersectObjects(anchorMeshes);
             if (intersects.length > 0) {
                 controls.enabled = false; // Matikan rotasi kamera agar fokus drag
@@ -688,7 +956,21 @@
         });
 
         renderer.domElement.addEventListener('pointermove', (event) => {
-            if (draggedParticle) {
+            if (interactionMode === 'draw' && drawStartParticle) {
+                updateMouse(event);
+                raycaster.setFromCamera(mouse, camera);
+                raycaster.ray.intersectPlane(dragPlane, intersectPoint);
+                
+                // Update ujung garis sementara mengikuti pergerakan pointer
+                const positions = tempDrawLine.geometry.attributes.position.array;
+                positions[3] = intersectPoint.x;
+                positions[4] = intersectPoint.y;
+                positions[5] = intersectPoint.z;
+                tempDrawLine.geometry.attributes.position.needsUpdate = true;
+                return;
+            }
+
+            if (draggedParticle && interactionMode === 'drag') {
                 updateMouse(event);
                 raycaster.setFromCamera(mouse, camera);
                 raycaster.ray.intersectPlane(dragPlane, intersectPoint);
@@ -700,12 +982,35 @@
             }
         });
 
-        renderer.domElement.addEventListener('pointerup', () => {
+        renderer.domElement.addEventListener('pointerup', (event) => {
+            if (interactionMode === 'draw' && drawStartParticle) {
+                updateMouse(event);
+                raycaster.setFromCamera(mouse, camera);
+                raycaster.ray.intersectPlane(dragPlane, intersectPoint);
+                
+                // Cari partikel terdekat dari titik di mana mouse dilepas
+                const drawEndParticle = getClosestParticle(intersectPoint, 2.5);
+                
+                // Jika titik target valid dan berbeda dari asal, buat koneksi (Truss Baru)
+                if (drawEndParticle && drawEndParticle !== drawStartParticle) {
+                    const dist = drawStartParticle.position.distanceTo(drawEndParticle.position);
+                    constraints.push([drawStartParticle, drawEndParticle, dist]);
+                }
+                
+                // Reset state
+                drawStartParticle = null;
+                tempDrawLine.visible = false;
+                controls.enabled = true; // Nyalakan kembali rotasi Orbit
+                return;
+            }
+
             draggedParticle = null;
             controls.enabled = true; // Nyalakan kembali rotasi Orbit
         });
 
         renderer.domElement.addEventListener('dblclick', (event) => {
+            if (interactionMode === 'draw') return; // Matikan double-click (tambah anchor) di mode gambar
+            
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
@@ -717,23 +1022,13 @@
             }
 
             // 2. Jika double click di permukaan kain -> Tambah anchor baru di titik terdekat
-            const clothIntersects = raycaster.intersectObject(clothMesh);
-            if (clothIntersects.length > 0) {
-                const hitPoint = clothIntersects[0].point;
-                let closestParticle = null;
-                let minDist = Infinity;
-                
-                // Cari partikel grid terdekat dari titik klik (Vertex Snapping)
-                for (let i = 0; i < particles.length; i++) {
-                    const dist = particles[i].position.distanceTo(hitPoint);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closestParticle = particles[i];
+            if (clothMesh) {
+                const clothIntersects = raycaster.intersectObject(clothMesh);
+                if (clothIntersects.length > 0) {
+                    const closestParticle = getClosestParticle(clothIntersects[0].point);
+                    if (closestParticle) {
+                        createAnchor(closestParticle);
                     }
-                }
-
-                if (closestParticle) {
-                    createAnchor(closestParticle);
                 }
             }
         });
