@@ -42,7 +42,7 @@
         <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto">
             <div class="p-5 border-b border-slate-700/50">
                 <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-300">Tensomatter</h1>
-                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh K. Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
@@ -87,34 +87,41 @@
                     </div>
                 </div>
 
-                <!-- Section: Winding Generator -->
+                <!-- Section: Weaving Generator -->
                 <div>
                     <h2 class="text-sm font-semibold text-teal-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Generator Pola Winding
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        Generator Pola Weaving
                     </h2>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs mb-1">Tipe Pola</label>
+                            <label class="block text-xs mb-1">Desain Anyaman & Winding</label>
                             <select id="ctrl-pattern" class="w-full bg-slate-800 border border-slate-600 rounded text-sm p-1.5 focus:ring-blue-500 focus:border-blue-500 text-white">
-                                <option value="helical">Helical (Spiral)</option>
-                                <option value="cross">Cross-Winding (X)</option>
-                                <option value="multi">Multi-Strand Parallel</option>
+                                <optgroup label="Tekstil Tradisional">
+                                    <option value="plain">Plain Weave (Anyaman Dasar 1/1)</option>
+                                    <option value="twill">Twill Weave (Anyaman Kepar 2/1)</option>
+                                    <option value="basket">Basket Weave (Anyaman Keranjang 2x2)</option>
+                                    <option value="satin">Satin Weave (Anyaman Satin 4/1)</option>
+                                </optgroup>
+                                <optgroup label="Biomimetik (Achim Menges Style)">
+                                    <option value="menges_coreless">Coreless Winding (Geometri Elytra)</option>
+                                    <option value="menges_swarm">Agent-Based Swarm (Berbasis Stress)</option>
+                                </optgroup>
                             </select>
                         </div>
                         <div>
                             <div class="flex justify-between text-xs mb-1">
-                                <span>Kepadatan (Density)</span>
-                                <span id="val-density">15</span>
+                                <span>Kepadatan Benang / Agen</span>
+                                <span id="val-density">20</span>
                             </div>
-                            <input type="range" id="ctrl-density" min="5" max="40" step="1" value="15" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-density" min="5" max="50" step="1" value="20" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-xs mb-1">
-                                <span>Jarak Antar Serat (Offset)</span>
-                                <span id="val-offset">0.2</span>
+                                <span>Amplitudo Gelombang (Offset)</span>
+                                <span id="val-offset">0.1</span>
                             </div>
-                            <input type="range" id="ctrl-offset" min="0.05" max="0.5" step="0.05" value="0.2" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-offset" min="0.02" max="0.3" step="0.02" value="0.1" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
@@ -160,8 +167,8 @@
                             <span>Peta Warna Tegangan (Stress Lines)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-winding" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
-                            <span>Tampilkan Pola Winding</span>
+                            <input type="checkbox" id="view-weaving" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
+                            <span>Tampilkan Pola Weaving</span>
                         </label>
                     </div>
                     <!-- Added interaction hint -->
@@ -196,17 +203,17 @@
 
                     <!-- Min Radius -->
                     <div>
-                        <span class="text-xs text-slate-400 block mb-1">Radius Belokan Minimum Winding</span>
+                        <span class="text-xs text-slate-400 block mb-1">Radius Belokan Minimum Weaving</span>
                         <div class="flex items-end gap-2">
                             <span id="eval-radius" class="text-2xl font-bold text-white">0.0</span>
                             <span class="text-xs text-slate-400 pb-1">mm</span>
                         </div>
-                        <p id="msg-radius" class="text-[10px] mt-1 text-red-400 hidden">Peringatan: Radius terlalu tajam untuk fabrikasi!</p>
+                        <p id="msg-radius" class="text-[10px] mt-1 text-red-400 hidden">Peringatan: Radius benang terlalu tajam!</p>
                     </div>
 
                     <!-- Integration Readiness -->
                     <div class="pt-2 border-t border-slate-700">
-                        <span class="text-xs text-slate-400 block mb-1">Kesiapan Coreless Winding</span>
+                        <span class="text-xs text-slate-400 block mb-1">Kesiapan Analisis Anyaman</span>
                         <div class="flex items-center gap-2 mt-1">
                             <div id="status-dot" class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
                             <span id="eval-status" class="text-sm font-semibold text-green-400">Siap Fabrikasi</span>
@@ -341,10 +348,10 @@
             damping: 0.95
         };
 
-        let windingConfig = {
-            pattern: 'helical',
-            density: 15,
-            offset: 0.2,
+        let weavingConfig = {
+            pattern: 'plain',
+            density: 20,
+            offset: 0.1,
             visible: true
         };
 
@@ -427,6 +434,8 @@
                     
                     const p = new Particle(x, 0, z, physicsConfig.mass);
                     p.index = pIndex++;
+                    p.u = u; // Tambahan untuk mempermudah deteksi koordinat agen Swarm
+                    p.v = v;
                     particles.push(p);
                     gridMap[v][u] = p;
                 }
@@ -509,46 +518,60 @@
             if(showTruss) trussMesh.visible = showTruss.checked;
         }
 
-        // --- 5. WINDING GENERATOR ---
-        let windingGroup = new THREE.Group();
-        scene.add(windingGroup);
+        // --- 5. WEAVING GENERATOR (ANYAMAN PARAMETRIK) ---
+        let weavingGroup = new THREE.Group();
+        scene.add(weavingGroup);
 
-        const windingMaterial = new THREE.LineBasicMaterial({
-            color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9
+        const warpMaterial = new THREE.LineBasicMaterial({
+            color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9 // Cyan untuk Lungsin
+        });
+        const weftMaterial = new THREE.LineBasicMaterial({
+            color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.9 // Pink untuk Pakan
         });
 
-        // Helper to get Y height dynamically from the square gridMap
-        function getSurfaceY(x, z) {
-            let u = (x + EXT_DIMS / 2) / EXT_DIMS * GRID_RES;
-            let v = (z + EXT_DIMS / 2) / EXT_DIMS * GRID_RES;
-            
-            if(u < 0 || u > GRID_RES || v < 0 || v > GRID_RES) return null;
+        // Helper untuk mengekstrak titik dan normal dari permukaan Grid
+        function getSurfacePointAndNormal(u_float, v_float) {
+            u_float = Math.max(0, Math.min(GRID_RES, u_float));
+            v_float = Math.max(0, Math.min(GRID_RES, v_float));
 
-            const u0 = Math.floor(u), u1 = Math.ceil(u);
-            const v0 = Math.floor(v), v1 = Math.ceil(v);
+            const u0 = Math.floor(u_float);
+            const u1 = Math.min(GRID_RES, u0 + 1);
+            const v0 = Math.floor(v_float);
+            const v1 = Math.min(GRID_RES, v0 + 1);
+
+            const mu = u_float - u0;
+            const mv = v_float - v0;
+
+            const p00 = gridMap[v0][u0].position;
+            const p10 = gridMap[v0][u1].position;
+            const p01 = gridMap[v1][u0].position;
+            const p11 = gridMap[v1][u1].position;
+
+            // Interpolasi Bilinear untuk Titik Posisi
+            const p0 = new THREE.Vector3().lerpVectors(p00, p10, mu);
+            const p1 = new THREE.Vector3().lerpVectors(p01, p11, mu);
+            const pos = new THREE.Vector3().lerpVectors(p0, p1, mv);
             
-            const p00 = gridMap[v0][u0];
-            const p10 = gridMap[v0][u1] || p00;
-            const p01 = gridMap[v1] ? gridMap[v1][u0] : p00;
-            const p11 = gridMap[v1] ? (gridMap[v1][u1] || p01) : p10;
-            
-            const mu = u - u0;
-            const mv = v - v0;
-            const y0 = p00.position.y * (1 - mu) + p10.position.y * mu;
-            const y1 = p01.position.y * (1 - mu) + p11.position.y * mu;
-            return y0 * (1 - mv) + y1 * mv;
+            // Perkiraan Vektor Normal (Arah atas permukaan)
+            const vu = new THREE.Vector3().subVectors(p10, p00);
+            const vv = new THREE.Vector3().subVectors(p01, p00);
+            let norm = new THREE.Vector3().crossVectors(vv, vu).normalize();
+            if (norm.y < 0) norm.negate();
+            if (norm.lengthSq() === 0) norm.set(0, 1, 0);
+
+            return { pos, norm };
         }
 
-        function generateWinding() {
-            while(windingGroup.children.length > 0) windingGroup.remove(windingGroup.children[0]); 
-            if(!windingConfig.visible) return;
+        function generateWeaving() {
+            while(weavingGroup.children.length > 0) weavingGroup.remove(weavingGroup.children[0]); 
+            if(!weavingConfig.visible) return;
 
-            const density = windingConfig.density;
-            const offset = windingConfig.offset;
-            const radius = DIMS / 2.2;
+            const N = weavingConfig.density;
+            const offset = weavingConfig.offset;
+            const pattern = weavingConfig.pattern;
             let minBendRadius = 9999;
             
-            const createStrand = (points) => {
+            const createStrand = (points, isWarp) => {
                 for(let i=1; i<points.length-1; i++) {
                     const v1 = new THREE.Vector3().subVectors(points[i], points[i-1]);
                     const v2 = new THREE.Vector3().subVectors(points[i+1], points[i]);
@@ -560,112 +583,149 @@
                     }
                 }
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                windingGroup.add(new THREE.Line(geometry, windingMaterial));
+                weavingGroup.add(new THREE.Line(geometry, isWarp ? warpMaterial : weftMaterial));
             };
 
-            const pointsPerLoop = 60;
-            
-            if (windingConfig.pattern === 'helical') {
-                let pts = [];
-                for(let i=0; i <= pointsPerLoop * density; i++) {
-                    const t = i / pointsPerLoop;
-                    const r = (t / density) * radius; 
-                    const angle = t * Math.PI * 2;
-                    const x = Math.cos(angle) * r;
-                    const z = Math.sin(angle) * r;
-                    const y = getSurfaceY(x, z);
-                    
-                    if (y !== null) {
-                        pts.push(new THREE.Vector3(x, y + 0.05, z));
-                    } else {
-                        // Break line if going out of bounds
-                        if(pts.length > 1) createStrand([...pts]);
-                        pts = [];
-                    }
-                }
-                if(pts.length > 1) createStrand(pts);
-            } 
-            else if (windingConfig.pattern === 'cross') {
-                for(let dir of [1, -1]) {
-                    let pts = [];
-                    for(let i=0; i <= pointsPerLoop * density; i++) {
-                        const t = i / pointsPerLoop;
-                        const r = (t / density) * radius;
-                        const angle = dir * t * Math.PI * 2;
-                        const x = Math.cos(angle) * r;
-                        const z = Math.sin(angle) * r;
-                        const y = getSurfaceY(x, z);
-                        
-                        if (y !== null) {
-                            pts.push(new THREE.Vector3(x, y + 0.05 + (dir<0?0.02:0), z));
-                        } else {
-                            if(pts.length > 1) createStrand([...pts]);
-                            pts = [];
-                        }
-                    }
-                    if(pts.length > 1) createStrand(pts);
-                }
-            }
-            else if (windingConfig.pattern === 'multi') {
-                const strands = 3;
-                for(let s=0; s<strands; s++) {
-                    let pts = [];
-                    const rOffset = (s - 1) * offset;
-                    for(let i=0; i <= pointsPerLoop * density; i++) {
-                        const t = i / pointsPerLoop;
-                        const r = (t / density) * radius + rOffset;
-                        if (r < 0 || r > radius) continue;
-                        const angle = t * Math.PI * 2;
-                        const x = Math.cos(angle) * r;
-                        const z = Math.sin(angle) * r;
-                        const y = getSurfaceY(x, z);
-                        
-                        if (y !== null) {
-                            pts.push(new THREE.Vector3(x, y + 0.05, z));
-                        } else {
-                            if(pts.length > 1) createStrand([...pts]);
-                            pts = [];
-                        }
-                    }
-                    if(pts.length > 1) createStrand(pts);
-                }
-            }
+            // Menentukan arah simpangan (over/under)
+            const getWeaveState = (type, i, j) => {
+                if (type === 'plain') return (i + j) % 2 === 0 ? 1 : -1;
+                if (type === 'twill') return (((j - i) % 3 + 3) % 3) < 2 ? 1 : -1;
+                if (type === 'basket') return (Math.floor(i/2) + Math.floor(j/2)) % 2 === 0 ? 1 : -1;
+                if (type === 'satin') return (((j - 2*i) % 5 + 5) % 5) === 0 ? -1 : 1;
+                return 1;
+            };
 
-            // Update UI Evaluation
-            if(minBendRadius !== 9999) {
-                // Convert to mm roughly for display scale (assuming scene is meters)
-                const displayRadius = (minBendRadius * 100).toFixed(1);
-                document.getElementById('eval-radius').innerText = displayRadius;
+            const resolution = 4; // Detail sampel kurva antar persilangan
+            const steps = N * resolution;
+
+            if (pattern === 'menges_coreless') {
+                // ALGORITMA CORELESS FILAMENT WINDING (MENGES ICD/ITKE)
+                // Melilitkan serat (filament) secara sekuensial antar titik tepi untuk membentuk struktur hibrid (seperti Elytra)
+                const numEdgePts = GRID_RES * 4;
+                const getEdgeUV = (index) => {
+                    let i = index % numEdgePts;
+                    if (i < GRID_RES) return {u: i, v: 0};
+                    if (i < GRID_RES*2) return {u: GRID_RES, v: i - GRID_RES};
+                    if (i < GRID_RES*3) return {u: GRID_RES - (i - GRID_RES*2), v: GRID_RES};
+                    return {u: 0, v: GRID_RES - (i - GRID_RES*3)};
+                };
                 
-                const msgRad = document.getElementById('msg-radius');
-                const evalStatus = document.getElementById('eval-status');
-                const statusDot = document.getElementById('status-dot');
-
-                if (displayRadius < 15.0) { // arbitrary threshold for warning
-                    msgRad.classList.remove('hidden');
-                    evalStatus.innerText = 'Risiko Fabrikasi Tinggi';
-                    evalStatus.className = 'text-sm font-semibold text-red-400';
-                    statusDot.className = 'w-3 h-3 rounded-full bg-red-500 animate-pulse';
-                } else {
-                    msgRad.classList.add('hidden');
-                    evalStatus.innerText = 'Siap Fabrikasi (Coreless)';
-                    evalStatus.className = 'text-sm font-semibold text-green-400';
-                    statusDot.className = 'w-3 h-3 rounded-full bg-green-500 animate-pulse';
+                let strandPts1 = [];
+                let strandPts2 = [];
+                // Loncatan 'golden angle' agar lilitan membentuk bintang berongga (cassette winding)
+                let jump = Math.floor(numEdgePts * 0.37); 
+                let currIdx = 0;
+                
+                for(let i = 0; i < N * 4; i++) {
+                    let uv1 = getEdgeUV(currIdx);
+                    let uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
+                    
+                    // Tarik serat menempel pada form-finding (drape over the cloth)
+                    for(let s = 0; s <= 20; s++) {
+                        let t = s/20;
+                        let u = uv1.u + (uv2.u - uv1.u)*t;
+                        let v = uv1.v + (uv2.v - uv1.v)*t;
+                        let {pos, norm} = getSurfacePointAndNormal(u, v);
+                        // Offset berbeda untuk layer 1 (Lungsin) dan 2 (Pakan)
+                        strandPts1.push(pos.clone().add(norm.multiplyScalar(0.08)));
+                        strandPts2.push(pos.clone().add(norm.multiplyScalar(0.12)));
+                    }
+                    currIdx = (currIdx + jump) % numEdgePts;
                 }
+                createStrand(strandPts1, true); // Layer Filament Utama (Cyan)
+                createStrand(strandPts2, false); // Layer Filament Sekunder (Pink)
+
+            } else if (pattern === 'menges_swarm') {
+                // ALGORITMA AGENT-BASED / SWARM INTELLIGENCE (MENGES ICD)
+                // Agen (seperti laba-laba virtual) mendeteksi area bertegangan (stress) tinggi dan menumpuk serat di sana.
+                for(let ag = 0; ag < N; ag++) {
+                    let strandPts = [];
+                    // Mulai dari titik tepi secara acak
+                    let u = Math.floor(Math.random() * GRID_RES);
+                    let v = (ag % 2 === 0) ? 0 : GRID_RES; 
+                    
+                    for(let step = 0; step < 60; step++) {
+                        let {pos, norm} = getSurfacePointAndNormal(u, v);
+                        strandPts.push(pos.clone().add(norm.multiplyScalar(0.06 + Math.random()*0.03)));
+                        
+                        // Cari tetangga dengan tegangan/stress tertinggi + noise untuk eksplorasi organik
+                        let bestU = u, bestV = v;
+                        let maxScore = -999;
+                        for(let du = -4; du <= 4; du++) {
+                            for(let dv = -4; dv <= 4; dv++) {
+                                let nu = u + du, nv = v + dv;
+                                if(nu >= 0 && nu <= GRID_RES && nv >= 0 && nv <= GRID_RES) {
+                                    let nodeStress = gridMap[nv][nu].stress;
+                                    // Skor = Stress Kain + Faktor Acak
+                                    let score = (nodeStress * 200) + (Math.random() * 5);
+                                    if(du === 0 && dv === 0) score -= 100; // Hukuman jika berdiam diri
+                                    
+                                    if(score > maxScore) {
+                                        maxScore = score;
+                                        bestU = nu; bestV = nv;
+                                    }
+                                }
+                            }
+                        }
+                        u = bestU; v = bestV;
+                    }
+                    createStrand(strandPts, ag % 2 === 0);
+                }
+
+            } else {
+                // 1. Generate Warp Threads (Benang Lungsin) - u konstan, v bergerak
+                for (let wt = 0; wt <= N; wt++) {
+                    const strandPts = [];
+                    const u_base = (wt / N) * GRID_RES;
+                    for (let s = 0; s <= steps; s++) {
+                        const v_base = (s / steps) * GRID_RES;
+                        const { pos, norm } = getSurfacePointAndNormal(u_base, v_base);
+                        const state = getWeaveState(pattern, wt, Math.floor(v_base / (GRID_RES / N)));
+                        strandPts.push(pos.clone().add(norm.multiplyScalar(offset * state)));
+                    }
+                    createStrand(strandPts, true);
+                }
+
+                // 2. Generate Weft Threads (Benang Pakan) - v konstan, u bergerak
+                for (let wt = 0; wt <= N; wt++) {
+                    const strandPts = [];
+                    const v_base = (wt / N) * GRID_RES;
+                    for (let s = 0; s <= steps; s++) {
+                        const u_base = (s / steps) * GRID_RES;
+                        const { pos, norm } = getSurfacePointAndNormal(u_base, v_base);
+                        const state = getWeaveState(pattern, Math.floor(u_base / (GRID_RES / N)), wt);
+                        strandPts.push(pos.clone().add(norm.multiplyScalar(-offset * state)));
+                    }
+                    createStrand(strandPts, false);
+                }
+            }
+
+            // Update Evaluasi Teknis Weaving
+            document.getElementById('eval-radius').innerText = minBendRadius === 9999 ? "0.0" : minBendRadius.toFixed(1);
+            if (minBendRadius < 0.2) {
+                document.getElementById('msg-radius').classList.remove('hidden');
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-red-500 animate-pulse";
+                document.getElementById('eval-status').innerText = "Resiko Patah";
+                document.getElementById('eval-status').className = "text-sm font-semibold text-red-400";
+            } else {
+                document.getElementById('msg-radius').classList.add('hidden');
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-green-500 animate-pulse";
+                document.getElementById('eval-status').innerText = "Siap Fabrikasi";
+                document.getElementById('eval-status').className = "text-sm font-semibold text-green-400";
             }
         }
 
-        // --- 6. SIMULATION LOOP ---
-        const TIMESTEP = 18 / 1000;
-        const sqTimeStep = TIMESTEP * TIMESTEP;
         let globalMaxStress = 0;
 
         function simulate() {
-            if (!clothGeometry) return; // Wait until geometry is ready
-
-            // Apply forces
+            const timeStep = 0.015;
+            const sqTimeStep = timeStep * timeStep;
+            
+            // 1. Calculate Forces
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
+                if (p.pinned) continue;
+
                 const netForce = new THREE.Vector3(0, 0, 0);
                 
                 // 1. Gaya tarik ke atas (Upward Force / Tekanan Form-finding)
@@ -793,9 +853,9 @@
             controls.update();
             simulate();
             
-            // Only update winding occasionally to save performance, or if parameters change.
+            // Only update occasionally to save performance, or if parameters change.
             // For real-time adherence to cloth, we update it every frame.
-            generateWinding();
+            generateWeaving();
             
             renderer.render(scene, camera);
         }
@@ -844,16 +904,16 @@
         });
 
         document.getElementById('ctrl-density').addEventListener('input', (e) => {
-            windingConfig.density = parseInt(e.target.value);
-            document.getElementById('val-density').innerText = windingConfig.density;
+            weavingConfig.density = parseInt(e.target.value);
+            document.getElementById('val-density').innerText = weavingConfig.density;
         });
         document.getElementById('ctrl-offset').addEventListener('input', (e) => {
-            windingConfig.offset = parseFloat(e.target.value);
-            document.getElementById('val-offset').innerText = windingConfig.offset.toFixed(2);
+            weavingConfig.offset = parseFloat(e.target.value);
+            document.getElementById('val-offset').innerText = weavingConfig.offset.toFixed(2);
         });
 
         document.getElementById('ctrl-pattern').addEventListener('change', (e) => {
-            windingConfig.pattern = e.target.value;
+            weavingConfig.pattern = e.target.value;
         });
 
         document.getElementById('view-surface').addEventListener('change', (e) => {
@@ -863,8 +923,8 @@
             if (trussMesh) trussMesh.visible = e.target.checked;
         });
         // view-stress handled in simulation loop
-        document.getElementById('view-winding').addEventListener('change', (e) => {
-            windingConfig.visible = e.target.checked;
+        document.getElementById('view-weaving').addEventListener('change', (e) => {
+            weavingConfig.visible = e.target.checked;
         });
 
         // START
