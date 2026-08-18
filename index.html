@@ -180,6 +180,29 @@
                         <p><strong class="text-pink-300">Mode Gambar:</strong> Tarik garis antar titik untuk buat jaring baru.</p>
                     </div>
                 </div>
+
+                <!-- Section: Export & Capture -->
+                <div>
+                    <h2 class="text-sm font-semibold text-emerald-300 uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Ekspor & Tangkap Gambar
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button id="btn-export-obj" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Export OBJ
+                        </button>
+                        <button id="btn-export-stl" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Export STL
+                        </button>
+                    </div>
+                    <button id="btn-screenshot" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1.5 shadow-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Screenshot Fullscreen (.PNG)
+                    </button>
+                    <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">* File <strong>.OBJ</strong> dapat langsung di-import ke Rhino 3D (disimpan sebagai .3dm), Grasshopper, Blender, maupun CAD/CAM.</p>
+                </div>
             </div>
         </div>
 
@@ -238,6 +261,8 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <script>
         // --- 1. SETUP THREE.JS SCENE ---
@@ -248,7 +273,8 @@
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 15, 25);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // preserveDrawingBuffer: true enables high quality screenshot capturing
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
@@ -600,7 +626,6 @@
 
             if (pattern === 'menges_coreless') {
                 // ALGORITMA CORELESS FILAMENT WINDING (MENGES ICD/ITKE)
-                // Melilitkan serat (filament) secara sekuensial antar titik tepi untuk membentuk struktur hibrid (seperti Elytra)
                 const numEdgePts = GRID_RES * 4;
                 const getEdgeUV = (index) => {
                     let i = index % numEdgePts;
@@ -612,7 +637,6 @@
                 
                 let strandPts1 = [];
                 let strandPts2 = [];
-                // Loncatan 'golden angle' agar lilitan membentuk bintang berongga (cassette winding)
                 let jump = Math.floor(numEdgePts * 0.37); 
                 let currIdx = 0;
                 
@@ -620,27 +644,23 @@
                     let uv1 = getEdgeUV(currIdx);
                     let uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
                     
-                    // Tarik serat menempel pada form-finding (drape over the cloth)
                     for(let s = 0; s <= 20; s++) {
                         let t = s/20;
                         let u = uv1.u + (uv2.u - uv1.u)*t;
                         let v = uv1.v + (uv2.v - uv1.v)*t;
                         let {pos, norm} = getSurfacePointAndNormal(u, v);
-                        // Offset berbeda untuk layer 1 (Lungsin) dan 2 (Pakan)
                         strandPts1.push(pos.clone().add(norm.multiplyScalar(0.08)));
                         strandPts2.push(pos.clone().add(norm.multiplyScalar(0.12)));
                     }
                     currIdx = (currIdx + jump) % numEdgePts;
                 }
-                createStrand(strandPts1, true); // Layer Filament Utama (Cyan)
-                createStrand(strandPts2, false); // Layer Filament Sekunder (Pink)
+                createStrand(strandPts1, true); 
+                createStrand(strandPts2, false); 
 
             } else if (pattern === 'menges_swarm') {
-                // ALGORITMA AGENT-BASED / SWARM INTELLIGENCE (MENGES ICD)
-                // Agen (seperti laba-laba virtual) mendeteksi area bertegangan (stress) tinggi dan menumpuk serat di sana.
+                // ALGORITMA AGENT-BASED / SWARM INTELLIGENCE
                 for(let ag = 0; ag < N; ag++) {
                     let strandPts = [];
-                    // Mulai dari titik tepi secara acak
                     let u = Math.floor(Math.random() * GRID_RES);
                     let v = (ag % 2 === 0) ? 0 : GRID_RES; 
                     
@@ -648,7 +668,6 @@
                         let {pos, norm} = getSurfacePointAndNormal(u, v);
                         strandPts.push(pos.clone().add(norm.multiplyScalar(0.06 + Math.random()*0.03)));
                         
-                        // Cari tetangga dengan tegangan/stress tertinggi + noise untuk eksplorasi organik
                         let bestU = u, bestV = v;
                         let maxScore = -999;
                         for(let du = -4; du <= 4; du++) {
@@ -656,9 +675,8 @@
                                 let nu = u + du, nv = v + dv;
                                 if(nu >= 0 && nu <= GRID_RES && nv >= 0 && nv <= GRID_RES) {
                                     let nodeStress = gridMap[nv][nu].stress;
-                                    // Skor = Stress Kain + Faktor Acak
                                     let score = (nodeStress * 200) + (Math.random() * 5);
-                                    if(du === 0 && dv === 0) score -= 100; // Hukuman jika berdiam diri
+                                    if(du === 0 && dv === 0) score -= 100;
                                     
                                     if(score > maxScore) {
                                         maxScore = score;
@@ -673,7 +691,7 @@
                 }
 
             } else {
-                // 1. Generate Warp Threads (Benang Lungsin) - u konstan, v bergerak
+                // 1. Generate Warp Threads
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const u_base = (wt / N) * GRID_RES;
@@ -686,7 +704,7 @@
                     createStrand(strandPts, true);
                 }
 
-                // 2. Generate Weft Threads (Benang Pakan) - v konstan, u bergerak
+                // 2. Generate Weft Threads
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const v_base = (wt / N) * GRID_RES;
@@ -728,21 +746,16 @@
 
                 const netForce = new THREE.Vector3(0, 0, 0);
                 
-                // 1. Gaya tarik ke atas (Upward Force / Tekanan Form-finding)
                 netForce.y += physicsConfig.upwardForce;
-                
-                // 2. Sedikit noise untuk simulasi lingkungan natural
                 netForce.x += (Math.random() - 0.5) * 0.1;
                 netForce.z += (Math.random() - 0.5) * 0.1;
                 
-                // 3. Gaya Gravitasi SEBENARNYA (Tergantung pada Massa)
-                // F = m * g (Kita menggunakan g = 10 untuk skala visual yang pas)
                 const gravityConstant = 10.0;
                 netForce.y -= p.mass * gravityConstant;
 
                 p.addForce(netForce);
                 p.integrate(sqTimeStep);
-                p.stress = 0; // Reset stress for recalculation
+                p.stress = 0; 
             }
 
             // Satisfy Constraints & Calculate Stress
@@ -755,15 +768,13 @@
                     const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
                     const currentDist = diff.length();
                     
-                    if (currentDist === 0) continue; // avoid division by zero
+                    if (currentDist === 0) continue;
 
-                    // Stiffness factor
                     const correction = diff.multiplyScalar(1 - restDist / currentDist).multiplyScalar(0.5 * physicsConfig.stiffness);
                     
                     if (!p1.pinned) p1.position.add(correction);
                     if (!p2.pinned) p2.position.sub(correction);
 
-                    // Accumulate stress for visualization (strain = change in length)
                     const strain = Math.abs(currentDist - restDist) / restDist;
                     p1.stress += strain;
                     p2.stress += strain;
@@ -772,7 +783,6 @@
                 }
             }
 
-            // Smooth max stress for UI
             globalMaxStress = globalMaxStress * 0.9 + currentMaxStress * 0.1;
 
             // Update Geometry and Colors
@@ -788,23 +798,19 @@
                 positions[idx3 + 1] = p.position.y;
                 positions[idx3 + 2] = p.position.z;
 
-                // Color mapping: White (neutral) -> Red (high tension)
                 if (useStressLines) {
-                    // Average stress per connection (approx 4 connections max)
                     const avgStress = p.stress / 4; 
-                    // Map stress to color (white to red)
-                    const tensionIntensity = Math.min(1, avgStress * 15); // Adjust multiplier for visual scale
+                    const tensionIntensity = Math.min(1, avgStress * 15);
                     
-                    colorAttr[idx3] = 1.0; // R
-                    colorAttr[idx3 + 1] = 1.0 - tensionIntensity; // G goes down as tension goes up
-                    colorAttr[idx3 + 2] = 1.0 - tensionIntensity; // B goes down as tension goes up
+                    colorAttr[idx3] = 1.0; 
+                    colorAttr[idx3 + 1] = 1.0 - tensionIntensity; 
+                    colorAttr[idx3 + 2] = 1.0 - tensionIntensity; 
                 } else {
                     colorAttr[idx3] = 0.9;
                     colorAttr[idx3 + 1] = 0.9;
                     colorAttr[idx3 + 2] = 0.9;
                 }
                 
-                // Sinkronisasi posisi bola pemberat jika ada
                 if (p.hasExtraMass && p.massMesh) {
                     p.massMesh.position.copy(p.position);
                 }
@@ -816,7 +822,7 @@
 
             // UPDATE TRUSS VISUALS (InstancedMesh)
             if (trussMesh && trussMesh.visible) {
-                trussMesh.count = constraints.length; // Hanya render sebanyak constraint yang aktif
+                trussMesh.count = constraints.length; 
                 for (let j = 0; j < constraints.length; j++) {
                     const [p1, p2, restDist] = constraints[j];
                     const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
@@ -824,7 +830,6 @@
                     
                     if (currentDist === 0) continue;
 
-                    // Posisikan silinder di tengah, sejajarkan, dan scale berdasarkan panjang & slider ketebalan
                     const mid = new THREE.Vector3().addVectors(p1.position, p2.position).multiplyScalar(0.5);
                     dummyObj.position.copy(mid);
                     dummyObj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), diff.clone().normalize());
@@ -832,7 +837,6 @@
                     dummyObj.updateMatrix();
                     trussMesh.setMatrixAt(j, dummyObj.matrix);
                     
-                    // Stress color mapping for truss
                     const strain = Math.abs(currentDist - restDist) / restDist;
                     const tensionIntensity = Math.min(1, strain * 15);
                     dummyColor.setRGB(1.0, 1.0 - tensionIntensity, 1.0 - tensionIntensity);
@@ -852,13 +856,71 @@
             requestAnimationFrame(animate);
             controls.update();
             simulate();
-            
-            // Only update occasionally to save performance, or if parameters change.
-            // For real-time adherence to cloth, we update it every frame.
             generateWeaving();
-            
             renderer.render(scene, camera);
         }
+
+        // --- 9. EXPORT & SCREENSHOT LOGIC ---
+        function downloadBlob(blob, filename) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function exportToOBJ() {
+            if (typeof THREE.OBJExporter === 'undefined') {
+                alert('Pustaka OBJExporter belum siap.');
+                return;
+            }
+            
+            const exporter = new THREE.OBJExporter();
+            const exportGroup = new THREE.Group();
+
+            if (clothMesh && clothMesh.visible) {
+                exportGroup.add(clothMesh.clone());
+            }
+            if (weavingGroup && weavingGroup.visible) {
+                exportGroup.add(weavingGroup.clone());
+            }
+
+            const result = exporter.parse(exportGroup);
+            const blob = new Blob([result], { type: 'text/plain' });
+            downloadBlob(blob, 'tensomatter_form_finding.obj');
+        }
+
+        function exportToSTL() {
+            if (typeof THREE.STLExporter === 'undefined') {
+                alert('Pustaka STLExporter belum siap.');
+                return;
+            }
+
+            const exporter = new THREE.STLExporter();
+            const exportTarget = (clothMesh && clothMesh.visible) ? clothMesh : scene;
+            const result = exporter.parse(exportTarget, { binary: true });
+            const blob = new Blob([result], { type: 'application/octet-stream' });
+            downloadBlob(blob, 'tensomatter_form_finding.stl');
+        }
+
+        function takeScreenshot() {
+            // Re-render scene for capture
+            renderer.render(scene, camera);
+            const dataUrl = renderer.domElement.toDataURL('image/png');
+            
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'tensomatter_screenshot_' + new Date().toISOString().slice(0, 10) + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('btn-export-obj').addEventListener('click', exportToOBJ);
+        document.getElementById('btn-export-stl').addEventListener('click', exportToSTL);
+        document.getElementById('btn-screenshot').addEventListener('click', takeScreenshot);
 
         // --- 7. EVENT LISTENERS ---
         window.addEventListener('resize', () => {
@@ -884,7 +946,6 @@
 
         document.getElementById('ctrl-mode').addEventListener('change', (e) => {
             interactionMode = e.target.value;
-            // Reset interaksi aktif
             drawStartParticle = null;
             if (tempDrawLine) tempDrawLine.visible = false;
         });
@@ -894,7 +955,6 @@
             extraMassValue = parseFloat(e.target.value);
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
             
-            // Perbarui massa secara live pada partikel yang sudah diberi pemberat
             particles.forEach(p => {
                 if (p.hasExtraMass) {
                     p.mass = physicsConfig.mass + extraMassValue;
@@ -922,14 +982,13 @@
         document.getElementById('view-truss').addEventListener('change', (e) => {
             if (trussMesh) trussMesh.visible = e.target.checked;
         });
-        // view-stress handled in simulation loop
         document.getElementById('view-weaving').addEventListener('change', (e) => {
             weavingConfig.visible = e.target.checked;
         });
 
         // START
         window.onload = () => {
-            initSimulation(); // Mulai dengan grid segi empat
+            initSimulation();
             animate();
         };
 
@@ -939,7 +998,6 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         }
 
-        // Helper untuk mencari node (particle) terdekat
         function getClosestParticle(hitPoint, maxDist = 1.5) {
             let closest = null;
             let minDist = maxDist;
@@ -957,7 +1015,6 @@
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
-            // Cek jika menahan tombol Shift untuk Mode Multi-Masa
             if (event.shiftKey && interactionMode === 'drag') {
                 if (clothMesh) {
                     const clothIntersects = raycaster.intersectObject(clothMesh);
@@ -966,10 +1023,9 @@
                         if (closestParticle) toggleMass(closestParticle);
                     }
                 }
-                return; // Batalkan aksi lain agar kamera/anchor tidak bereaksi
+                return;
             }
 
-            // MODE GAMBAR TRUSS
             if (interactionMode === 'draw') {
                 if (clothMesh) {
                     const intersects = raycaster.intersectObject(clothMesh);
@@ -977,10 +1033,9 @@
                         const hitPoint = intersects[0].point;
                         drawStartParticle = getClosestParticle(hitPoint);
                         if (drawStartParticle) {
-                            controls.enabled = false; // Disable orbit rotasi saat menggambar
+                            controls.enabled = false;
                             tempDrawLine.visible = true;
                             
-                            // Set titik awal garis sementara
                             const positions = tempDrawLine.geometry.attributes.position.array;
                             positions[0] = drawStartParticle.position.x;
                             positions[1] = drawStartParticle.position.y;
@@ -990,7 +1045,6 @@
                             positions[5] = hitPoint.z;
                             tempDrawLine.geometry.attributes.position.needsUpdate = true;
                             
-                            // Setup Drag Plane untuk sumbu pergerakan mouse di ruang 3D
                             dragPlane.setFromNormalAndCoplanarPoint(
                                 camera.getWorldDirection(new THREE.Vector3()).negate(),
                                 drawStartParticle.position
@@ -1001,13 +1055,11 @@
                 return;
             }
 
-            // MODE DRAG ANCHOR
             const intersects = raycaster.intersectObjects(anchorMeshes);
             if (intersects.length > 0) {
-                controls.enabled = false; // Matikan rotasi kamera agar fokus drag
+                controls.enabled = false;
                 draggedParticle = intersects[0].object.userData.particle;
                 
-                // Buat bidang geser (plane) sementara sejajar dengan pandangan kamera
                 dragPlane.setFromNormalAndCoplanarPoint(
                     camera.getWorldDirection(new THREE.Vector3()).negate(),
                     draggedParticle.position
@@ -1021,7 +1073,6 @@
                 raycaster.setFromCamera(mouse, camera);
                 raycaster.ray.intersectPlane(dragPlane, intersectPoint);
                 
-                // Update ujung garis sementara mengikuti pergerakan pointer
                 const positions = tempDrawLine.geometry.attributes.position.array;
                 positions[3] = intersectPoint.x;
                 positions[4] = intersectPoint.y;
@@ -1035,9 +1086,7 @@
                 raycaster.setFromCamera(mouse, camera);
                 raycaster.ray.intersectPlane(dragPlane, intersectPoint);
                 
-                // Pindah posisi partikel di simulasi fisika
                 draggedParticle.position.copy(intersectPoint);
-                // Ikut pindahkan mesh bola anchor visualnya
                 draggedParticle.anchorMesh.position.copy(intersectPoint);
             }
         });
@@ -1048,40 +1097,35 @@
                 raycaster.setFromCamera(mouse, camera);
                 raycaster.ray.intersectPlane(dragPlane, intersectPoint);
                 
-                // Cari partikel terdekat dari titik di mana mouse dilepas
                 const drawEndParticle = getClosestParticle(intersectPoint, 2.5);
                 
-                // Jika titik target valid dan berbeda dari asal, buat koneksi (Truss Baru)
                 if (drawEndParticle && drawEndParticle !== drawStartParticle) {
                     const dist = drawStartParticle.position.distanceTo(drawEndParticle.position);
                     constraints.push([drawStartParticle, drawEndParticle, dist]);
                 }
                 
-                // Reset state
                 drawStartParticle = null;
                 tempDrawLine.visible = false;
-                controls.enabled = true; // Nyalakan kembali rotasi Orbit
+                controls.enabled = true;
                 return;
             }
 
             draggedParticle = null;
-            controls.enabled = true; // Nyalakan kembali rotasi Orbit
+            controls.enabled = true;
         });
 
         renderer.domElement.addEventListener('dblclick', (event) => {
-            if (interactionMode === 'draw') return; // Matikan double-click (tambah anchor) di mode gambar
+            if (interactionMode === 'draw') return;
             
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
-            // 1. Jika double click di anchor yang sudah ada -> Hapus
             const anchorIntersects = raycaster.intersectObjects(anchorMeshes);
             if (anchorIntersects.length > 0) {
                 removeAnchor(anchorIntersects[0].object.userData.particle);
                 return;
             }
 
-            // 2. Jika double click di permukaan kain -> Tambah anchor baru di titik terdekat
             if (clothMesh) {
                 const clothIntersects = raycaster.intersectObject(clothMesh);
                 if (clothIntersects.length > 0) {
