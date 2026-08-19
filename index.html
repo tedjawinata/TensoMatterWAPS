@@ -9,7 +9,8 @@
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #1a1a1a; color: #e2e8f0; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-        #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; }
+        /* Transisi ditambahkan pada ui-layer untuk efek smooth saat hide/unhide */
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; transition: opacity 0.3s ease; }
         .pointer-events-auto { pointer-events: auto; }
         
         /* Custom Scrollbar for sidebars */
@@ -39,10 +40,10 @@
     <div id="ui-layer" class="flex justify-between p-4">
         
         <!-- Left Sidebar: Controls -->
-        <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto">
+        <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto ui-panel">
             <div class="p-5 border-b border-slate-700/50">
                 <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-300">Tensomatter</h1>
-                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh KTedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
+                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
@@ -207,7 +208,7 @@
         </div>
 
         <!-- Right Sidebar: Evaluation & Performance -->
-        <div class="flex flex-col gap-4 pointer-events-auto w-72">
+        <div class="flex flex-col gap-4 pointer-events-auto w-72 ui-panel">
             <div class="glass-panel p-5 rounded-xl shadow-2xl">
                 <h2 class="text-sm font-semibold text-orange-300 uppercase tracking-wider mb-4 border-b border-slate-700 pb-2">Evaluasi Performa (Co-Design)</h2>
                 
@@ -255,8 +256,12 @@
                 </div>
             </div>
         </div>
-
     </div>
+
+    <!-- TAMPILAN TOMBOL HIDE/UNHIDE UI -->
+<button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-full shadow-lg backdrop-blur-md border border-slate-600 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer">        <svg id="icon-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+        <span id="text-toggle-ui">Hide Menu</span>
+    </button>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -265,6 +270,26 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <script>
+        // --- 0. UI TOGGLE LOGIC ---
+        const btnToggleUI = document.getElementById('btn-toggle-ui');
+        const uiLayer = document.getElementById('ui-layer');
+        const textToggleUI = document.getElementById('text-toggle-ui');
+        const uiPanels = document.querySelectorAll('.ui-panel');
+        let uiVisible = true;
+
+        btnToggleUI.addEventListener('click', () => {
+            uiVisible = !uiVisible;
+            if (uiVisible) {
+                uiLayer.style.opacity = '1';
+                textToggleUI.innerText = 'Hide Menu';
+                uiPanels.forEach(p => p.style.pointerEvents = 'auto');
+            } else {
+                uiLayer.style.opacity = '0';
+                textToggleUI.innerText = 'Show Menu';
+                uiPanels.forEach(p => p.style.pointerEvents = 'none');
+            }
+        });
+
         // --- 1. SETUP THREE.JS SCENE ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
