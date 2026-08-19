@@ -2,18 +2,17 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tensomatter - Form-Finding & Winding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #1a1a1a; color: #e2e8f0; }
-        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-        /* Transisi ditambahkan pada ui-layer untuk efek smooth saat hide/unhide */
+        /* touch-action: none; sangat penting agar browser HP tidak melakukan zoom/scroll saat menyentuh canvas */
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; touch-action: none; }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; transition: opacity 0.3s ease; }
         .pointer-events-auto { pointer-events: auto; }
         
-        /* Custom Scrollbar for sidebars */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 4px; }
@@ -26,13 +25,10 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        input[type=range] {
-            accent-color: #3b82f6;
-        }
+        input[type=range] { accent-color: #3b82f6; }
     </style>
 </head>
 <body>
-
     <!-- 3D Canvas -->
     <div id="canvas-container"></div>
 
@@ -172,11 +168,10 @@
                             <span>Tampilkan Pola Weaving</span>
                         </label>
                     </div>
-                    <!-- Added interaction hint -->
                     <div class="mt-4 p-3 bg-slate-800/50 border border-slate-700 rounded-lg text-xs text-slate-300 space-y-2 shadow-inner">
                         <p><strong class="text-blue-300">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
-                        <p><strong class="text-green-300">Dbl-Klik Kain:</strong> Tambah titik anchor baru.</p>
-                        <p><strong class="text-red-300">Dbl-Klik Anchor:</strong> Hapus titik anchor.</p>
+                        <p><strong class="text-green-300">Dbl-Tap/Klik Kain:</strong> Tambah titik anchor baru.</p>
+                        <p><strong class="text-red-300">Dbl-Tap/Klik Anchor:</strong> Hapus titik anchor.</p>
                         <p><strong class="text-yellow-300">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
                         <p><strong class="text-pink-300">Mode Gambar:</strong> Tarik garis antar titik untuk buat jaring baru.</p>
                     </div>
@@ -202,7 +197,6 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         Screenshot Fullscreen (.PNG)
                     </button>
-                    <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">* File <strong>.OBJ</strong> dapat langsung di-import ke Rhino 3D (disimpan sebagai .3dm), Grasshopper, Blender, maupun CAD/CAM.</p>
                 </div>
             </div>
         </div>
@@ -258,12 +252,12 @@
         </div>
     </div>
 
-    <!-- TAMPILAN TOMBOL HIDE/UNHIDE UI -->
-<button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-full shadow-lg backdrop-blur-md border border-slate-600 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer">        <svg id="icon-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+    <!-- Toggle UI Button -->
+    <button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-full shadow-lg backdrop-blur-md border border-slate-600 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer">
+        <svg id="icon-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
         <span id="text-toggle-ui">Hide Menu</span>
     </button>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
@@ -298,7 +292,6 @@
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 15, 25);
 
-        // preserveDrawingBuffer: true enables high quality screenshot capturing
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -307,40 +300,37 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 + 0.2; // Allow slightly looking from below
+        controls.maxPolarAngle = Math.PI / 2 + 0.2;
 
-        // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(10, 20, 10);
         scene.add(dirLight);
 
-        // Grid & Anchor visualizer
         const gridHelper = new THREE.GridHelper(20, 20, 0x334155, 0x1e293b);
         gridHelper.position.y = -0.1;
         scene.add(gridHelper);
 
-        // Interaction Objects
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const dragPlane = new THREE.Plane();
         let draggedParticle = null;
         let intersectPoint = new THREE.Vector3();
-        const anchorMeshes = [];
         
+        const anchorMeshes = [];
         const anchorGeo = new THREE.SphereGeometry(0.25);
-        const anchorMat = new THREE.MeshStandardMaterial({color: 0xf87171, roughness: 0.3, metalness: 0.5}); // Warna anchor merah mudah diklik
+        const anchorMat = new THREE.MeshStandardMaterial({color: 0xf87171, roughness: 0.3, metalness: 0.5});
 
         function createAnchor(particle) {
-            if (particle.pinned) return; // Cegah duplikasi
+            if (particle.pinned) return;
             const anchor = new THREE.Mesh(anchorGeo, anchorMat);
             anchor.position.copy(particle.position);
             scene.add(anchor);
             anchorMeshes.push(anchor);
             particle.pinned = true;
             particle.anchorMesh = anchor;
-            anchor.userData.particle = particle; // Mapping bolak-balik
+            anchor.userData.particle = particle;
         }
 
         function removeAnchor(particle) {
@@ -354,17 +344,15 @@
             }
         }
 
-        // Variabel dan Fungsi Multi-Masa
         const massMeshes = [];
         let extraMassValue = 0.5;
         const massGeo = new THREE.SphereGeometry(0.15);
-        const massMat = new THREE.MeshStandardMaterial({color: 0x3b82f6, roughness: 0.4, metalness: 0.8}); // Warna biru untuk pemberat
+        const massMat = new THREE.MeshStandardMaterial({color: 0x3b82f6, roughness: 0.4, metalness: 0.8});
 
         function toggleMass(particle) {
-            if (particle.pinned) return; // Anchor tidak bisa diberi pemberat
+            if (particle.pinned) return;
             
             if (particle.hasExtraMass) {
-                // Hapus beban
                 particle.hasExtraMass = false;
                 particle.mass = physicsConfig.mass;
                 particle.invMass = 1 / particle.mass;
@@ -375,7 +363,6 @@
                     particle.massMesh = null;
                 }
             } else {
-                // Tambah beban
                 particle.hasExtraMass = true;
                 particle.mass = physicsConfig.mass + extraMassValue;
                 particle.invMass = 1 / particle.mass;
@@ -388,36 +375,21 @@
         }
 
         // --- 2. PHYSICS PARAMETERS & STATE ---
-        const DIMS = 10; // Base size
-        const EXT_DIMS = DIMS * 1.2; // Extended boundary for meshing
-        const GRID_RES = 35; // Grid resolution for physics
+        const DIMS = 10;
+        const EXT_DIMS = DIMS * 1.2;
+        const GRID_RES = 35;
         
-        let physicsConfig = {
-            upwardForce: 1.5,
-            stiffness: 0.8,
-            mass: 0.1,
-            damping: 0.95
-        };
+        let physicsConfig = { upwardForce: 1.5, stiffness: 0.8, mass: 0.1, damping: 0.95 };
+        let weavingConfig = { pattern: 'plain', density: 20, offset: 0.1, visible: true };
+        let trussConfig = { thickness: 0.05 };
 
-        let weavingConfig = {
-            pattern: 'plain',
-            density: 20,
-            offset: 0.1,
-            visible: true
-        };
-
-        let trussConfig = {
-            thickness: 0.05
-        };
-
-        let interactionMode = 'drag'; // 'drag' or 'draw'
+        let interactionMode = 'drag';
         let drawStartParticle = null;
         let tempDrawLine = null;
         let dummyObj = new THREE.Object3D();
         let dummyColor = new THREE.Color();
         const MAX_TRUSSES = 15000;
 
-        // --- 3. CLOTH / FORM-FINDING SIMULATION ---
         class Particle {
             constructor(x, y, z, mass) {
                 this.position = new THREE.Vector3(x, y, z);
@@ -428,8 +400,8 @@
                 this.invMass = 1 / mass;
                 this.pinned = false;
                 this.stress = 0; 
-                this.index = 0; // For Geometry linking
-                this.hasExtraMass = false; // Flag untuk multimasa
+                this.index = 0;
+                this.hasExtraMass = false;
                 this.massMesh = null;
             }
             addForce(force) {
@@ -451,29 +423,19 @@
         const particles = [];
         const constraints = [];
         let gridMap = [];
-        let clothGeometry, clothMesh;
-        let trussMesh; // Menggunakan InstancedMesh untuk ketebalan interaktif
+        let clothGeometry, clothMesh, trussMesh;
 
-        // Initialize Dynamic Topology (Square Base Version)
         function initSimulation() {
-            // 1. Cleanup Old
             anchorMeshes.forEach(m => scene.remove(m));
             massMeshes.forEach(m => scene.remove(m));
             anchorMeshes.length = 0;
             massMeshes.length = 0;
             particles.length = 0;
             constraints.length = 0;
-            if (clothMesh) {
-                scene.remove(clothMesh);
-                if(clothGeometry) clothGeometry.dispose();
-            }
-            if (trussMesh) {
-                scene.remove(trussMesh);
-                if(trussMesh.geometry) trussMesh.geometry.dispose();
-            }
+            if (clothMesh) { scene.remove(clothMesh); if(clothGeometry) clothGeometry.dispose(); }
+            if (trussMesh) { scene.remove(trussMesh); if(trussMesh.geometry) trussMesh.geometry.dispose(); }
             draggedParticle = null;
 
-            // 2. Generate Particles (Square Grid)
             const cellDist = EXT_DIMS / GRID_RES;
             gridMap = Array(GRID_RES + 1).fill(null).map(() => Array(GRID_RES + 1).fill(null));
             let pIndex = 0;
@@ -482,22 +444,18 @@
                 for (let u = 0; u <= GRID_RES; u++) {
                     const x = (u / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
                     const z = (v / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
-                    
                     const p = new Particle(x, 0, z, physicsConfig.mass);
                     p.index = pIndex++;
-                    p.u = u; // Tambahan untuk mempermudah deteksi koordinat agen Swarm
-                    p.v = v;
+                    p.u = u; p.v = v;
                     particles.push(p);
                     gridMap[v][u] = p;
                 }
             }
 
-            // 3. Create Constraints (Springs)
             for (let v = 0; v <= GRID_RES; v++) {
                 for (let u = 0; u <= GRID_RES; u++) {
                     const p = gridMap[v][u];
                     if (!p) continue;
-                    
                     const right = u < GRID_RES ? gridMap[v][u + 1] : null;
                     const bottom = v < GRID_RES ? gridMap[v + 1][u] : null;
                     const br = (v < GRID_RES && u < GRID_RES) ? gridMap[v + 1][u + 1] : null;
@@ -510,13 +468,11 @@
                 }
             }
 
-            // 4. Place Default Anchors (Square Corners)
             createAnchor(gridMap[0][0]);
             createAnchor(gridMap[0][GRID_RES]);
             createAnchor(gridMap[GRID_RES][0]);
             createAnchor(gridMap[GRID_RES][GRID_RES]);
 
-            // 5. Build Geometry indices for WebGL
             const indices = [];
             for (let v = 0; v < GRID_RES; v++) {
                 for (let u = 0; u < GRID_RES; u++) {
@@ -524,7 +480,6 @@
                     const p10 = gridMap[v][u + 1];
                     const p01 = gridMap[v + 1][u];
                     const p11 = gridMap[v + 1][u + 1];
-                    
                     indices.push(p00.index, p01.index, p10.index);
                     indices.push(p10.index, p01.index, p11.index);
                 }
@@ -535,24 +490,17 @@
             clothGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(particles.length * 3), 3));
             clothGeometry.setIndex(indices);
 
-            const clothMaterial = new THREE.MeshStandardMaterial({
-                side: THREE.DoubleSide, vertexColors: true, roughness: 0.8, metalness: 0.1
-            });
+            const clothMaterial = new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, vertexColors: true, roughness: 0.8, metalness: 0.1 });
             clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
             scene.add(clothMesh);
 
-            // 6. Build Truss Geometry (InstancedMesh untuk Ketebalan yang bisa diubah)
-            const trussMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff, roughness: 0.5, metalness: 0.3
-            });
-            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 5); // Segi-5 agar lebih efisien
-            
+            const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.3 });
+            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 5);
             trussMesh = new THREE.InstancedMesh(cylinderGeo, trussMaterial, MAX_TRUSSES);
             trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
             if (trussMesh.instanceColor) trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
             scene.add(trussMesh);
 
-            // 7. Setup Visual Bantuan Gambar Interaktif
             if (!tempDrawLine) {
                 const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
                 const lineMat = new THREE.LineBasicMaterial({ color: 0xec4899, linewidth: 3, dashSize: 0.2, gapSize: 0.2 });
@@ -561,10 +509,8 @@
                 scene.add(tempDrawLine);
             }
 
-            // Re-apply visibility setting from UI
             const showSurface = document.getElementById('view-surface');
             if(showSurface) clothMesh.visible = showSurface.checked;
-            
             const showTruss = document.getElementById('view-truss');
             if(showTruss) trussMesh.visible = showTruss.checked;
         }
@@ -573,43 +519,30 @@
         let weavingGroup = new THREE.Group();
         scene.add(weavingGroup);
 
-        const warpMaterial = new THREE.LineBasicMaterial({
-            color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9 // Cyan untuk Lungsin
-        });
-        const weftMaterial = new THREE.LineBasicMaterial({
-            color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.9 // Pink untuk Pakan
-        });
+        const warpMaterial = new THREE.LineBasicMaterial({ color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9 });
+        const weftMaterial = new THREE.LineBasicMaterial({ color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.9 });
 
-        // Helper untuk mengekstrak titik dan normal dari permukaan Grid
         function getSurfacePointAndNormal(u_float, v_float) {
             u_float = Math.max(0, Math.min(GRID_RES, u_float));
             v_float = Math.max(0, Math.min(GRID_RES, v_float));
-
             const u0 = Math.floor(u_float);
             const u1 = Math.min(GRID_RES, u0 + 1);
             const v0 = Math.floor(v_float);
             const v1 = Math.min(GRID_RES, v0 + 1);
-
             const mu = u_float - u0;
             const mv = v_float - v0;
-
             const p00 = gridMap[v0][u0].position;
             const p10 = gridMap[v0][u1].position;
             const p01 = gridMap[v1][u0].position;
             const p11 = gridMap[v1][u1].position;
-
-            // Interpolasi Bilinear untuk Titik Posisi
             const p0 = new THREE.Vector3().lerpVectors(p00, p10, mu);
             const p1 = new THREE.Vector3().lerpVectors(p01, p11, mu);
             const pos = new THREE.Vector3().lerpVectors(p0, p1, mv);
-            
-            // Perkiraan Vektor Normal (Arah atas permukaan)
             const vu = new THREE.Vector3().subVectors(p10, p00);
             const vv = new THREE.Vector3().subVectors(p01, p00);
             let norm = new THREE.Vector3().crossVectors(vv, vu).normalize();
             if (norm.y < 0) norm.negate();
             if (norm.lengthSq() === 0) norm.set(0, 1, 0);
-
             return { pos, norm };
         }
 
@@ -637,7 +570,6 @@
                 weavingGroup.add(new THREE.Line(geometry, isWarp ? warpMaterial : weftMaterial));
             };
 
-            // Menentukan arah simpangan (over/under)
             const getWeaveState = (type, i, j) => {
                 if (type === 'plain') return (i + j) % 2 === 0 ? 1 : -1;
                 if (type === 'twill') return (((j - i) % 3 + 3) % 3) < 2 ? 1 : -1;
@@ -646,11 +578,10 @@
                 return 1;
             };
 
-            const resolution = 4; // Detail sampel kurva antar persilangan
+            const resolution = 4;
             const steps = N * resolution;
 
             if (pattern === 'menges_coreless') {
-                // ALGORITMA CORELESS FILAMENT WINDING (MENGES ICD/ITKE)
                 const numEdgePts = GRID_RES * 4;
                 const getEdgeUV = (index) => {
                     let i = index % numEdgePts;
@@ -668,7 +599,6 @@
                 for(let i = 0; i < N * 4; i++) {
                     let uv1 = getEdgeUV(currIdx);
                     let uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
-                    
                     for(let s = 0; s <= 20; s++) {
                         let t = s/20;
                         let u = uv1.u + (uv2.u - uv1.u)*t;
@@ -683,7 +613,6 @@
                 createStrand(strandPts2, false); 
 
             } else if (pattern === 'menges_swarm') {
-                // ALGORITMA AGENT-BASED / SWARM INTELLIGENCE
                 for(let ag = 0; ag < N; ag++) {
                     let strandPts = [];
                     let u = Math.floor(Math.random() * GRID_RES);
@@ -714,9 +643,7 @@
                     }
                     createStrand(strandPts, ag % 2 === 0);
                 }
-
             } else {
-                // 1. Generate Warp Threads
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const u_base = (wt / N) * GRID_RES;
@@ -728,8 +655,6 @@
                     }
                     createStrand(strandPts, true);
                 }
-
-                // 2. Generate Weft Threads
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const v_base = (wt / N) * GRID_RES;
@@ -743,7 +668,6 @@
                 }
             }
 
-            // Update Evaluasi Teknis Weaving
             document.getElementById('eval-radius').innerText = minBendRadius === 9999 ? "0.0" : minBendRadius.toFixed(1);
             if (minBendRadius < 0.2) {
                 document.getElementById('msg-radius').classList.remove('hidden');
@@ -764,26 +688,20 @@
             const timeStep = 0.015;
             const sqTimeStep = timeStep * timeStep;
             
-            // 1. Calculate Forces
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 if (p.pinned) continue;
-
                 const netForce = new THREE.Vector3(0, 0, 0);
-                
                 netForce.y += physicsConfig.upwardForce;
                 netForce.x += (Math.random() - 0.5) * 0.1;
                 netForce.z += (Math.random() - 0.5) * 0.1;
-                
                 const gravityConstant = 10.0;
                 netForce.y -= p.mass * gravityConstant;
-
                 p.addForce(netForce);
                 p.integrate(sqTimeStep);
                 p.stress = 0; 
             }
 
-            // Satisfy Constraints & Calculate Stress
             let currentMaxStress = 0;
             const relaxationIterations = 5;
             
@@ -792,9 +710,7 @@
                     const [p1, p2, restDist] = constraints[j];
                     const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
                     const currentDist = diff.length();
-                    
                     if (currentDist === 0) continue;
-
                     const correction = diff.multiplyScalar(1 - restDist / currentDist).multiplyScalar(0.5 * physicsConfig.stiffness);
                     
                     if (!p1.pinned) p1.position.add(correction);
@@ -803,17 +719,14 @@
                     const strain = Math.abs(currentDist - restDist) / restDist;
                     p1.stress += strain;
                     p2.stress += strain;
-                    
                     if(strain > currentMaxStress) currentMaxStress = strain;
                 }
             }
 
             globalMaxStress = globalMaxStress * 0.9 + currentMaxStress * 0.1;
 
-            // Update Geometry and Colors
             const positions = clothGeometry.attributes.position.array;
             const colorAttr = clothGeometry.attributes.color.array;
-            
             const useStressLines = document.getElementById('view-stress').checked;
 
             for (let i = 0; i < particles.length; i++) {
@@ -826,7 +739,6 @@
                 if (useStressLines) {
                     const avgStress = p.stress / 4; 
                     const tensionIntensity = Math.min(1, avgStress * 15);
-                    
                     colorAttr[idx3] = 1.0; 
                     colorAttr[idx3 + 1] = 1.0 - tensionIntensity; 
                     colorAttr[idx3 + 2] = 1.0 - tensionIntensity; 
@@ -845,16 +757,13 @@
             clothGeometry.attributes.color.needsUpdate = true;
             clothGeometry.computeVertexNormals();
 
-            // UPDATE TRUSS VISUALS (InstancedMesh)
             if (trussMesh && trussMesh.visible) {
                 trussMesh.count = constraints.length; 
                 for (let j = 0; j < constraints.length; j++) {
                     const [p1, p2, restDist] = constraints[j];
                     const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
                     const currentDist = diff.length();
-                    
                     if (currentDist === 0) continue;
-
                     const mid = new THREE.Vector3().addVectors(p1.position, p2.position).multiplyScalar(0.5);
                     dummyObj.position.copy(mid);
                     dummyObj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), diff.clone().normalize());
@@ -871,7 +780,6 @@
                 if (trussMesh.instanceColor) trussMesh.instanceColor.needsUpdate = true;
             }
 
-            // Update UI Stress Evaluation
             const displayStress = (globalMaxStress * 100).toFixed(2);
             document.getElementById('eval-stress').innerText = displayStress;
             document.getElementById('bar-stress').style.width = Math.min(100, globalMaxStress * 500) + '%';
@@ -885,7 +793,6 @@
             renderer.render(scene, camera);
         }
 
-        // --- 9. EXPORT & SCREENSHOT LOGIC ---
         function downloadBlob(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -897,32 +804,18 @@
         }
 
         function exportToOBJ() {
-            if (typeof THREE.OBJExporter === 'undefined') {
-                alert('Pustaka OBJExporter belum siap.');
-                return;
-            }
-            
+            if (typeof THREE.OBJExporter === 'undefined') return alert('Pustaka OBJExporter belum siap.');
             const exporter = new THREE.OBJExporter();
             const exportGroup = new THREE.Group();
-
-            if (clothMesh && clothMesh.visible) {
-                exportGroup.add(clothMesh.clone());
-            }
-            if (weavingGroup && weavingGroup.visible) {
-                exportGroup.add(weavingGroup.clone());
-            }
-
+            if (clothMesh && clothMesh.visible) exportGroup.add(clothMesh.clone());
+            if (weavingGroup && weavingGroup.visible) exportGroup.add(weavingGroup.clone());
             const result = exporter.parse(exportGroup);
             const blob = new Blob([result], { type: 'text/plain' });
             downloadBlob(blob, 'tensomatter_form_finding.obj');
         }
 
         function exportToSTL() {
-            if (typeof THREE.STLExporter === 'undefined') {
-                alert('Pustaka STLExporter belum siap.');
-                return;
-            }
-
+            if (typeof THREE.STLExporter === 'undefined') return alert('Pustaka STLExporter belum siap.');
             const exporter = new THREE.STLExporter();
             const exportTarget = (clothMesh && clothMesh.visible) ? clothMesh : scene;
             const result = exporter.parse(exportTarget, { binary: true });
@@ -931,10 +824,8 @@
         }
 
         function takeScreenshot() {
-            // Re-render scene for capture
             renderer.render(scene, camera);
             const dataUrl = renderer.domElement.toDataURL('image/png');
-            
             const link = document.createElement('a');
             link.href = dataUrl;
             link.download = 'tensomatter_screenshot_' + new Date().toISOString().slice(0, 10) + '.png';
@@ -947,14 +838,12 @@
         document.getElementById('btn-export-stl').addEventListener('click', exportToSTL);
         document.getElementById('btn-screenshot').addEventListener('click', takeScreenshot);
 
-        // --- 7. EVENT LISTENERS ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // UI Binding
         const bindSlider = (id, varName, configObj, displayId) => {
             const el = document.getElementById(id);
             const disp = document.getElementById(displayId);
@@ -975,11 +864,9 @@
             if (tempDrawLine) tempDrawLine.visible = false;
         });
 
-        // Binding untuk beban massa dinamis
         document.getElementById('ctrl-extramass').addEventListener('input', (e) => {
             extraMassValue = parseFloat(e.target.value);
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
-            
             particles.forEach(p => {
                 if (p.hasExtraMass) {
                     p.mass = physicsConfig.mass + extraMassValue;
@@ -996,22 +883,11 @@
             weavingConfig.offset = parseFloat(e.target.value);
             document.getElementById('val-offset').innerText = weavingConfig.offset.toFixed(2);
         });
+        document.getElementById('ctrl-pattern').addEventListener('change', (e) => { weavingConfig.pattern = e.target.value; });
+        document.getElementById('view-surface').addEventListener('change', (e) => { if (clothMesh) clothMesh.visible = e.target.checked; });
+        document.getElementById('view-truss').addEventListener('change', (e) => { if (trussMesh) trussMesh.visible = e.target.checked; });
+        document.getElementById('view-weaving').addEventListener('change', (e) => { weavingConfig.visible = e.target.checked; });
 
-        document.getElementById('ctrl-pattern').addEventListener('change', (e) => {
-            weavingConfig.pattern = e.target.value;
-        });
-
-        document.getElementById('view-surface').addEventListener('change', (e) => {
-            if (clothMesh) clothMesh.visible = e.target.checked;
-        });
-        document.getElementById('view-truss').addEventListener('change', (e) => {
-            if (trussMesh) trussMesh.visible = e.target.checked;
-        });
-        document.getElementById('view-weaving').addEventListener('change', (e) => {
-            weavingConfig.visible = e.target.checked;
-        });
-
-        // START
         window.onload = () => {
             initSimulation();
             animate();
@@ -1036,10 +912,62 @@
             return closest;
         }
 
+        // Variabel untuk mendeteksi Double Tap (Mobile/Mouse)
+        let lastTapTime = 0;
+        let lastTapClientX = 0;
+        let lastTapClientY = 0;
+        const DOUBLE_TAP_DELAY = 300; // maksimal 300ms antar ketukan
+
         renderer.domElement.addEventListener('pointerdown', (event) => {
+            // DETEKSI DOUBLE TAP KUSTOM
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            // Hitung jarak ketukan pertama dan kedua (toleransi meleset)
+            const dx = event.clientX - lastTapClientX;
+            const dy = event.clientY - lastTapClientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Jika tap kurang dari 300ms dan di posisi yang hampir sama -> Hitung sebagai Double Tap
+            if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0 && distance < 20) {
+                lastTapTime = 0; // Reset agar tidak terjadi triple tap
+                
+                if (interactionMode !== 'draw') {
+                    updateMouse(event);
+                    raycaster.setFromCamera(mouse, camera);
+
+                    // Cek jika klik pada anchor (Hapus)
+                    const anchorIntersects = raycaster.intersectObjects(anchorMeshes);
+                    if (anchorIntersects.length > 0) {
+                        removeAnchor(anchorIntersects[0].object.userData.particle);
+                        return; // Berhenti memproses pointerdown reguler
+                    }
+
+                    // Cek jika klik pada area kosong di kain (Tambah)
+                    if (clothMesh) {
+                        const clothIntersects = raycaster.intersectObject(clothMesh);
+                        if (clothIntersects.length > 0) {
+                            const closestParticle = getClosestParticle(clothIntersects[0].point);
+                            if (closestParticle) {
+                                createAnchor(closestParticle);
+                            }
+                        }
+                    }
+                }
+                return; // Keluar agar tidak mengaktifkan drag saat melakukan double tap
+            } else {
+                // Bukan double tap, catat waktu dan posisi untuk dicek pada ketukan selanjutnya
+                lastTapTime = currentTime;
+                lastTapClientX = event.clientX;
+                lastTapClientY = event.clientY;
+            }
+            // AKHIR DETEKSI DOUBLE TAP KUSTOM
+
+            // --- Logika Pointer Down Reguler (Drag / Shift+Click) ---
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
+            // Shift+Click untuk Tambah/Kurang Masa
             if (event.shiftKey && interactionMode === 'drag') {
                 if (clothMesh) {
                     const clothIntersects = raycaster.intersectObject(clothMesh);
@@ -1051,6 +979,7 @@
                 return;
             }
 
+            // Mode Menggambar Jaring
             if (interactionMode === 'draw') {
                 if (clothMesh) {
                     const intersects = raycaster.intersectObject(clothMesh);
@@ -1080,6 +1009,7 @@
                 return;
             }
 
+            // Mode Menggeser Anchor (Drag)
             const intersects = raycaster.intersectObjects(anchorMeshes);
             if (intersects.length > 0) {
                 controls.enabled = false;
@@ -1137,29 +1067,6 @@
 
             draggedParticle = null;
             controls.enabled = true;
-        });
-
-        renderer.domElement.addEventListener('dblclick', (event) => {
-            if (interactionMode === 'draw') return;
-            
-            updateMouse(event);
-            raycaster.setFromCamera(mouse, camera);
-
-            const anchorIntersects = raycaster.intersectObjects(anchorMeshes);
-            if (anchorIntersects.length > 0) {
-                removeAnchor(anchorIntersects[0].object.userData.particle);
-                return;
-            }
-
-            if (clothMesh) {
-                const clothIntersects = raycaster.intersectObject(clothMesh);
-                if (clothIntersects.length > 0) {
-                    const closestParticle = getClosestParticle(clothIntersects[0].point);
-                    if (closestParticle) {
-                        createAnchor(closestParticle);
-                    }
-                }
-            }
         });
 
     </script>
