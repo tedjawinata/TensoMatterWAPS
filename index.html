@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tensomatter - Form-Finding & Winding</title>
+    <title>Tensomatter - Form-Finding & Winding (Multi-Masa Enhanced)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #1a1a1a; color: #e2e8f0; }
+        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #121316; color: #e2e8f0; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-        /* Transisi ditambahkan pada ui-layer untuk efek smooth saat hide/unhide */
         #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; transition: opacity 0.3s ease; }
         .pointer-events-auto { pointer-events: auto; }
         
-        /* Custom Scrollbar for sidebars */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 4px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
 
         .glass-panel {
-            background: rgba(26, 26, 26, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(20, 24, 33, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         input[type=range] {
             accent-color: #3b82f6;
         }
+
+        /* Toast Animation */
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-show { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .toast-exit { transform: translateY(100%); opacity: 0; transition: all 0.2s ease-in; }
     </style>
 </head>
 <body>
@@ -36,68 +40,98 @@
     <!-- 3D Canvas -->
     <div id="canvas-container"></div>
 
-    <!-- UI Overlay -->
     <div id="ui-layer" class="flex justify-between p-4">
         
         <!-- Left Sidebar: Controls -->
-        <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto ui-panel">
-            <div class="p-5 border-b border-slate-700/50">
-                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-teal-300">Tensomatter</h1>
-                <p class="text-xs text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
+        <div class="glass-panel w-84 h-full max-h-[calc(100vh-2rem)] rounded-2xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto ui-panel">
+            <!-- Header -->
+            <div class="p-5 border-b border-slate-700/60 sticky top-0 bg-[#141821]/95 z-20 backdrop-blur-md">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-indigo-400">Tensomatter</h1>
+                    <span class="text-[10px] bg-blue-500/20 text-blue-300 font-semibold px-2 py-0.5 rounded-full border border-blue-500/30">v2.5 Multi-Mass</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan & Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
-                <!-- Section: Material & Form-Finding -->
+                <!-- Section 1: Parameter Material -->
                 <div>
-                    <h2 class="text-sm font-semibold text-blue-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                        Parameter Material
+                    <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                        Parameter Material & Form-Finding
                     </h2>
-                    <div class="space-y-4">
+                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Gaya Tarik Vertikal (Tension)</span>
-                                <span id="val-force">1.5</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Gaya Tarik Vertikal (Tension)</span>
+                                <span id="val-force" class="text-blue-400 font-bold">1.5</span>
                             </div>
                             <input type="range" id="ctrl-force" min="0" max="4" step="0.1" value="1.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Kekakuan Kain (Stiffness)</span>
-                                <span id="val-stiffness">0.8</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Kekakuan Kain (Stiffness)</span>
+                                <span id="val-stiffness" class="text-blue-400 font-bold">0.8</span>
                             </div>
                             <input type="range" id="ctrl-stiffness" min="0.1" max="2" step="0.1" value="0.8" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
-                    </div>
-                </div>
-
-                <!-- Section: Multi-Masa -->
-                <div>
-                    <h2 class="text-sm font-semibold text-yellow-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                        Multi-Masa (Pemberat)
-                    </h2>
-                    <div class="space-y-4">
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Beban Tambahan (Kg)</span>
-                                <span id="val-extramass">0.5</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Skala Gravitasi Simulasi</span>
+                                <span id="val-gravity" class="text-blue-400 font-bold">10.0</span>
                             </div>
-                            <input type="range" id="ctrl-extramass" min="0.1" max="3.0" step="0.1" value="0.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-gravity" min="0" max="25" step="0.5" value="10.0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section: Weaving Generator -->
+                <!-- Section 2: Multi-Masa (Pemberat Dinamis & Preset) -->
                 <div>
-                    <h2 class="text-sm font-semibold text-teal-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                        Generator Pola Weaving
+                    <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        Sistem Multi-Masa (Pemberat)
                     </h2>
-                    <div class="space-y-4">
+                    <div class="bg-amber-950/20 p-3 rounded-xl border border-amber-500/20 space-y-4">
                         <div>
-                            <label class="block text-xs mb-1">Desain Anyaman & Winding</label>
-                            <select id="ctrl-pattern" class="w-full bg-slate-800 border border-slate-600 rounded text-sm p-1.5 focus:ring-blue-500 focus:border-blue-500 text-white">
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Berat Per Titik (Kg)</span>
+                                <span id="val-extramass" class="text-amber-400 font-bold">0.5</span>
+                            </div>
+                            <input type="range" id="ctrl-extramass" min="0.1" max="25.0" step="0.1" value="0.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Preset Sebaran Massa Fast-Load</label>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button id="btn-preset-center" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">🎯 Pusat (Center)</button>
+                                <button id="btn-preset-4points" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">❖ 4-Titik Simetris</button>
+                                <button id="btn-preset-ring" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">⭕ Cincin Perimeter</button>
+                                <button id="btn-preset-random" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">🎲 Distribusi Acak</button>
+                            </div>
+                            <button id="btn-clear-masses" class="w-full mt-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-xs py-1.5 rounded-lg border border-rose-800/40 transition flex items-center justify-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Hapus Semua Massa Ekstra
+                            </button>
+                        </div>
+
+                        <!-- Mass Stats Display -->
+                        <div class="flex justify-between items-center text-[11px] pt-1 border-t border-amber-500/20 text-slate-400">
+                            <span>Titik Massa Aktif: <strong id="stat-mass-count" class="text-amber-300">0</strong></span>
+                            <span>Total Beban: <strong id="stat-mass-total" class="text-amber-300">0.0 kg</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Weaving Generator -->
+                <div>
+                    <h2 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        Generator Pola Weaving & Winding
+                    </h2>
+                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Algoritma & Desain Anyaman</label>
+                            <select id="ctrl-pattern" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 focus:ring-2 focus:ring-teal-500 text-white outline-none">
                                 <optgroup label="Tekstil Tradisional">
                                     <option value="plain">Plain Weave (Anyaman Dasar 1/1)</option>
                                     <option value="twill">Twill Weave (Anyaman Kepar 2/1)</option>
@@ -106,171 +140,215 @@
                                 </optgroup>
                                 <optgroup label="Biomimetik (Achim Menges Style)">
                                     <option value="menges_coreless">Coreless Winding (Geometri Elytra)</option>
-                                    <option value="menges_swarm">Agent-Based Swarm (Berbasis Stress)</option>
+                                    <option value="menges_swarm" selected>Agent-Based Swarm (Berbasis Stress & Massa)</option>
                                 </optgroup>
                             </select>
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Kepadatan Benang / Agen</span>
-                                <span id="val-density">20</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Kepadatan Benang / Agen</span>
+                                <span id="val-density" class="text-teal-400 font-bold">20</span>
                             </div>
                             <input type="range" id="ctrl-density" min="5" max="50" step="1" value="20" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Amplitudo Gelombang (Offset)</span>
-                                <span id="val-offset">0.1</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Amplitudo Gelombang (Offset)</span>
+                                <span id="val-offset" class="text-teal-400 font-bold">0.10</span>
                             </div>
-                            <input type="range" id="ctrl-offset" min="0.02" max="0.3" step="0.02" value="0.1" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-offset" min="0.02" max="0.3" step="0.02" value="0.10" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section: Modifikasi Jaring (Truss) -->
+                <!-- Section 4: Modifikasi Jaring (Truss) -->
                 <div>
-                    <h2 class="text-sm font-semibold text-pink-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                        Modifikasi Truss
+                    <h2 class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                        Modifikasi Truss & Interaksi
                     </h2>
-                    <div class="space-y-4">
+                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
                         <div>
-                            <label class="block text-xs mb-1">Mode Interaksi Kursor</label>
-                            <select id="ctrl-mode" class="w-full bg-slate-800 border border-slate-600 rounded text-sm p-1.5 focus:ring-blue-500 focus:border-blue-500 text-white">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Mode Interaksi Kursor</label>
+                            <select id="ctrl-mode" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 focus:ring-2 focus:ring-pink-500 text-white outline-none">
                                 <option value="drag">Geser Anchor & Tambah Massa</option>
                                 <option value="draw">Gambar Jaring Interaktif (Drag-Drop)</option>
                             </select>
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>Ketebalan Jaring (Truss)</span>
-                                <span id="val-truss-size">0.05</span>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Ketebalan Jaring (Truss)</span>
+                                <span id="val-truss-size" class="text-pink-400 font-bold">0.05</span>
                             </div>
                             <input type="range" id="ctrl-truss-size" min="0.01" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section: View Options -->
+                <!-- Section 5: View Options -->
                 <div>
-                    <h2 class="text-sm font-semibold text-purple-300 uppercase tracking-wider mb-3">Tampilan & Interaksi</h2>
-                    <div class="space-y-2">
-                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-surface" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
-                            <span>Tampilkan Permukaan Kain</span>
+                    <h2 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3">Tampilan & Layer</h2>
+                    <div class="space-y-2.5 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-xs">
+                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input type="checkbox" id="view-surface" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
+                            <span>Permukaan Kain Membran</span>
                         </label>
-                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-truss" class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
-                            <span>Tampilkan Jaring (Truss)</span>
+                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input type="checkbox" id="view-truss" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
+                            <span>Jaring Elemen Structural (Truss)</span>
                         </label>
-                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-stress" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
-                            <span>Peta Warna Tegangan (Stress Lines)</span>
+                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input type="checkbox" id="view-stress" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
+                            <span>Peta Warna Tegangan (Stress Map)</span>
                         </label>
-                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-weaving" checked class="rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500">
-                            <span>Tampilkan Pola Weaving</span>
+                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input type="checkbox" id="view-weaving" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
+                            <span>Pola Benang Weaving & Winding</span>
+                        </label>
+                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input type="checkbox" id="view-masses" checked class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-500 w-4 h-4">
+                            <span>Tampilkan Visual Pemberat (Massa)</span>
                         </label>
                     </div>
-                    <!-- Added interaction hint -->
-                    <div class="mt-4 p-3 bg-slate-800/50 border border-slate-700 rounded-lg text-xs text-slate-300 space-y-2 shadow-inner">
-                        <p><strong class="text-blue-300">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
-                        <p><strong class="text-green-300">Dbl-Klik Kain:</strong> Tambah titik anchor baru.</p>
-                        <p><strong class="text-red-300">Dbl-Klik Anchor:</strong> Hapus titik anchor.</p>
-                        <p><strong class="text-yellow-300">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
-                        <p><strong class="text-pink-300">Mode Gambar:</strong> Tarik garis antar titik untuk buat jaring baru.</p>
+
+                    <!-- Visual interaction guide -->
+                    <div class="mt-4 p-3 bg-slate-900/60 border border-slate-800 rounded-xl text-[11px] text-slate-300 space-y-1.5">
+                        <p class="font-semibold text-slate-200 border-b border-slate-800 pb-1 mb-1">Panduan Kontrol Interaktif:</p>
+                        <p><strong class="text-blue-400">Drag Anchor:</strong> Klik & tahan bola merah.</p>
+                        <p><strong class="text-green-400">Dbl-Klik Kain:</strong> Tambah titik tumpuan (Anchor).</p>
+                        <p><strong class="text-red-400">Dbl-Klik Anchor:</strong> Hapus tumpuan.</p>
+                        <p><strong class="text-amber-400">Shift + Klik Kain:</strong> Pasang / Lepas Pemberat (Massa).</p>
+                        <p><strong class="text-pink-400">Mode Gambar:</strong> Tarik garis untuk merangkai jaring.</p>
                     </div>
                 </div>
 
-                <!-- Section: Export & Capture -->
+                <!-- Section 6: Export Tools -->
                 <div>
-                    <h2 class="text-sm font-semibold text-emerald-300 uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         Ekspor & Tangkap Gambar
                     </h2>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <button id="btn-export-obj" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
+                        <button id="btn-export-obj" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Export OBJ
                         </button>
-                        <button id="btn-export-stl" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
+                        <button id="btn-export-stl" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Export STL
                         </button>
                     </div>
-                    <button id="btn-screenshot" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1.5 shadow-lg">
+                    <button id="btn-screenshot" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         Screenshot Fullscreen (.PNG)
                     </button>
-                    <p class="text-[10px] text-slate-400 mt-2 leading-relaxed">* File <strong>.OBJ</strong> dapat langsung di-import ke Rhino 3D (disimpan sebagai .3dm), Grasshopper, Blender, maupun CAD/CAM.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Right Sidebar: Evaluation & Performance -->
+        <!-- Right Sidebar: Analytics & Structural Health -->
         <div class="flex flex-col gap-4 pointer-events-auto w-72 ui-panel">
-            <div class="glass-panel p-5 rounded-xl shadow-2xl">
-                <h2 class="text-sm font-semibold text-orange-300 uppercase tracking-wider mb-4 border-b border-slate-700 pb-2">Evaluasi Performa (Co-Design)</h2>
+            <div class="glass-panel p-5 rounded-2xl shadow-2xl space-y-4">
+                <h2 class="text-xs font-bold text-orange-400 uppercase tracking-wider border-b border-slate-700/60 pb-2 flex items-center justify-between">
+                    <span>Evaluasi Structural Co-Design</span>
+                    <span class="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+                </h2>
                 
                 <div class="space-y-4">
-                    <!-- Max Tension -->
+                    <!-- Max Stress -->
                     <div>
-                        <span class="text-xs text-slate-400 block mb-1">Tegangan Maksimum Permukaan</span>
-                        <div class="flex items-end gap-2">
-                            <span id="eval-stress" class="text-2xl font-bold text-white">0.00</span>
+                        <span class="text-[11px] text-slate-400 block mb-1">Tegangan Maksimum Permukaan</span>
+                        <div class="flex items-end gap-1.5">
+                            <span id="eval-stress" class="text-2xl font-bold text-white tracking-tight">0.00</span>
                             <span class="text-xs text-slate-400 pb-1">MPa</span>
                         </div>
-                        <div class="w-full bg-slate-700 h-1 mt-2 rounded overflow-hidden">
-                            <div id="bar-stress" class="bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 h-full w-0 transition-all duration-300"></div>
+                        <div class="w-full bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden border border-slate-700">
+                            <div id="bar-stress" class="bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500 h-full w-0 transition-all duration-300"></div>
                         </div>
                     </div>
 
                     <!-- Min Radius -->
                     <div>
-                        <span class="text-xs text-slate-400 block mb-1">Radius Belokan Minimum Weaving</span>
-                        <div class="flex items-end gap-2">
-                            <span id="eval-radius" class="text-2xl font-bold text-white">0.0</span>
+                        <span class="text-[11px] text-slate-400 block mb-1">Radius Belokan Min. Weaving</span>
+                        <div class="flex items-end gap-1.5">
+                            <span id="eval-radius" class="text-2xl font-bold text-white tracking-tight">0.0</span>
                             <span class="text-xs text-slate-400 pb-1">mm</span>
                         </div>
-                        <p id="msg-radius" class="text-[10px] mt-1 text-red-400 hidden">Peringatan: Radius benang terlalu tajam!</p>
+                        <p id="msg-radius" class="text-[10px] mt-1 text-rose-400 hidden flex items-center gap-1">
+                            ⚠️ Warning: Lengkungan benang terlalu tajam!
+                        </p>
                     </div>
 
-                    <!-- Integration Readiness -->
-                    <div class="pt-2 border-t border-slate-700">
-                        <span class="text-xs text-slate-400 block mb-1">Kesiapan Analisis Anyaman</span>
-                        <div class="flex items-center gap-2 mt-1">
-                            <div id="status-dot" class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                            <span id="eval-status" class="text-sm font-semibold text-green-400">Siap Fabrikasi</span>
+                    <!-- Multi-Mass Influence Metric -->
+                    <div>
+                        <span class="text-[11px] text-slate-400 block mb-1">Defleksi Maks. Akibat Masa</span>
+                        <div class="flex items-end gap-1.5">
+                            <span id="eval-deflection" class="text-xl font-bold text-amber-300 tracking-tight">0.00</span>
+                            <span class="text-xs text-slate-400 pb-0.5">m</span>
+                        </div>
+                    </div>
+
+                    <!-- Status readiness -->
+                    <div class="pt-3 border-t border-slate-700/60">
+                        <span class="text-[11px] text-slate-400 block mb-1">Kesiapan Analisis & Fabrikasi</span>
+                        <div class="flex items-center gap-2 mt-1 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
+                            <div id="status-dot" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                            <span id="eval-status" class="text-xs font-semibold text-emerald-400">Siap Fabrikasi</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Legend -->
-            <div class="glass-panel p-4 rounded-xl shadow-xl mt-auto">
-                <h3 class="text-xs font-semibold text-slate-300 mb-2">Legenda Stress Map</h3>
-                <div class="w-full h-3 rounded bg-gradient-to-r from-slate-200 via-yellow-200 to-red-600"></div>
-                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
-                    <span>Netral</span>
+            <!-- Stress Legend -->
+            <div class="glass-panel p-4 rounded-2xl shadow-xl mt-auto space-y-2">
+                <h3 class="text-[11px] font-semibold text-slate-300">Skala Peta Tegangan (Stress Map)</h3>
+                <div class="w-full h-3 rounded-full bg-gradient-to-r from-slate-200 via-amber-300 to-rose-600 border border-slate-700"></div>
+                <div class="flex justify-between text-[10px] text-slate-400">
+                    <span>Relaksasi / Netral</span>
                     <span>Tegang (Tension)</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TAMPILAN TOMBOL HIDE/UNHIDE UI -->
-<button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-full shadow-lg backdrop-blur-md border border-slate-600 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer">        <svg id="icon-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+    <!-- Toggle UI Button -->
+    <button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800/90 hover:bg-slate-700 text-white px-4 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-600/80 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95">
+        <svg id="icon-eye" class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
         <span id="text-toggle-ui">Hide Menu</span>
     </button>
 
-    <!-- Scripts -->
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <script>
-        // --- 0. UI TOGGLE LOGIC ---
+        // Toast Notification System (Replaces browser alert)
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'success' ? 'bg-emerald-900/90 border-emerald-500/50 text-emerald-200' :
+                            type === 'error' ? 'bg-rose-900/90 border-rose-500/50 text-rose-200' :
+                            'bg-slate-800/90 border-slate-600/50 text-slate-200';
+
+            toast.className = `glass-panel ${bgClass} px-4 py-3 rounded-xl border text-xs font-medium shadow-2xl toast-enter flex items-center gap-2 pointer-events-auto`;
+            toast.innerHTML = `<span>${message}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('toast-show'));
+
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 250);
+            }, 3000);
+        }
+
+        // --- UI TOGGLE LOGIC ---
         const btnToggleUI = document.getElementById('btn-toggle-ui');
         const uiLayer = document.getElementById('ui-layer');
         const textToggleUI = document.getElementById('text-toggle-ui');
@@ -290,38 +368,41 @@
             }
         });
 
-        // --- 1. SETUP THREE.JS SCENE ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.02);
+        scene.fog = new THREE.FogExp2(0x121316, 0.018);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 25);
+        camera.position.set(0, 16, 26);
 
-        // preserveDrawingBuffer: true enables high quality screenshot capturing
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 + 0.2; // Allow slightly looking from below
+        controls.maxPolarAngle = Math.PI / 2 + 0.2;
 
-        // Lighting
+        // Lighting System
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
+
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(10, 20, 10);
+        dirLight.position.set(12, 24, 12);
         scene.add(dirLight);
 
-        // Grid & Anchor visualizer
-        const gridHelper = new THREE.GridHelper(20, 20, 0x334155, 0x1e293b);
+        const dirLightBack = new THREE.DirectionalLight(0x38bdf8, 0.4);
+        dirLightBack.position.set(-12, -10, -12);
+        scene.add(dirLightBack);
+
+        // Grid Visualizer
+        const gridHelper = new THREE.GridHelper(24, 24, 0x334155, 0x1e293b);
         gridHelper.position.y = -0.1;
         scene.add(gridHelper);
 
-        // Interaction Objects
+        // Raycasting & Interaction Setup
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const dragPlane = new THREE.Plane();
@@ -329,22 +410,22 @@
         let intersectPoint = new THREE.Vector3();
         const anchorMeshes = [];
         
-        const anchorGeo = new THREE.SphereGeometry(0.25);
-        const anchorMat = new THREE.MeshStandardMaterial({color: 0xf87171, roughness: 0.3, metalness: 0.5}); // Warna anchor merah mudah diklik
+        const anchorGeo = new THREE.SphereGeometry(0.25, 16, 16);
+        const anchorMat = new THREE.MeshStandardMaterial({ color: 0xf87171, roughness: 0.2, metalness: 0.6 });
 
         function createAnchor(particle) {
-            if (particle.pinned) return; // Cegah duplikasi
+            if (!particle || particle.pinned) return;
             const anchor = new THREE.Mesh(anchorGeo, anchorMat);
             anchor.position.copy(particle.position);
             scene.add(anchor);
             anchorMeshes.push(anchor);
             particle.pinned = true;
             particle.anchorMesh = anchor;
-            anchor.userData.particle = particle; // Mapping bolak-balik
+            anchor.userData.particle = particle;
         }
 
         function removeAnchor(particle) {
-            if (!particle.pinned) return;
+            if (!particle || !particle.pinned) return;
             particle.pinned = false;
             if (particle.anchorMesh) {
                 scene.remove(particle.anchorMesh);
@@ -354,55 +435,176 @@
             }
         }
 
-        // Variabel dan Fungsi Multi-Masa
         const massMeshes = [];
         let extraMassValue = 0.5;
-        const massGeo = new THREE.SphereGeometry(0.15);
-        const massMat = new THREE.MeshStandardMaterial({color: 0x3b82f6, roughness: 0.4, metalness: 0.8}); // Warna biru untuk pemberat
+        const baseMassGeo = new THREE.SphereGeometry(1, 16, 16); // Unit sphere, dynamically scaled
 
-        function toggleMass(particle) {
-            if (particle.pinned) return; // Anchor tidak bisa diberi pemberat
-            
-            if (particle.hasExtraMass) {
-                // Hapus beban
-                particle.hasExtraMass = false;
-                particle.mass = physicsConfig.mass;
-                particle.invMass = 1 / particle.mass;
-                if (particle.massMesh) {
-                    scene.remove(particle.massMesh);
-                    const idx = massMeshes.indexOf(particle.massMesh);
-                    if (idx > -1) massMeshes.splice(idx, 1);
-                    particle.massMesh = null;
-                }
-            } else {
-                // Tambah beban
-                particle.hasExtraMass = true;
-                particle.mass = physicsConfig.mass + extraMassValue;
-                particle.invMass = 1 / particle.mass;
-                const mesh = new THREE.Mesh(massGeo, massMat);
-                mesh.position.copy(particle.position);
-                scene.add(mesh);
-                massMeshes.push(mesh);
-                particle.massMesh = mesh;
+        // Color gradient for mass indicators (Light weight = Amber, Heavy = Deep Magenta)
+        function getMassColor(massWeight) {
+            const t = Math.min(1, Math.max(0, (massWeight - 0.1) / 24.9));
+            const c = new THREE.Color();
+            c.setHSL(0.12 - t * 0.15, 0.9, 0.5); // Warm Amber to Magenta/Red
+            return c;
+        }
+
+        function createMassMesh(particle) {
+            const scale = 0.10 + Math.pow(particle.extraMassValue / 25.0, 0.5) * 0.45;
+            const massMat = new THREE.MeshStandardMaterial({
+                color: getMassColor(particle.extraMassValue),
+                roughness: 0.3,
+                metalness: 0.7,
+                emissive: getMassColor(particle.extraMassValue),
+                emissiveIntensity: 0.2
+            });
+            const mesh = new THREE.Mesh(baseMassGeo, massMat);
+            mesh.scale.set(scale, scale, scale);
+            mesh.position.copy(particle.position);
+            mesh.visible = document.getElementById('view-masses').checked;
+            scene.add(mesh);
+            massMeshes.push(mesh);
+            particle.massMesh = mesh;
+        }
+
+        function removeMassMesh(particle) {
+            if (particle.massMesh) {
+                scene.remove(particle.massMesh);
+                const idx = massMeshes.indexOf(particle.massMesh);
+                if (idx > -1) massMeshes.splice(idx, 1);
+                particle.massMesh = null;
             }
         }
 
-        // --- 2. PHYSICS PARAMETERS & STATE ---
-        const DIMS = 10; // Base size
-        const EXT_DIMS = DIMS * 1.2; // Extended boundary for meshing
-        const GRID_RES = 35; // Grid resolution for physics
+        function toggleMass(particle, specificWeight = null) {
+            if (!particle || particle.pinned) return;
+
+            if (particle.hasExtraMass && specificWeight === null) {
+                // Remove mass
+                particle.hasExtraMass = false;
+                particle.extraMassValue = 0;
+                particle.mass = physicsConfig.mass;
+                particle.invMass = 1 / particle.mass;
+                removeMassMesh(particle);
+            } else {
+                // Add or update mass
+                const weight = specificWeight !== null ? specificWeight : extraMassValue;
+                particle.hasExtraMass = true;
+                particle.extraMassValue = weight;
+                particle.mass = physicsConfig.mass + weight;
+                particle.invMass = 1 / particle.mass;
+
+                if (particle.massMesh) {
+                    removeMassMesh(particle);
+                }
+                createMassMesh(particle);
+            }
+            updateMassStats();
+        }
+
+        function updateMassStats() {
+            let count = 0;
+            let total = 0;
+            particles.forEach(p => {
+                if (p.hasExtraMass) {
+                    count++;
+                    total += p.extraMassValue;
+                }
+            });
+            document.getElementById('stat-mass-count').innerText = count;
+            document.getElementById('stat-mass-total').innerText = total.toFixed(1) + ' kg';
+        }
+
+        // Multi-Mass Presets
+        function clearAllMasses() {
+            particles.forEach(p => {
+                if (p.hasExtraMass) {
+                    p.hasExtraMass = false;
+                    p.extraMassValue = 0;
+                    p.mass = physicsConfig.mass;
+                    p.invMass = 1 / p.mass;
+                    removeMassMesh(p);
+                }
+            });
+            updateMassStats();
+            showToast('Semua massa tambahan dibersihkan', 'info');
+        }
+
+        function applyPresetCenterMass() {
+            clearAllMasses();
+            const mid = Math.floor(GRID_RES / 2);
+            for (let v = mid - 2; v <= mid + 2; v++) {
+                for (let u = mid - 2; u <= mid + 2; u++) {
+                    if (gridMap[v] && gridMap[v][u]) {
+                        toggleMass(gridMap[v][u], extraMassValue);
+                    }
+                }
+            }
+            showToast('Preset Massa Terpusat diterapkan', 'success');
+        }
+
+        function applyPreset4Points() {
+            clearAllMasses();
+            const offset = Math.floor(GRID_RES * 0.28);
+            const corners = [
+                [offset, offset],
+                [GRID_RES - offset, offset],
+                [offset, GRID_RES - offset],
+                [GRID_RES - offset, GRID_RES - offset]
+            ];
+            corners.forEach(([u, v]) => {
+                for (let dv = -1; dv <= 1; dv++) {
+                    for (let du = -1; du <= 1; du++) {
+                        if (gridMap[v + dv] && gridMap[v + dv][u + du]) {
+                            toggleMass(gridMap[v + dv][u + du], extraMassValue * 1.2);
+                        }
+                    }
+                }
+            });
+            showToast('Preset 4-Titik Simetris diterapkan', 'success');
+        }
+
+        function applyPresetRingMass() {
+            clearAllMasses();
+            const mid = GRID_RES / 2;
+            const radius = GRID_RES * 0.35;
+            for (let v = 0; v <= GRID_RES; v++) {
+                for (let u = 0; u <= GRID_RES; u++) {
+                    const dist = Math.hypot(u - mid, v - mid);
+                    if (Math.abs(dist - radius) < 1.4) {
+                        toggleMass(gridMap[v][u], extraMassValue);
+                    }
+                }
+            }
+            showToast('Preset Massa Perimeter Cincin diterapkan', 'success');
+        }
+
+        function applyPresetRandomMass() {
+            clearAllMasses();
+            const totalPoints = Math.floor(GRID_RES * GRID_RES * 0.08);
+            for (let i = 0; i < totalPoints; i++) {
+                const u = Math.floor(Math.random() * (GRID_RES - 2)) + 1;
+                const v = Math.floor(Math.random() * (GRID_RES - 2)) + 1;
+                const randomWeight = Number((0.2 + Math.random() * extraMassValue * 1.5).toFixed(1));
+                toggleMass(gridMap[v][u], randomWeight);
+            }
+            showToast('Preset Massa Acak diterapkan', 'success');
+        }
+
+        const DIMS = 10;
+        const EXT_DIMS = DIMS * 1.2;
+        const GRID_RES = 35;
         
         let physicsConfig = {
             upwardForce: 1.5,
             stiffness: 0.8,
             mass: 0.1,
+            gravity: 10.0,
             damping: 0.95
         };
 
         let weavingConfig = {
-            pattern: 'plain',
+            pattern: 'menges_swarm',
             density: 20,
-            offset: 0.1,
+            offset: 0.10,
             visible: true
         };
 
@@ -410,14 +612,13 @@
             thickness: 0.05
         };
 
-        let interactionMode = 'drag'; // 'drag' or 'draw'
+        let interactionMode = 'drag';
         let drawStartParticle = null;
         let tempDrawLine = null;
         let dummyObj = new THREE.Object3D();
         let dummyColor = new THREE.Color();
         const MAX_TRUSSES = 15000;
 
-        // --- 3. CLOTH / FORM-FINDING SIMULATION ---
         class Particle {
             constructor(x, y, z, mass) {
                 this.position = new THREE.Vector3(x, y, z);
@@ -428,8 +629,9 @@
                 this.invMass = 1 / mass;
                 this.pinned = false;
                 this.stress = 0; 
-                this.index = 0; // For Geometry linking
-                this.hasExtraMass = false; // Flag untuk multimasa
+                this.index = 0;
+                this.hasExtraMass = false;
+                this.extraMassValue = 0;
                 this.massMesh = null;
             }
             addForce(force) {
@@ -452,28 +654,28 @@
         const constraints = [];
         let gridMap = [];
         let clothGeometry, clothMesh;
-        let trussMesh; // Menggunakan InstancedMesh untuk ketebalan interaktif
+        let trussMesh;
 
-        // Initialize Dynamic Topology (Square Base Version)
         function initSimulation() {
-            // 1. Cleanup Old
+            // Clean old elements
             anchorMeshes.forEach(m => scene.remove(m));
             massMeshes.forEach(m => scene.remove(m));
             anchorMeshes.length = 0;
             massMeshes.length = 0;
             particles.length = 0;
             constraints.length = 0;
+
             if (clothMesh) {
                 scene.remove(clothMesh);
-                if(clothGeometry) clothGeometry.dispose();
+                if (clothGeometry) clothGeometry.dispose();
             }
             if (trussMesh) {
                 scene.remove(trussMesh);
-                if(trussMesh.geometry) trussMesh.geometry.dispose();
+                if (trussMesh.geometry) trussMesh.geometry.dispose();
             }
             draggedParticle = null;
 
-            // 2. Generate Particles (Square Grid)
+            // Generate Particles Grid
             const cellDist = EXT_DIMS / GRID_RES;
             gridMap = Array(GRID_RES + 1).fill(null).map(() => Array(GRID_RES + 1).fill(null));
             let pIndex = 0;
@@ -485,14 +687,14 @@
                     
                     const p = new Particle(x, 0, z, physicsConfig.mass);
                     p.index = pIndex++;
-                    p.u = u; // Tambahan untuk mempermudah deteksi koordinat agen Swarm
+                    p.u = u;
                     p.v = v;
                     particles.push(p);
                     gridMap[v][u] = p;
                 }
             }
 
-            // 3. Create Constraints (Springs)
+            // Create Spring Constraints
             for (let v = 0; v <= GRID_RES; v++) {
                 for (let u = 0; u <= GRID_RES; u++) {
                     const p = gridMap[v][u];
@@ -510,13 +712,13 @@
                 }
             }
 
-            // 4. Place Default Anchors (Square Corners)
+            // Default Anchors at 4 corners
             createAnchor(gridMap[0][0]);
             createAnchor(gridMap[0][GRID_RES]);
             createAnchor(gridMap[GRID_RES][0]);
             createAnchor(gridMap[GRID_RES][GRID_RES]);
 
-            // 5. Build Geometry indices for WebGL
+            // Construct Cloth Buffer Geometry
             const indices = [];
             for (let v = 0; v < GRID_RES; v++) {
                 for (let u = 0; u < GRID_RES; u++) {
@@ -536,51 +738,41 @@
             clothGeometry.setIndex(indices);
 
             const clothMaterial = new THREE.MeshStandardMaterial({
-                side: THREE.DoubleSide, vertexColors: true, roughness: 0.8, metalness: 0.1
+                side: THREE.DoubleSide, vertexColors: true, roughness: 0.75, metalness: 0.15
             });
             clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
             scene.add(clothMesh);
 
-            // 6. Build Truss Geometry (InstancedMesh untuk Ketebalan yang bisa diubah)
-            const trussMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff, roughness: 0.5, metalness: 0.3
-            });
-            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 5); // Segi-5 agar lebih efisien
+            // Instanced Mesh for Interactive Truss System
+            const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.4 });
+            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
             
             trussMesh = new THREE.InstancedMesh(cylinderGeo, trussMaterial, MAX_TRUSSES);
             trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
             if (trussMesh.instanceColor) trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
             scene.add(trussMesh);
 
-            // 7. Setup Visual Bantuan Gambar Interaktif
+            // Interactive Line Tool Helper
             if (!tempDrawLine) {
                 const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
-                const lineMat = new THREE.LineBasicMaterial({ color: 0xec4899, linewidth: 3, dashSize: 0.2, gapSize: 0.2 });
+                const lineMat = new THREE.LineBasicMaterial({ color: 0xf472b6, linewidth: 3 });
                 tempDrawLine = new THREE.Line(lineGeo, lineMat);
                 tempDrawLine.visible = false;
                 scene.add(tempDrawLine);
             }
 
-            // Re-apply visibility setting from UI
-            const showSurface = document.getElementById('view-surface');
-            if(showSurface) clothMesh.visible = showSurface.checked;
-            
-            const showTruss = document.getElementById('view-truss');
-            if(showTruss) trussMesh.visible = showTruss.checked;
+            // Sync Layer Visibilities
+            clothMesh.visible = document.getElementById('view-surface').checked;
+            trussMesh.visible = document.getElementById('view-truss').checked;
+            updateMassStats();
         }
 
-        // --- 5. WEAVING GENERATOR (ANYAMAN PARAMETRIK) ---
         let weavingGroup = new THREE.Group();
         scene.add(weavingGroup);
 
-        const warpMaterial = new THREE.LineBasicMaterial({
-            color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.9 // Cyan untuk Lungsin
-        });
-        const weftMaterial = new THREE.LineBasicMaterial({
-            color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.9 // Pink untuk Pakan
-        });
+        const warpMaterial = new THREE.LineBasicMaterial({ color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.95 });
+        const weftMaterial = new THREE.LineBasicMaterial({ color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.95 });
 
-        // Helper untuk mengekstrak titik dan normal dari permukaan Grid
         function getSurfacePointAndNormal(u_float, v_float) {
             u_float = Math.max(0, Math.min(GRID_RES, u_float));
             v_float = Math.max(0, Math.min(GRID_RES, v_float));
@@ -598,12 +790,10 @@
             const p01 = gridMap[v1][u0].position;
             const p11 = gridMap[v1][u1].position;
 
-            // Interpolasi Bilinear untuk Titik Posisi
             const p0 = new THREE.Vector3().lerpVectors(p00, p10, mu);
             const p1 = new THREE.Vector3().lerpVectors(p01, p11, mu);
             const pos = new THREE.Vector3().lerpVectors(p0, p1, mv);
             
-            // Perkiraan Vektor Normal (Arah atas permukaan)
             const vu = new THREE.Vector3().subVectors(p10, p00);
             const vv = new THREE.Vector3().subVectors(p01, p00);
             let norm = new THREE.Vector3().crossVectors(vv, vu).normalize();
@@ -614,8 +804,8 @@
         }
 
         function generateWeaving() {
-            while(weavingGroup.children.length > 0) weavingGroup.remove(weavingGroup.children[0]); 
-            if(!weavingConfig.visible) return;
+            while (weavingGroup.children.length > 0) weavingGroup.remove(weavingGroup.children[0]); 
+            if (!weavingConfig.visible) return;
 
             const N = weavingConfig.density;
             const offset = weavingConfig.offset;
@@ -623,41 +813,39 @@
             let minBendRadius = 9999;
             
             const createStrand = (points, isWarp) => {
-                for(let i=1; i<points.length-1; i++) {
-                    const v1 = new THREE.Vector3().subVectors(points[i], points[i-1]);
-                    const v2 = new THREE.Vector3().subVectors(points[i+1], points[i]);
+                for (let i = 1; i < points.length - 1; i++) {
+                    const v1 = new THREE.Vector3().subVectors(points[i], points[i - 1]);
+                    const v2 = new THREE.Vector3().subVectors(points[i + 1], points[i]);
                     const angle = v1.angleTo(v2);
-                    if(angle > 0.001) {
+                    if (angle > 0.001) {
                         const dist = (v1.length() + v2.length()) / 2;
                         const bendR = dist / angle;
-                        if(bendR < minBendRadius) minBendRadius = bendR;
+                        if (bendR < minBendRadius) minBendRadius = bendR;
                     }
                 }
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
                 weavingGroup.add(new THREE.Line(geometry, isWarp ? warpMaterial : weftMaterial));
             };
 
-            // Menentukan arah simpangan (over/under)
             const getWeaveState = (type, i, j) => {
                 if (type === 'plain') return (i + j) % 2 === 0 ? 1 : -1;
                 if (type === 'twill') return (((j - i) % 3 + 3) % 3) < 2 ? 1 : -1;
-                if (type === 'basket') return (Math.floor(i/2) + Math.floor(j/2)) % 2 === 0 ? 1 : -1;
-                if (type === 'satin') return (((j - 2*i) % 5 + 5) % 5) === 0 ? -1 : 1;
+                if (type === 'basket') return (Math.floor(i / 2) + Math.floor(j / 2)) % 2 === 0 ? 1 : -1;
+                if (type === 'satin') return (((j - 2 * i) % 5 + 5) % 5) === 0 ? -1 : 1;
                 return 1;
             };
 
-            const resolution = 4; // Detail sampel kurva antar persilangan
+            const resolution = 4;
             const steps = N * resolution;
 
             if (pattern === 'menges_coreless') {
-                // ALGORITMA CORELESS FILAMENT WINDING (MENGES ICD/ITKE)
                 const numEdgePts = GRID_RES * 4;
                 const getEdgeUV = (index) => {
                     let i = index % numEdgePts;
                     if (i < GRID_RES) return {u: i, v: 0};
-                    if (i < GRID_RES*2) return {u: GRID_RES, v: i - GRID_RES};
-                    if (i < GRID_RES*3) return {u: GRID_RES - (i - GRID_RES*2), v: GRID_RES};
-                    return {u: 0, v: GRID_RES - (i - GRID_RES*3)};
+                    if (i < GRID_RES * 2) return {u: GRID_RES, v: i - GRID_RES};
+                    if (i < GRID_RES * 3) return {u: GRID_RES - (i - GRID_RES * 2), v: GRID_RES};
+                    return {u: 0, v: GRID_RES - (i - GRID_RES * 3)};
                 };
                 
                 let strandPts1 = [];
@@ -665,14 +853,14 @@
                 let jump = Math.floor(numEdgePts * 0.37); 
                 let currIdx = 0;
                 
-                for(let i = 0; i < N * 4; i++) {
+                for (let i = 0; i < N * 4; i++) {
                     let uv1 = getEdgeUV(currIdx);
                     let uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
                     
-                    for(let s = 0; s <= 20; s++) {
-                        let t = s/20;
-                        let u = uv1.u + (uv2.u - uv1.u)*t;
-                        let v = uv1.v + (uv2.v - uv1.v)*t;
+                    for (let s = 0; s <= 20; s++) {
+                        let t = s / 20;
+                        let u = uv1.u + (uv2.u - uv1.u) * t;
+                        let v = uv1.v + (uv2.v - uv1.v) * t;
                         let {pos, norm} = getSurfacePointAndNormal(u, v);
                         strandPts1.push(pos.clone().add(norm.multiplyScalar(0.08)));
                         strandPts2.push(pos.clone().add(norm.multiplyScalar(0.12)));
@@ -683,27 +871,29 @@
                 createStrand(strandPts2, false); 
 
             } else if (pattern === 'menges_swarm') {
-                // ALGORITMA AGENT-BASED / SWARM INTELLIGENCE
-                for(let ag = 0; ag < N; ag++) {
+                // Swarm intelligence sensitive to both structural tension & multi-mass concentrations
+                for (let ag = 0; ag < N; ag++) {
                     let strandPts = [];
                     let u = Math.floor(Math.random() * GRID_RES);
                     let v = (ag % 2 === 0) ? 0 : GRID_RES; 
                     
-                    for(let step = 0; step < 60; step++) {
+                    for (let step = 0; step < 60; step++) {
                         let {pos, norm} = getSurfacePointAndNormal(u, v);
-                        strandPts.push(pos.clone().add(norm.multiplyScalar(0.06 + Math.random()*0.03)));
+                        strandPts.push(pos.clone().add(norm.multiplyScalar(0.06 + Math.random() * 0.03)));
                         
                         let bestU = u, bestV = v;
                         let maxScore = -999;
-                        for(let du = -4; du <= 4; du++) {
-                            for(let dv = -4; dv <= 4; dv++) {
+                        for (let du = -4; du <= 4; du++) {
+                            for (let dv = -4; dv <= 4; dv++) {
                                 let nu = u + du, nv = v + dv;
-                                if(nu >= 0 && nu <= GRID_RES && nv >= 0 && nv <= GRID_RES) {
-                                    let nodeStress = gridMap[nv][nu].stress;
-                                    let score = (nodeStress * 200) + (Math.random() * 5);
-                                    if(du === 0 && dv === 0) score -= 100;
+                                if (nu >= 0 && nu <= GRID_RES && nv >= 0 && nv <= GRID_RES) {
+                                    let node = gridMap[nv][nu];
+                                    let nodeStress = node.stress;
+                                    let massFactor = node.hasExtraMass ? (node.extraMassValue * 8.0) : 0;
+                                    let score = (nodeStress * 180) + massFactor + (Math.random() * 5);
+                                    if (du === 0 && dv === 0) score -= 80;
                                     
-                                    if(score > maxScore) {
+                                    if (score > maxScore) {
                                         maxScore = score;
                                         bestU = nu; bestV = nv;
                                     }
@@ -716,7 +906,7 @@
                 }
 
             } else {
-                // 1. Generate Warp Threads
+                // Traditional Weaving
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const u_base = (wt / N) * GRID_RES;
@@ -729,7 +919,6 @@
                     createStrand(strandPts, true);
                 }
 
-                // 2. Generate Weft Threads
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const v_base = (wt / N) * GRID_RES;
@@ -743,18 +932,18 @@
                 }
             }
 
-            // Update Evaluasi Teknis Weaving
+            // Update Weaving Evaluation UI
             document.getElementById('eval-radius').innerText = minBendRadius === 9999 ? "0.0" : minBendRadius.toFixed(1);
             if (minBendRadius < 0.2) {
                 document.getElementById('msg-radius').classList.remove('hidden');
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-red-500 animate-pulse";
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-rose-500 animate-pulse";
                 document.getElementById('eval-status').innerText = "Resiko Patah";
-                document.getElementById('eval-status').className = "text-sm font-semibold text-red-400";
+                document.getElementById('eval-status').className = "text-xs font-semibold text-rose-400";
             } else {
                 document.getElementById('msg-radius').classList.add('hidden');
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-green-500 animate-pulse";
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
                 document.getElementById('eval-status').innerText = "Siap Fabrikasi";
-                document.getElementById('eval-status').className = "text-sm font-semibold text-green-400";
+                document.getElementById('eval-status').className = "text-xs font-semibold text-emerald-400";
             }
         }
 
@@ -764,26 +953,32 @@
             const timeStep = 0.015;
             const sqTimeStep = timeStep * timeStep;
             
-            // 1. Calculate Forces
+            let maxDeflection = 0;
+
+            // 1. Force Integration (Tension + Dynamic Multi-Mass Gravity)
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 if (p.pinned) continue;
 
                 const netForce = new THREE.Vector3(0, 0, 0);
                 
+                // Upward prestress form-finding force
                 netForce.y += physicsConfig.upwardForce;
-                netForce.x += (Math.random() - 0.5) * 0.1;
-                netForce.z += (Math.random() - 0.5) * 0.1;
+                netForce.x += (Math.random() - 0.5) * 0.05;
+                netForce.z += (Math.random() - 0.5) * 0.05;
                 
-                const gravityConstant = 10.0;
-                netForce.y -= p.mass * gravityConstant;
+                // Downward mass gravity force calculation
+                netForce.y -= p.mass * physicsConfig.gravity;
 
                 p.addForce(netForce);
                 p.integrate(sqTimeStep);
-                p.stress = 0; 
+                p.stress = 0;
+
+                const deflection = Math.abs(p.position.y);
+                if (deflection > maxDeflection) maxDeflection = deflection;
             }
 
-            // Satisfy Constraints & Calculate Stress
+            // 2. Relaxation Constraints & Stress Map Mapping
             let currentMaxStress = 0;
             const relaxationIterations = 5;
             
@@ -804,16 +999,15 @@
                     p1.stress += strain;
                     p2.stress += strain;
                     
-                    if(strain > currentMaxStress) currentMaxStress = strain;
+                    if (strain > currentMaxStress) currentMaxStress = strain;
                 }
             }
 
             globalMaxStress = globalMaxStress * 0.9 + currentMaxStress * 0.1;
 
-            // Update Geometry and Colors
+            // 3. Update WebGL Cloth Buffers
             const positions = clothGeometry.attributes.position.array;
             const colorAttr = clothGeometry.attributes.color.array;
-            
             const useStressLines = document.getElementById('view-stress').checked;
 
             for (let i = 0; i < particles.length; i++) {
@@ -845,7 +1039,7 @@
             clothGeometry.attributes.color.needsUpdate = true;
             clothGeometry.computeVertexNormals();
 
-            // UPDATE TRUSS VISUALS (InstancedMesh)
+            // 4. Update Instanced Truss Mesh
             if (trussMesh && trussMesh.visible) {
                 trussMesh.count = constraints.length; 
                 for (let j = 0; j < constraints.length; j++) {
@@ -871,10 +1065,11 @@
                 if (trussMesh.instanceColor) trussMesh.instanceColor.needsUpdate = true;
             }
 
-            // Update UI Stress Evaluation
+            // Update Structural Analytics UI
             const displayStress = (globalMaxStress * 100).toFixed(2);
             document.getElementById('eval-stress').innerText = displayStress;
             document.getElementById('bar-stress').style.width = Math.min(100, globalMaxStress * 500) + '%';
+            document.getElementById('eval-deflection').innerText = maxDeflection.toFixed(2);
         }
 
         function animate() {
@@ -885,7 +1080,6 @@
             renderer.render(scene, camera);
         }
 
-        // --- 9. EXPORT & SCREENSHOT LOGIC ---
         function downloadBlob(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -898,28 +1092,25 @@
 
         function exportToOBJ() {
             if (typeof THREE.OBJExporter === 'undefined') {
-                alert('Pustaka OBJExporter belum siap.');
+                showToast('Modul OBJExporter belum siap', 'error');
                 return;
             }
             
             const exporter = new THREE.OBJExporter();
             const exportGroup = new THREE.Group();
 
-            if (clothMesh && clothMesh.visible) {
-                exportGroup.add(clothMesh.clone());
-            }
-            if (weavingGroup && weavingGroup.visible) {
-                exportGroup.add(weavingGroup.clone());
-            }
+            if (clothMesh && clothMesh.visible) exportGroup.add(clothMesh.clone());
+            if (weavingGroup && weavingGroup.visible) exportGroup.add(weavingGroup.clone());
 
             const result = exporter.parse(exportGroup);
             const blob = new Blob([result], { type: 'text/plain' });
             downloadBlob(blob, 'tensomatter_form_finding.obj');
+            showToast('Model 3D disalin ke tensomatter_form_finding.obj', 'success');
         }
 
         function exportToSTL() {
             if (typeof THREE.STLExporter === 'undefined') {
-                alert('Pustaka STLExporter belum siap.');
+                showToast('Modul STLExporter belum siap', 'error');
                 return;
             }
 
@@ -928,10 +1119,10 @@
             const result = exporter.parse(exportTarget, { binary: true });
             const blob = new Blob([result], { type: 'application/octet-stream' });
             downloadBlob(blob, 'tensomatter_form_finding.stl');
+            showToast('Model 3D disalin ke tensomatter_form_finding.stl', 'success');
         }
 
         function takeScreenshot() {
-            // Re-render scene for capture
             renderer.render(scene, camera);
             const dataUrl = renderer.domElement.toDataURL('image/png');
             
@@ -941,32 +1132,32 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            showToast('Tangkapan layar resolusi tinggi berhasil diunduh', 'success');
         }
 
         document.getElementById('btn-export-obj').addEventListener('click', exportToOBJ);
         document.getElementById('btn-export-stl').addEventListener('click', exportToSTL);
         document.getElementById('btn-screenshot').addEventListener('click', takeScreenshot);
 
-        // --- 7. EVENT LISTENERS ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // UI Binding
-        const bindSlider = (id, varName, configObj, displayId) => {
+        const bindSlider = (id, varName, configObj, displayId, isFloat = true) => {
             const el = document.getElementById(id);
             const disp = document.getElementById(displayId);
             el.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
+                const val = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
                 configObj[varName] = val;
-                disp.innerText = val.toFixed(1);
+                disp.innerText = isFloat ? val.toFixed(1) : val;
             });
         };
 
         bindSlider('ctrl-force', 'upwardForce', physicsConfig, 'val-force');
         bindSlider('ctrl-stiffness', 'stiffness', physicsConfig, 'val-stiffness');
+        bindSlider('ctrl-gravity', 'gravity', physicsConfig, 'val-gravity');
         bindSlider('ctrl-truss-size', 'thickness', trussConfig, 'val-truss-size');
 
         document.getElementById('ctrl-mode').addEventListener('change', (e) => {
@@ -975,18 +1166,17 @@
             if (tempDrawLine) tempDrawLine.visible = false;
         });
 
-        // Binding untuk beban massa dinamis
         document.getElementById('ctrl-extramass').addEventListener('input', (e) => {
             extraMassValue = parseFloat(e.target.value);
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
-            
-            particles.forEach(p => {
-                if (p.hasExtraMass) {
-                    p.mass = physicsConfig.mass + extraMassValue;
-                    p.invMass = 1 / p.mass;
-                }
-            });
         });
+
+        // Multi-mass preset listeners
+        document.getElementById('btn-preset-center').addEventListener('click', applyPresetCenterMass);
+        document.getElementById('btn-preset-4points').addEventListener('click', applyPreset4Points);
+        document.getElementById('btn-preset-ring').addEventListener('click', applyPresetRingMass);
+        document.getElementById('btn-preset-random').addEventListener('click', applyPresetRandomMass);
+        document.getElementById('btn-clear-masses').addEventListener('click', clearAllMasses);
 
         document.getElementById('ctrl-density').addEventListener('input', (e) => {
             weavingConfig.density = parseInt(e.target.value);
@@ -1010,14 +1200,11 @@
         document.getElementById('view-weaving').addEventListener('change', (e) => {
             weavingConfig.visible = e.target.checked;
         });
+        document.getElementById('view-masses').addEventListener('change', (e) => {
+            const isVisible = e.target.checked;
+            massMeshes.forEach(m => m.visible = isVisible);
+        });
 
-        // START
-        window.onload = () => {
-            initSimulation();
-            animate();
-        };
-
-        // --- 8. INTERACTIVITY LOGIC (DRAG & ADD/REMOVE) ---
         function updateMouse(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -1040,6 +1227,7 @@
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
+            // Shift + Click -> Toggle Multi-Mass Loading
             if (event.shiftKey && interactionMode === 'drag') {
                 if (clothMesh) {
                     const clothIntersects = raycaster.intersectObject(clothMesh);
@@ -1051,6 +1239,7 @@
                 return;
             }
 
+            // Draw Mode -> Dynamic Cable/Truss Mesh Creation
             if (interactionMode === 'draw') {
                 if (clothMesh) {
                     const intersects = raycaster.intersectObject(clothMesh);
@@ -1080,6 +1269,7 @@
                 return;
             }
 
+            // Drag Anchor Point
             const intersects = raycaster.intersectObjects(anchorMeshes);
             if (intersects.length > 0) {
                 controls.enabled = false;
@@ -1127,6 +1317,7 @@
                 if (drawEndParticle && drawEndParticle !== drawStartParticle) {
                     const dist = drawStartParticle.position.distanceTo(drawEndParticle.position);
                     constraints.push([drawStartParticle, drawEndParticle, dist]);
+                    showToast('Jaring truss interaktif ditambahkan', 'info');
                 }
                 
                 drawStartParticle = null;
@@ -1148,6 +1339,7 @@
             const anchorIntersects = raycaster.intersectObjects(anchorMeshes);
             if (anchorIntersects.length > 0) {
                 removeAnchor(anchorIntersects[0].object.userData.particle);
+                showToast('Anchor tumpuan dihapus', 'info');
                 return;
             }
 
@@ -1157,10 +1349,17 @@
                     const closestParticle = getClosestParticle(clothIntersects[0].point);
                     if (closestParticle) {
                         createAnchor(closestParticle);
+                        showToast('Anchor tumpuan baru ditambahkan', 'success');
                     }
                 }
             }
         });
+
+        window.onload = () => {
+            initSimulation();
+            animate();
+            showToast('Tensomatter Siap - Gunakan Shift+Klik untuk menambah massa', 'info');
+        };
 
     </script>
 </body>
