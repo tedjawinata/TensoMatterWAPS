@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tensomatter - Form-Finding & Winding (Multi-Masa Enhanced)</title>
+    <title>Tensomatter - Form-Finding & Agent Swarm Winding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -12,7 +12,7 @@
         #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; transition: opacity 0.3s ease; }
         .pointer-events-auto { pointer-events: auto; }
         
-        /* Custom Scrollbar */
+        /* Custom Scrollbar Styling */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
@@ -29,7 +29,7 @@
             accent-color: #3b82f6;
         }
 
-        /* Toast Animation */
+        /* Toast Animations */
         .toast-enter { transform: translateY(100%); opacity: 0; }
         .toast-show { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .toast-exit { transform: translateY(100%); opacity: 0; transition: all 0.2s ease-in; }
@@ -37,7 +37,6 @@
 </head>
 <body>
 
-    <!-- 3D Canvas -->
     <div id="canvas-container"></div>
 
     <div id="ui-layer" class="flex justify-between p-4">
@@ -48,13 +47,12 @@
             <div class="p-5 border-b border-slate-700/60 sticky top-0 bg-[#141821]/95 z-20 backdrop-blur-md">
                 <div class="flex items-center justify-between">
                     <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-indigo-400">Tensomatter</h1>
-                    <span class="text-[10px] bg-blue-500/20 text-blue-300 font-semibold px-2 py-0.5 rounded-full border border-blue-500/30">v2.5 Multi-Mass</span>
+                    <span class="text-[10px] bg-teal-500/20 text-teal-300 font-semibold px-2 py-0.5 rounded-full border border-teal-500/30">v2.6 Swarm FX</span>
                 </div>
                 <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan & Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
-                <!-- Section 1: Parameter Material -->
                 <div>
                     <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
@@ -85,7 +83,6 @@
                     </div>
                 </div>
 
-                <!-- Section 2: Multi-Masa (Pemberat Dinamis & Preset) -->
                 <div>
                     <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
@@ -122,7 +119,6 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Weaving Generator -->
                 <div>
                     <h2 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -132,24 +128,31 @@
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Algoritma & Desain Anyaman</label>
                             <select id="ctrl-pattern" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 focus:ring-2 focus:ring-teal-500 text-white outline-none">
+                                <optgroup label="Biomimetik (Achim Menges ICD/ITKE)">
+                                    <option value="menges_swarm" selected>Agent-Based Swarm (Berbasis Tegangan & Inersia)</option>
+                                    <option value="menges_coreless">Coreless Winding (Geometri Elytra Loop)</option>
+                                </optgroup>
                                 <optgroup label="Tekstil Tradisional">
                                     <option value="plain">Plain Weave (Anyaman Dasar 1/1)</option>
                                     <option value="twill">Twill Weave (Anyaman Kepar 2/1)</option>
                                     <option value="basket">Basket Weave (Anyaman Keranjang 2x2)</option>
                                     <option value="satin">Satin Weave (Anyaman Satin 4/1)</option>
                                 </optgroup>
-                                <optgroup label="Biomimetik (Achim Menges Style)">
-                                    <option value="menges_coreless">Coreless Winding (Geometri Elytra)</option>
-                                    <option value="menges_swarm" selected>Agent-Based Swarm (Berbasis Stress & Massa)</option>
-                                </optgroup>
                             </select>
                         </div>
                         <div>
                             <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Kepadatan Benang / Agen</span>
-                                <span id="val-density" class="text-teal-400 font-bold">20</span>
+                                <span class="text-slate-300">Kepadatan Benang / Agen Swarm</span>
+                                <span id="val-density" class="text-teal-400 font-bold">24</span>
                             </div>
-                            <input type="range" id="ctrl-density" min="5" max="50" step="1" value="20" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-density" min="6" max="60" step="2" value="24" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1 font-medium">
+                                <span class="text-slate-300">Sensitivitas Tegangan Agen Swarm</span>
+                                <span id="val-swarm-sens" class="text-teal-400 font-bold">1.2</span>
+                            </div>
+                            <input type="range" id="ctrl-swarm-sens" min="0.2" max="3.0" step="0.1" value="1.2" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-xs mb-1 font-medium">
@@ -161,7 +164,6 @@
                     </div>
                 </div>
 
-                <!-- Section 4: Modifikasi Jaring (Truss) -->
                 <div>
                     <h2 class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
@@ -185,7 +187,6 @@
                     </div>
                 </div>
 
-                <!-- Section 5: View Options -->
                 <div>
                     <h2 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3">Tampilan & Layer</h2>
                     <div class="space-y-2.5 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-xs">
@@ -203,7 +204,7 @@
                         </label>
                         <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
                             <input type="checkbox" id="view-weaving" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
-                            <span>Pola Benang Weaving & Winding</span>
+                            <span>Pola Serat Swarm & Winding</span>
                         </label>
                         <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
                             <input type="checkbox" id="view-masses" checked class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-500 w-4 h-4">
@@ -211,7 +212,6 @@
                         </label>
                     </div>
 
-                    <!-- Visual interaction guide -->
                     <div class="mt-4 p-3 bg-slate-900/60 border border-slate-800 rounded-xl text-[11px] text-slate-300 space-y-1.5">
                         <p class="font-semibold text-slate-200 border-b border-slate-800 pb-1 mb-1">Panduan Kontrol Interaktif:</p>
                         <p><strong class="text-blue-400">Drag Anchor:</strong> Klik & tahan bola merah.</p>
@@ -222,7 +222,6 @@
                     </div>
                 </div>
 
-                <!-- Section 6: Export Tools -->
                 <div>
                     <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -246,7 +245,6 @@
             </div>
         </div>
 
-        <!-- Right Sidebar: Analytics & Structural Health -->
         <div class="flex flex-col gap-4 pointer-events-auto w-72 ui-panel">
             <div class="glass-panel p-5 rounded-2xl shadow-2xl space-y-4">
                 <h2 class="text-xs font-bold text-orange-400 uppercase tracking-wider border-b border-slate-700/60 pb-2 flex items-center justify-between">
@@ -255,7 +253,6 @@
                 </h2>
                 
                 <div class="space-y-4">
-                    <!-- Max Stress -->
                     <div>
                         <span class="text-[11px] text-slate-400 block mb-1">Tegangan Maksimum Permukaan</span>
                         <div class="flex items-end gap-1.5">
@@ -267,7 +264,6 @@
                         </div>
                     </div>
 
-                    <!-- Min Radius -->
                     <div>
                         <span class="text-[11px] text-slate-400 block mb-1">Radius Belokan Min. Weaving</span>
                         <div class="flex items-end gap-1.5">
@@ -279,7 +275,6 @@
                         </p>
                     </div>
 
-                    <!-- Multi-Mass Influence Metric -->
                     <div>
                         <span class="text-[11px] text-slate-400 block mb-1">Defleksi Maks. Akibat Masa</span>
                         <div class="flex items-end gap-1.5">
@@ -288,7 +283,6 @@
                         </div>
                     </div>
 
-                    <!-- Status readiness -->
                     <div class="pt-3 border-t border-slate-700/60">
                         <span class="text-[11px] text-slate-400 block mb-1">Kesiapan Analisis & Fabrikasi</span>
                         <div class="flex items-center gap-2 mt-1 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
@@ -326,7 +320,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <script>
-        // Toast Notification System (Replaces browser alert)
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -348,7 +341,6 @@
             }, 3000);
         }
 
-        // --- UI TOGGLE LOGIC ---
         const btnToggleUI = document.getElementById('btn-toggle-ui');
         const uiLayer = document.getElementById('ui-layer');
         const textToggleUI = document.getElementById('text-toggle-ui');
@@ -385,7 +377,6 @@
         controls.dampingFactor = 0.05;
         controls.maxPolarAngle = Math.PI / 2 + 0.2;
 
-        // Lighting System
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
 
@@ -397,12 +388,10 @@
         dirLightBack.position.set(-12, -10, -12);
         scene.add(dirLightBack);
 
-        // Grid Visualizer
         const gridHelper = new THREE.GridHelper(24, 24, 0x334155, 0x1e293b);
         gridHelper.position.y = -0.1;
         scene.add(gridHelper);
 
-        // Raycasting & Interaction Setup
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const dragPlane = new THREE.Plane();
@@ -437,13 +426,12 @@
 
         const massMeshes = [];
         let extraMassValue = 0.5;
-        const baseMassGeo = new THREE.SphereGeometry(1, 16, 16); // Unit sphere, dynamically scaled
+        const baseMassGeo = new THREE.SphereGeometry(1, 16, 16);
 
-        // Color gradient for mass indicators (Light weight = Amber, Heavy = Deep Magenta)
         function getMassColor(massWeight) {
             const t = Math.min(1, Math.max(0, (massWeight - 0.1) / 24.9));
             const c = new THREE.Color();
-            c.setHSL(0.12 - t * 0.15, 0.9, 0.5); // Warm Amber to Magenta/Red
+            c.setHSL(0.12 - t * 0.15, 0.9, 0.5);
             return c;
         }
 
@@ -478,14 +466,12 @@
             if (!particle || particle.pinned) return;
 
             if (particle.hasExtraMass && specificWeight === null) {
-                // Remove mass
                 particle.hasExtraMass = false;
                 particle.extraMassValue = 0;
                 particle.mass = physicsConfig.mass;
                 particle.invMass = 1 / particle.mass;
                 removeMassMesh(particle);
             } else {
-                // Add or update mass
                 const weight = specificWeight !== null ? specificWeight : extraMassValue;
                 particle.hasExtraMass = true;
                 particle.extraMassValue = weight;
@@ -513,7 +499,6 @@
             document.getElementById('stat-mass-total').innerText = total.toFixed(1) + ' kg';
         }
 
-        // Multi-Mass Presets
         function clearAllMasses() {
             particles.forEach(p => {
                 if (p.hasExtraMass) {
@@ -603,7 +588,8 @@
 
         let weavingConfig = {
             pattern: 'menges_swarm',
-            density: 20,
+            density: 24,
+            swarmSensitivity: 1.2,
             offset: 0.10,
             visible: true
         };
@@ -657,7 +643,6 @@
         let trussMesh;
 
         function initSimulation() {
-            // Clean old elements
             anchorMeshes.forEach(m => scene.remove(m));
             massMeshes.forEach(m => scene.remove(m));
             anchorMeshes.length = 0;
@@ -675,7 +660,6 @@
             }
             draggedParticle = null;
 
-            // Generate Particles Grid
             const cellDist = EXT_DIMS / GRID_RES;
             gridMap = Array(GRID_RES + 1).fill(null).map(() => Array(GRID_RES + 1).fill(null));
             let pIndex = 0;
@@ -694,7 +678,6 @@
                 }
             }
 
-            // Create Spring Constraints
             for (let v = 0; v <= GRID_RES; v++) {
                 for (let u = 0; u <= GRID_RES; u++) {
                     const p = gridMap[v][u];
@@ -712,13 +695,11 @@
                 }
             }
 
-            // Default Anchors at 4 corners
             createAnchor(gridMap[0][0]);
             createAnchor(gridMap[0][GRID_RES]);
             createAnchor(gridMap[GRID_RES][0]);
             createAnchor(gridMap[GRID_RES][GRID_RES]);
 
-            // Construct Cloth Buffer Geometry
             const indices = [];
             for (let v = 0; v < GRID_RES; v++) {
                 for (let u = 0; u < GRID_RES; u++) {
@@ -743,7 +724,6 @@
             clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
             scene.add(clothMesh);
 
-            // Instanced Mesh for Interactive Truss System
             const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.4 });
             const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
             
@@ -752,7 +732,6 @@
             if (trussMesh.instanceColor) trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
             scene.add(trussMesh);
 
-            // Interactive Line Tool Helper
             if (!tempDrawLine) {
                 const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
                 const lineMat = new THREE.LineBasicMaterial({ color: 0xf472b6, linewidth: 3 });
@@ -761,7 +740,6 @@
                 scene.add(tempDrawLine);
             }
 
-            // Sync Layer Visibilities
             clothMesh.visible = document.getElementById('view-surface').checked;
             trussMesh.visible = document.getElementById('view-truss').checked;
             updateMassStats();
@@ -803,6 +781,38 @@
             return { pos, norm };
         }
 
+        function getSurfaceStressAndMass(u_float, v_float) {
+            u_float = Math.max(0, Math.min(GRID_RES, u_float));
+            v_float = Math.max(0, Math.min(GRID_RES, v_float));
+
+            const u0 = Math.floor(u_float);
+            const u1 = Math.min(GRID_RES, u0 + 1);
+            const v0 = Math.floor(v_float);
+            const v1 = Math.min(GRID_RES, v0 + 1);
+
+            const mu = u_float - u0;
+            const mv = v_float - v0;
+
+            const getNodeVal = (vIdx, uIdx) => {
+                const node = gridMap[vIdx][uIdx];
+                const massVal = node.hasExtraMass ? (node.extraMassValue * 4.0) : 0;
+                return node.stress * 100 + massVal;
+            };
+
+            const s00 = getNodeVal(v0, u0);
+            const s10 = getNodeVal(v0, u1);
+            const s01 = getNodeVal(v1, u0);
+            const s11 = getNodeVal(v1, u1);
+
+            const val = (1 - mu) * (1 - mv) * s00 + mu * (1 - mv) * s10 + (1 - mu) * mv * s01 + mu * mv * s11;
+            
+            // Gradient in UV space
+            const du = (s10 - s00) * (1 - mv) + (s11 - s01) * mv;
+            const dv = (s01 - s00) * (1 - mu) + (s11 - s10) * mu;
+
+            return { val, gradU: du, gradV: dv };
+        }
+
         function generateWeaving() {
             while (weavingGroup.children.length > 0) weavingGroup.remove(weavingGroup.children[0]); 
             if (!weavingConfig.visible) return;
@@ -813,6 +823,7 @@
             let minBendRadius = 9999;
             
             const createStrand = (points, isWarp) => {
+                if (points.length < 2) return;
                 for (let i = 1; i < points.length - 1; i++) {
                     const v1 = new THREE.Vector3().subVectors(points[i], points[i - 1]);
                     const v2 = new THREE.Vector3().subVectors(points[i + 1], points[i]);
@@ -838,7 +849,104 @@
             const resolution = 4;
             const steps = N * resolution;
 
-            if (pattern === 'menges_coreless') {
+            if (pattern === 'menges_swarm') {
+                /* 
+                 * STABLE BIOMIMETIC AGENT-BASED FIBER WINDING ALGORITHM:
+                 * - Continuous (u, v) floating coordinates.
+                 * - Deterministic seeding based on perimeter anchor points (No frame flickering).
+                 * - Vector field steering driven by stress gradients + extra mass attraction.
+                 * - Smooth angular momentum constraints (Achim Menges style coreless filament paths).
+                 */
+                const totalAgents = N;
+                const stepsPerAgent = 50;
+                const stepLength = 0.65; // Movement distance in grid UV space per step
+                const sensitivity = weavingConfig.swarmSensitivity;
+
+                for (let ag = 0; ag < totalAgents; ag++) {
+                    const strandPts = [];
+                    
+                    // Deterministic perimeter spawn point
+                    const perimeterRatio = ag / totalAgents;
+                    let u, v, initialHeading;
+
+                    if (perimeterRatio < 0.25) {
+                        // Top Edge
+                        u = (perimeterRatio / 0.25) * GRID_RES;
+                        v = 0;
+                        initialHeading = Math.PI / 2; // Move downward
+                    } else if (perimeterRatio < 0.5) {
+                        // Right Edge
+                        u = GRID_RES;
+                        v = ((perimeterRatio - 0.25) / 0.25) * GRID_RES;
+                        initialHeading = Math.PI; // Move left
+                    } else if (perimeterRatio < 0.75) {
+                        // Bottom Edge
+                        u = (1 - (perimeterRatio - 0.5) / 0.25) * GRID_RES;
+                        v = GRID_RES;
+                        initialHeading = -Math.PI / 2; // Move upward
+                    } else {
+                        // Left Edge
+                        u = 0;
+                        v = (1 - (perimeterRatio - 0.75) / 0.25) * GRID_RES;
+                        initialHeading = 0; // Move right
+                    }
+
+                    let heading = initialHeading;
+                    let dirX = Math.cos(heading);
+                    let dirY = Math.sin(heading);
+
+                    for (let step = 0; step < stepsPerAgent; step++) {
+                        // 1. Get continuous surface point and surface normal
+                        let { pos, norm } = getSurfacePointAndNormal(u, v);
+                        
+                        // Fiber height offset with subtle weave elevation
+                        const wavePhase = Math.sin(step * 0.4 + ag);
+                        const strandOffset = offset * (0.6 + 0.4 * wavePhase);
+                        strandPts.push(pos.clone().add(norm.clone().multiplyScalar(strandOffset)));
+
+                        // 2. Query stress field and gradient vector at current (u, v)
+                        const stressData = getSurfaceStressAndMass(u, v);
+                        
+                        let targetDirX = dirX;
+                        let targetDirY = dirY;
+
+                        if (Math.hypot(stressData.gradU, stressData.gradV) > 0.001) {
+                            // Steer towards higher stress / mass concentrations
+                            targetDirX = stressData.gradU * sensitivity;
+                            targetDirY = stressData.gradV * sensitivity;
+
+                            const len = Math.hypot(targetDirX, targetDirY);
+                            if (len > 0) {
+                                targetDirX /= len;
+                                targetDirY /= len;
+                            }
+                        }
+
+                        // 3. Apply smooth steering momentum (Blend 82% previous direction, 18% target direction)
+                        dirX = dirX * 0.82 + targetDirX * 0.18;
+                        dirY = dirY * 0.82 + targetDirY * 0.18;
+
+                        const len = Math.hypot(dirX, dirY);
+                        if (len > 0) {
+                            dirX /= len;
+                            dirY /= len;
+                        }
+
+                        // 4. Update agent position in continuous UV space
+                        u += dirX * stepLength;
+                        v += dirY * stepLength;
+
+                        // Boundary reflection/bounce to keep agents within grid bounds
+                        if (u < 0) { u = 0; dirX = Math.abs(dirX); }
+                        if (u > GRID_RES) { u = GRID_RES; dirX = -Math.abs(dirX); }
+                        if (v < 0) { v = 0; dirY = Math.abs(dirY); }
+                        if (v > GRID_RES) { v = GRID_RES; dirY = -Math.abs(dirY); }
+                    }
+
+                    createStrand(strandPts, ag % 2 === 0);
+                }
+
+            } else if (pattern === 'menges_coreless') {
                 const numEdgePts = GRID_RES * 4;
                 const getEdgeUV = (index) => {
                     let i = index % numEdgePts;
@@ -870,43 +978,8 @@
                 createStrand(strandPts1, true); 
                 createStrand(strandPts2, false); 
 
-            } else if (pattern === 'menges_swarm') {
-                // Swarm intelligence sensitive to both structural tension & multi-mass concentrations
-                for (let ag = 0; ag < N; ag++) {
-                    let strandPts = [];
-                    let u = Math.floor(Math.random() * GRID_RES);
-                    let v = (ag % 2 === 0) ? 0 : GRID_RES; 
-                    
-                    for (let step = 0; step < 60; step++) {
-                        let {pos, norm} = getSurfacePointAndNormal(u, v);
-                        strandPts.push(pos.clone().add(norm.multiplyScalar(0.06 + Math.random() * 0.03)));
-                        
-                        let bestU = u, bestV = v;
-                        let maxScore = -999;
-                        for (let du = -4; du <= 4; du++) {
-                            for (let dv = -4; dv <= 4; dv++) {
-                                let nu = u + du, nv = v + dv;
-                                if (nu >= 0 && nu <= GRID_RES && nv >= 0 && nv <= GRID_RES) {
-                                    let node = gridMap[nv][nu];
-                                    let nodeStress = node.stress;
-                                    let massFactor = node.hasExtraMass ? (node.extraMassValue * 8.0) : 0;
-                                    let score = (nodeStress * 180) + massFactor + (Math.random() * 5);
-                                    if (du === 0 && dv === 0) score -= 80;
-                                    
-                                    if (score > maxScore) {
-                                        maxScore = score;
-                                        bestU = nu; bestV = nv;
-                                    }
-                                }
-                            }
-                        }
-                        u = bestU; v = bestV;
-                    }
-                    createStrand(strandPts, ag % 2 === 0);
-                }
-
             } else {
-                // Traditional Weaving
+                // Traditional Weaving (Plain, Twill, Basket, Satin)
                 for (let wt = 0; wt <= N; wt++) {
                     const strandPts = [];
                     const u_base = (wt / N) * GRID_RES;
@@ -934,10 +1007,10 @@
 
             // Update Weaving Evaluation UI
             document.getElementById('eval-radius').innerText = minBendRadius === 9999 ? "0.0" : minBendRadius.toFixed(1);
-            if (minBendRadius < 0.2) {
+            if (minBendRadius < 0.2 && minBendRadius > 0) {
                 document.getElementById('msg-radius').classList.remove('hidden');
                 document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-rose-500 animate-pulse";
-                document.getElementById('eval-status').innerText = "Resiko Patah";
+                document.getElementById('eval-status').innerText = "Resiko Patah (Kritis)";
                 document.getElementById('eval-status').className = "text-xs font-semibold text-rose-400";
             } else {
                 document.getElementById('msg-radius').classList.add('hidden');
@@ -955,19 +1028,17 @@
             
             let maxDeflection = 0;
 
-            // 1. Force Integration (Tension + Dynamic Multi-Mass Gravity)
+            // 1. Force Integration
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 if (p.pinned) continue;
 
                 const netForce = new THREE.Vector3(0, 0, 0);
                 
-                // Upward prestress form-finding force
                 netForce.y += physicsConfig.upwardForce;
-                netForce.x += (Math.random() - 0.5) * 0.05;
-                netForce.z += (Math.random() - 0.5) * 0.05;
+                netForce.x += (Math.random() - 0.5) * 0.02;
+                netForce.z += (Math.random() - 0.5) * 0.02;
                 
-                // Downward mass gravity force calculation
                 netForce.y -= p.mass * physicsConfig.gravity;
 
                 p.addForce(netForce);
@@ -1065,7 +1136,6 @@
                 if (trussMesh.instanceColor) trussMesh.instanceColor.needsUpdate = true;
             }
 
-            // Update Structural Analytics UI
             const displayStress = (globalMaxStress * 100).toFixed(2);
             document.getElementById('eval-stress').innerText = displayStress;
             document.getElementById('bar-stress').style.width = Math.min(100, globalMaxStress * 500) + '%';
@@ -1171,7 +1241,6 @@
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
         });
 
-        // Multi-mass preset listeners
         document.getElementById('btn-preset-center').addEventListener('click', applyPresetCenterMass);
         document.getElementById('btn-preset-4points').addEventListener('click', applyPreset4Points);
         document.getElementById('btn-preset-ring').addEventListener('click', applyPresetRingMass);
@@ -1181,6 +1250,10 @@
         document.getElementById('ctrl-density').addEventListener('input', (e) => {
             weavingConfig.density = parseInt(e.target.value);
             document.getElementById('val-density').innerText = weavingConfig.density;
+        });
+        document.getElementById('ctrl-swarm-sens').addEventListener('input', (e) => {
+            weavingConfig.swarmSensitivity = parseFloat(e.target.value);
+            document.getElementById('val-swarm-sens').innerText = weavingConfig.swarmSensitivity.toFixed(1);
         });
         document.getElementById('ctrl-offset').addEventListener('input', (e) => {
             weavingConfig.offset = parseFloat(e.target.value);
@@ -1227,7 +1300,6 @@
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
-            // Shift + Click -> Toggle Multi-Mass Loading
             if (event.shiftKey && interactionMode === 'drag') {
                 if (clothMesh) {
                     const clothIntersects = raycaster.intersectObject(clothMesh);
@@ -1239,7 +1311,6 @@
                 return;
             }
 
-            // Draw Mode -> Dynamic Cable/Truss Mesh Creation
             if (interactionMode === 'draw') {
                 if (clothMesh) {
                     const intersects = raycaster.intersectObject(clothMesh);
@@ -1269,7 +1340,6 @@
                 return;
             }
 
-            // Drag Anchor Point
             const intersects = raycaster.intersectObjects(anchorMeshes);
             if (intersects.length > 0) {
                 controls.enabled = false;
@@ -1358,7 +1428,7 @@
         window.onload = () => {
             initSimulation();
             animate();
-            showToast('Tensomatter Siap - Gunakan Shift+Klik untuk menambah massa', 'info');
+            showToast('Tensomatter Swarm Fixed - Agen bergerak mulus & responsif', 'success');
         };
 
     </script>
