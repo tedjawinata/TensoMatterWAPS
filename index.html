@@ -31,7 +31,9 @@
             content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
             background: linear-gradient(150deg, rgba(74,222,128,0.65), rgba(22,163,74,0.12) 40%, rgba(6,95,70,0.5));
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
         }
 
         .text-accent { color: var(--accent); }
@@ -170,31 +172,35 @@
                     </div>
                 </div>
 
-                <!-- Section: Modifikasi Jaring (Truss) -->
+                <!-- Section: Rangka Luar Otomatis -->
                 <div>
                     <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                        Modifikasi Truss
+                        Frame Luar Otomatis
                     </h2>
-                    <div class="space-y-4">
+                    <div class="space-y-3">
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="frame-enabled" class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Frame Masif dari Titik Anchor</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="frame-visible" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Tampilkan Frame (Hide / Show)</span>
+                        </label>
                         <div>
-                            <label class="block text-xs mb-1">Mode Interaksi Kursor</label>
-                            <select id="ctrl-mode" class="w-full bg-neutral-800 border border-neutral-600 rounded text-sm p-1.5 text-white">
-                                <option value="drag">Geser Anchor & Tambah Massa</option>
-                                <option value="draw">Gambar Jaring Interaktif (Drag-Drop)</option>
-                            </select>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Ketebalan Frame (radius)</span>
+                                <span id="val-truss-size">0.05</span>
+                            </div>
+                            <input type="range" id="ctrl-truss-size" min="0.02" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between text-xs mb-1">
-                                <span>Ketebalan Jaring (Truss)</span>
-                                <span id="val-truss-size">0.05</span>
+                                <span>Jarak Auto-Connect (m)</span>
+                                <span id="val-connect">7.0</span>
                             </div>
-                            <input type="range" id="ctrl-truss-size" min="0.01" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-connect" min="0" max="50" step="0.5" value="7" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
-                        <p class="text-[10px] text-neutral-400 leading-relaxed">Batang hasil gambar adalah elemen batang FEM (kaku aksial EA, E sama dengan kain). Jari-jari fisik = 0.1 &times; nilai slider (tampilan visual diperbesar). Panjang awal = jarak saat digambar.</p>
-                        <button id="btn-clear-bars" class="w-full bg-neutral-900 border border-neutral-700 hover-accent text-white font-medium py-1.5 px-3 rounded-lg text-xs transition duration-200">
-                            Hapus Semua Batang Buatan (<span id="bar-count">0</span>)
-                        </button>
+                        <p class="text-[10px] text-neutral-400 leading-relaxed">Frame masif berupa balok kuning yang kaku dan lurus (tidak bisa melengkung) di antara anchor (batas luar = lambung cembung anchor; anchor di dalam otomatis tersambung ke 2 anchor luar terdekat). Tepi kain di sepanjang balok ikut terkunci lurus pada balok, dan balok mengikuti anchor saat digeser, ditambah, atau dihapus. Jika dua anchor saling mendekat hingga lebih dekat dari jarak auto-connect (0–50 m), balok penghubung antar-anchor dibuat otomatis (0 = nonaktif; terputus lagi bila dijauhkan). Jumlah balok: <span id="bar-count" class="text-accent font-semibold">0</span></p>
                     </div>
                 </div>
 
@@ -211,10 +217,6 @@
                             <span>Tampilkan Rangka (Wireframe)</span>
                         </label>
                         <label class="flex items-center space-x-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="view-truss" class="rounded bg-neutral-800 border-neutral-600 text-accent">
-                            <span>Tampilkan Jaring (Truss)</span>
-                        </label>
-                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
                             <input type="checkbox" id="view-stress" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
                             <span>Peta Warna Tegangan von Mises</span>
                         </label>
@@ -222,13 +224,6 @@
                             <input type="checkbox" id="view-weaving" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
                             <span>Tampilkan Pola Weaving</span>
                         </label>
-                    </div>
-                    <div class="mt-4 p-3 bg-neutral-900/70 border border-neutral-700 rounded-lg text-xs text-neutral-300 space-y-2 shadow-inner">
-                        <p><strong class="text-accent">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
-                        <p><strong class="text-accent">Dbl-Tap/Klik Kain:</strong> Tambah titik anchor baru.</p>
-                        <p><strong class="text-red-300">Dbl-Tap/Klik Anchor:</strong> Hapus titik anchor.</p>
-                        <p><strong class="text-accent">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
-                        <p><strong class="text-accent">Mode Gambar:</strong> Tarik garis antar titik untuk buat batang truss baru.</p>
                     </div>
                 </div>
 
@@ -286,8 +281,10 @@
                         </div>
                     </div>
                     <div id="row-bar-stress" class="hidden">
-                        <span class="text-[10px] text-neutral-400 block">&sigma; aksial batang buatan (maks)</span>
-                        <span><span id="eval-bar" class="text-base font-bold text-accent">0.000</span> <span class="text-[10px] text-neutral-400">MPa</span></span>
+                        <span class="text-[10px] text-neutral-400 block">&sigma; frame masif maks (aksial + lentur)</span>
+                        <span><span id="eval-bar" class="text-base font-bold text-accent">0.0</span> <span class="text-[10px] text-neutral-400">MPa</span> <span id="eval-bar-pct" class="text-[10px] text-neutral-400">(0% izin)</span></span>
+                        <div class="w-full bg-neutral-800 h-1 mt-1 rounded overflow-hidden"><div id="bar-frame" class="h-full w-0 transition-all duration-300" style="background:linear-gradient(90deg,#16a34a,#eab308,#800000)"></div></div>
+                        <p class="text-[10px] text-neutral-500 mt-1">Hijau = aman, merah maroon = hampir patah. Izin 250 MPa (baja).</p>
                     </div>
 
                     <!-- Min Radius -->
@@ -312,12 +309,22 @@
             </div>
 
             <!-- Legend -->
+            <div class="glass-panel p-4 rounded-xl shadow-xl">
+                <h3 class="text-xs font-semibold text-accent uppercase tracking-wider mb-3">Kontrol Interaksi</h3>
+                <div class="text-xs text-neutral-300 space-y-2">
+                        <p><strong class="text-accent">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
+                        <p><strong class="text-accent">Dbl-Tap/Klik Kain:</strong> Tambah titik anchor baru.</p>
+                        <p><strong class="text-red-300">Dbl-Tap/Klik Anchor:</strong> Hapus titik anchor.</p>
+                        <p><strong class="text-accent">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
+                </div>
+            </div>
+
             <div class="glass-panel p-4 rounded-xl shadow-xl mt-auto">
                 <h3 class="text-xs font-semibold text-neutral-300 mb-2">Legenda Tegangan von Mises</h3>
-                <div class="w-full h-3 rounded bg-gradient-to-r from-blue-600 via-green-400 via-yellow-400 to-red-600"></div>
+                <div id="legend-bar" class="w-full h-3 rounded"></div>
                 <div class="flex justify-between text-[10px] font-medium text-neutral-300 mt-1">
-                    <span id="legend-min">0.000 MPa (Biru)</span>
-                    <span id="legend-max" class="text-right">0.000 MPa (Merah)</span>
+                    <span id="legend-min">0.000 MPa (Biru dongker)</span>
+                    <span id="legend-max" class="text-right">0.000 MPa (Maroon)</span>
                 </div>
             </div>
         </div>
@@ -394,7 +401,8 @@
             maxSub: 40,         // batas substep per frame
             anchorVmax: 6.0,    // laju maks. perpindahan anchor (m/s)
             barRadiusScale: 0.1,// jari-jari fisik batang = 0.1 * slider ketebalan
-            sigmaAllow: 20.0    // tegangan acuan untuk bar indikator (MPa)
+            sigmaAllow: 20.0,   // tegangan acuan untuk bar indikator (MPa)
+            frameAllow: 250e6   // tegangan izin frame masif (Pa), baja struktural ~ 250 MPa
         };
 
         let physicsConfig = { upwardForce: 1.5, stiffness: 0.8 };
@@ -423,7 +431,135 @@
         const nodeAn = new Float64Array(N);   // anisotropi tegangan nodal (0 = isotropik, 1 = uniaksial)
 
         let tris, Minv, A0, edges, edgeRest;
-        const bars = [];                      // batang buatan: [a, b, L0]
+        const bars = [];                      // batang rangka luar otomatis: [a, b, L0]
+        const frameConfig = { enabled: false, visible: true, connect: 7.0 };
+        let frameDirty = true;
+        const frameChains = [];               // daftar rantai simpul (satu per sisi poligon anchor)
+
+        // Frame luar kaku-lurus: lambung cembung semua anchor (+ sambungan anchor dalam ke anchor
+        // lambung terdekat) pada bidang material X-Z. Tiap sisi adalah balok LURUS anchor-ke-anchor
+        // yang tidak dapat melengkung: simpul kain di sepanjang sisi dipaksa (kinematik) tetap berada
+        // pada garis lurus antara dua anchor, sesuai fraksi panjang busur referensinya.
+        const slaveFlag = new Uint8Array(N);
+        const slaves = [];                    // [simpul, anchorA, anchorB, t]
+        const chainRecs = [];                 // indeks slaves per rantai (urut dari ujung A ke B)
+        const frameSigma = [];                // tegangan kombinasi (aksial + lentur) maks per balok (Pa)
+        function buildFrame() {
+            frameDirty = false;
+            bars.length = 0;
+            frameChains.length = 0;
+            slaves.length = 0;
+            chainRecs.length = 0;
+            frameSigma.length = 0;
+            slaveFlag.fill(0);
+            if (!frameConfig.enabled) return;
+            const an = [];
+            for (let i = 0; i < N; i++) if (pinned[i]) an.push(i);
+            if (an.length < 2) return;
+            const link = (p, q) => {
+                const u0 = p % NV, v0 = (p / NV) | 0, u1 = q % NV, v1 = (q / NV) | 0;
+                const n = Math.max(Math.abs(u1 - u0), Math.abs(v1 - v0));
+                const chain = [p];
+                for (let k = 1; k <= n; k++) {
+                    const cur = idx(Math.round(u0 + (u1 - u0) * k / n), Math.round(v0 + (v1 - v0) * k / n));
+                    if (cur !== chain[chain.length - 1]) chain.push(cur);
+                }
+                if (chain.length < 2) return;
+                const recs = [];
+                const len = [0];
+                for (let k = 1; k < chain.length; k++) {
+                    const a = 3 * chain[k - 1], b = 3 * chain[k];
+                    len.push(len[k - 1] + Math.hypot(orig[b] - orig[a], orig[b + 1] - orig[a + 1], orig[b + 2] - orig[a + 2]));
+                }
+                const tot = len[len.length - 1] || 1;
+                for (let k = 1; k < chain.length - 1; k++) {
+                    if (pinned[chain[k]]) continue;         // anchor lain tetap sebagai tumpuan
+                    slaveFlag[chain[k]] = 1;
+                    slaves.push([chain[k], p, q, len[k] / tot]);
+                    recs.push(slaves.length - 1);
+                }
+                frameChains.push(chain); chainRecs.push(recs); frameSigma.push(0);
+            };
+            // Lambung cembung (convex hull) dari anchor = frame luar; anchor yang berada di dalam
+            // lambung disambungkan otomatis ke 2 anchor lambung terdekat.
+            const X = (i) => orig[3 * i], Z = (i) => orig[3 * i + 2];
+            const pts = an.slice().sort((p, q) => (X(p) - X(q)) || (Z(p) - Z(q)));
+            const cross = (o, a, b) => (X(a) - X(o)) * (Z(b) - Z(o)) - (Z(a) - Z(o)) * (X(b) - X(o));
+            const eps = 1e-9;
+            const half = (list) => {
+                const h = [];
+                for (const q of list) {
+                    while (h.length >= 2 && cross(h[h.length - 2], h[h.length - 1], q) < -eps) h.pop();
+                    h.push(q);
+                }
+                return h;
+            };
+            const lower = half(pts), upper = half(pts.slice().reverse());
+            let collinear = true;
+            for (let k = 2; k < pts.length; k++) if (Math.abs(cross(pts[0], pts[1], pts[k])) > eps) { collinear = false; break; }
+            if (collinear) {                       // semua anchor segaris: rantai terbuka
+                for (let k = 0; k + 1 < pts.length; k++) link(pts[k], pts[k + 1]);
+                return;
+            }
+            const hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+            const inHull = new Set(hull);
+            for (let k = 0; k < hull.length; k++) link(hull[k], hull[(k + 1) % hull.length]);
+            for (const i of an) {
+                if (inHull.has(i)) continue;
+                const near = hull.slice().sort((p, q) =>
+                    (Math.hypot(X(p) - X(i), Z(p) - Z(i)) - Math.hypot(X(q) - X(i), Z(q) - Z(i))) || (p - q));
+                link(i, near[0]);
+                if (near.length > 1) link(i, near[1]);
+            }
+        }
+        // Beban frame dari kain: gaya simpul terkunci (frc) dianggap beban titik pada balok tumpuan
+        // sederhana anchor-anchor. Tegangan = N/A + M*r/I (penampang bulat pejal, jari-jari = slider).
+        function frameLoads() {
+            const r = Math.max(1e-3, trussConfig.thickness), A = Math.PI * r * r, I = Math.PI * r * r * r * r / 4;
+            let worst = 0;
+            for (let c = 0; c < frameChains.length; c++) {
+                const ch = frameChains[c], recs = chainRecs[c];
+                if (recs.length === 0) { frameSigma[c] = 0; continue; }
+                const pa = 3 * ch[0], pb = 3 * ch[ch.length - 1];
+                let ux = pos[pb] - pos[pa], uy = pos[pb + 1] - pos[pa + 1], uz = pos[pb + 2] - pos[pa + 2];
+                const L = Math.hypot(ux, uy, uz);
+                if (L < 1e-9) { frameSigma[c] = 0; continue; }
+                ux /= L; uy /= L; uz /= L;
+                const n = recs.length, sx = new Array(n), Px = new Array(n), Py = new Array(n), Pz = new Array(n), Pa = new Array(n);
+                let Rx = 0, Ry = 0, Rz = 0;
+                for (let k = 0; k < n; k++) {
+                    const sl = slaves[recs[k]], j = 3 * sl[0];
+                    const fx = frc[j], fy = frc[j + 1], fz = frc[j + 2];
+                    const ax = fx * ux + fy * uy + fz * uz;
+                    Pa[k] = ax; Px[k] = fx - ax * ux; Py[k] = fy - ax * uy; Pz[k] = fz - ax * uz;
+                    sx[k] = sl[3] * L;
+                    const w = (L - sx[k]) / L;
+                    Rx += Px[k] * w; Ry += Py[k] * w; Rz += Pz[k] * w;
+                }
+                let Mmax = 0, Nmax = 0, cum = 0;
+                for (let k = 0; k < n; k++) {
+                    let mx = Rx * sx[k], my = Ry * sx[k], mz = Rz * sx[k];
+                    for (let q = 0; q < k; q++) { const d = sx[k] - sx[q]; mx -= Px[q] * d; my -= Py[q] * d; mz -= Pz[q] * d; }
+                    const m = Math.hypot(mx, my, mz);
+                    if (m > Mmax) Mmax = m;
+                    cum += Pa[k];
+                    if (Math.abs(cum) > Nmax) Nmax = Math.abs(cum);
+                }
+                const sig = Nmax / A + Mmax * r / I;
+                frameSigma[c] = sig;
+                if (sig > worst) worst = sig;
+            }
+            stats.maxBar = worst;
+        }
+        function applySlaves() {
+            for (let s = 0; s < slaves.length; s++) {
+                const sl = slaves[s], i = 3 * sl[0], a = 3 * sl[1], b = 3 * sl[2], t = sl[3];
+                pos[i] = pos[a] + t * (pos[b] - pos[a]);
+                pos[i + 1] = pos[a + 1] + t * (pos[b + 1] - pos[a + 1]);
+                pos[i + 2] = pos[a + 2] + t * (pos[b + 2] - pos[a + 2]);
+                vel[i] = vel[i + 1] = vel[i + 2] = 0;
+            }
+        }
         const stats = { maxVM: 0, maxS1: 0, maxEps: 0, maxBar: 0 };
 
         const idx = (u, v) => u + v * NV;
@@ -668,15 +804,18 @@
                 else { const s = maxMove / d; pos[j] += dx * s; pos[j + 1] += dy * s; pos[j + 2] += dz * s; }
             }
 
+            applySlaves();
+
             // beban luar: tekanan angkat setara (upwardForce per sel interior) - berat sendiri & pemberat
             const pUp = physicsConfig.upwardForce / (H * H);
             for (let i = 0; i < N; i++) {
-                if (pinned[i]) continue;
+                if (pinned[i] || slaveFlag[i]) continue;
                 frc[3 * i + 1] += pUp * nodeArea[i] - (mass[i] + extra[i]) * FEM.g;
             }
 
             elementForces(E, withStress);
             barForces(E, withStress);
+            if (withStress) frameLoads();
 
             // redaman antar-simpul sepanjang sisi elemen
             const kd = FEM.edgeDampRatio * (FEM.rho * FEM.massScale * FEM.t * H * H) * c / H;
@@ -690,7 +829,7 @@
             const drag = Math.exp(-FEM.dragGlobal * dt);
             for (let i = 0; i < N; i++) {
                 const j = 3 * i;
-                if (pinned[i]) { vel[j] = vel[j + 1] = vel[j + 2] = 0; continue; }
+                if (pinned[i] || slaveFlag[i]) { vel[j] = vel[j + 1] = vel[j + 2] = 0; continue; }
                 const im = dt / ((mass[i] + extra[i]) * FEM.massScale);
                 vel[j] = (vel[j] + frc[j] * im) * drag;
                 vel[j + 1] = (vel[j + 1] + frc[j + 1] * im) * drag;
@@ -916,11 +1055,13 @@
             anchorMeshes.push(m);
             anchorByIndex[i] = m;
             pinned[i] = 1;
+            frameDirty = true;
         }
 
         function removeAnchor(i) {
             if (!pinned[i]) return;
             pinned[i] = 0; hasTgt[i] = 0;
+            frameDirty = true;
             const m = anchorByIndex[i];
             if (m) {
                 scene.remove(m);
@@ -985,25 +1126,12 @@
         scene.add(clothMesh);
 
         // ---- Truss (visual jaring FEM + batang buatan) ----
-        const MAX_TRUSSES = 15000;
-        const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.3 });
-        const trussMesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(1, 1, 1, 5), trussMaterial, MAX_TRUSSES);
-        trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        trussMesh.frustumCulled = false;
-        trussMesh.visible = false;
-        scene.add(trussMesh);
-
-        // Garis sementara saat mode gambar
-        const tempDrawLine = new THREE.Line(
-            new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
-            new THREE.LineBasicMaterial({ color: 0x16a34a })
-        );
-        tempDrawLine.visible = false;
-        scene.add(tempDrawLine);
-
-        let interactionMode = 'drag';
-        let drawStartIndex = -1;
-
+        const frameGroup = new THREE.Group();
+        scene.add(frameGroup);
+        const frameMaterial = new THREE.MeshStandardMaterial({
+            color: 0x16a34a, roughness: 0.4, metalness: 0.2, emissive: 0x052e16, emissiveIntensity: 0.5
+        });
+        const frameMeshes = [], frameJoints = [];
         // =====================================================================
         // 3. WEAVING GENERATOR (ANYAMAN PARAMETRIK)
         // =====================================================================
@@ -1191,39 +1319,123 @@
         const UP = new THREE.Vector3(0, 1, 0);
         const tdir = new THREE.Vector3();
 
+        // Peta tegangan: biru dongker (0) -> biru -> cyan -> hijau -> kuning -> jingga -> merah maroon (maks)
         function setStressColor(color, rel) {
-            color.setHSL((1 - Math.max(0, Math.min(1, rel))) * 0.66, 1.0, 0.5); // biru (0) -> merah (maks)
+            rel = Math.max(0, Math.min(1, rel));
+            color.setHSL((1 - rel) * 0.66, 1.0, 0.26 + 0.26 * Math.sin(Math.PI * rel));
+        }
+        (function buildLegendGradient() {
+            const c = new THREE.Color(), stops = [];
+            for (let i = 0; i <= 12; i++) { setStressColor(c, i / 12); stops.push('#' + c.getHexString() + ' ' + (i / 12 * 100).toFixed(1) + '%'); }
+            document.getElementById('legend-bar').style.background = 'linear-gradient(90deg,' + stops.join(',') + ')';
+        })();
+
+        // ---- FRAME_RENDER_START ----
+        // Frame masif lurus: satu silinder kaku per sisi poligon anchor + bola sambungan di tiap anchor.
+        const frameCylGeo = new THREE.CylinderGeometry(1, 1, 1, 24, 1, false);
+        const frameBallGeo = new THREE.SphereGeometry(1, 24, 16);
+        const frUp = new THREE.Vector3(0, 1, 0), frDir = new THREE.Vector3();
+        // Auto-connect: anchor yang mendekat ke anchor lain disambung otomatis dengan balok lurus
+        // (histeresis 30% agar tidak berkedip). Balok tambahan bersifat geometris-kinematik
+        // (kedua ujungnya ikut anchor), sehingga tidak mengubah fisika kain.
+        const autoActive = new Set();
+        const extraBeams = [];                // [x0,y0,z0,x1,y1,z1]
+        function updateAutoLinks(anchorIdx) {
+            extraBeams.length = 0;
+            const Ron = frameConfig.connect, Roff = Ron * 1.3;
+            if (!frameConfig.enabled || Ron <= 0 || anchorIdx.length < 2) { autoActive.clear(); return; }
+            const linked = new Set();
+            for (const ch of frameChains) { const p = ch[0], q = ch[ch.length - 1]; linked.add(Math.min(p, q) + '-' + Math.max(p, q)); }
+            const keep = new Set();
+            const P = (i) => [pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]];
+            // anchor - anchor
+            for (let x = 0; x < anchorIdx.length; x++) for (let y = x + 1; y < anchorIdx.length; y++) {
+                const i = anchorIdx[x], j = anchorIdx[y], lo = Math.min(i, j), hi = Math.max(i, j);
+                if (linked.has(lo + '-' + hi)) continue;
+                const a = P(i), b = P(j), d = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+                const key = 'p' + lo + '-' + hi;
+                if (d < Ron || (autoActive.has(key) && d < Roff)) { keep.add(key); extraBeams.push([a[0], a[1], a[2], b[0], b[1], b[2]]); }
+            }
+            autoActive.clear(); keep.forEach(k => autoActive.add(k));
         }
 
-        function updateTruss(E) {
-            let k = 0;
-            const th = trussConfig.thickness;
-            const put = (a, b, L0) => {
-                if (k >= MAX_TRUSSES) return;
-                const ja = 3 * a, jb = 3 * b;
-                const dx = pos[jb] - pos[ja], dy = pos[jb + 1] - pos[ja + 1], dz = pos[jb + 2] - pos[ja + 2];
-                const L = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                if (L < 1e-9) return;
-                dummyObj.position.set((pos[ja] + pos[jb]) / 2, (pos[ja + 1] + pos[jb + 1]) / 2, (pos[ja + 2] + pos[jb + 2]) / 2);
-                tdir.set(dx / L, dy / L, dz / L);
-                dummyObj.quaternion.setFromUnitVectors(UP, tdir);
-                dummyObj.scale.set(th, L, th);
-                dummyObj.updateMatrix();
-                trussMesh.setMatrixAt(k, dummyObj.matrix);
-                // tegangan aksial sisi elemen = E * regangan (indikator), dibandingkan dengan acuan peta tegangan
-                setStressColor(tempColor, (E * (L - L0) / L0) / ceilPa);
-                trussMesh.setColorAt(k, tempColor);
-                k++;
-            };
-            for (let e = 0; e < edgeRest.length; e++) put(edges[2 * e], edges[2 * e + 1], edgeRest[e]);
-            for (let b = 0; b < bars.length; b++) put(bars[b][0], bars[b][1], bars[b][2]);
-            trussMesh.count = k;
-            trussMesh.instanceMatrix.needsUpdate = true;
-            if (trussMesh.instanceColor) {
-                trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
-                trussMesh.instanceColor.needsUpdate = true;
+        const extraMeshes = [];
+        // Warna menurut utilisasi u = sigma / sigma-izin: aksen #16a34a (aman) -> kuning/jingga -> merah maroon (hampir patah)
+        const frameUtilSm = [];
+        const frAcc = { h: 142 / 360, s: 0.76, l: 0.36 }, frMar = { h: 0, s: 1.0, l: 0.25 };
+        function frameColor(u, out) {
+            u = Math.max(0, Math.min(1, u));
+            return out.setHSL(frAcc.h + (frMar.h - frAcc.h) * u, frAcc.s + (frMar.s - frAcc.s) * u, frAcc.l + (frMar.l - frAcc.l) * u);
+        }
+        const frTmp = new THREE.Color();
+        function paint(mesh, u) {
+            frameColor(u, frTmp);
+            mesh.material.color.copy(frTmp);
+            mesh.material.emissive.copy(frTmp).multiplyScalar(0.22);
+        }
+        function newFrameMesh(geo) {
+            const m = new THREE.Mesh(geo, frameMaterial.clone());
+            m.frustumCulled = false; frameGroup.add(m); return m;
+        }
+        function placeBeam(mesh, x0, y0, z0, x1, y1, z1, r) {
+            const dx = x1 - x0, dy = y1 - y0, dz = z1 - z0, L = Math.hypot(dx, dy, dz);
+            if (L < 1e-9) { mesh.visible = false; return; }
+            mesh.visible = true;
+            mesh.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+            frDir.set(dx / L, dy / L, dz / L);
+            mesh.quaternion.setFromUnitVectors(frUp, frDir);
+            mesh.scale.set(r, L, r);
+        }
+
+        function updateFrame() {
+            const r = trussConfig.thickness;
+            const anchorIdx = anchorMeshes.map(m => m.userData.index);
+            updateAutoLinks(anchorIdx);
+            while (frameMeshes.length < frameChains.length) {
+                frameMeshes.push(newFrameMesh(frameCylGeo));
+            }
+            while (extraMeshes.length < extraBeams.length) {
+                extraMeshes.push(newFrameMesh(frameCylGeo));
+            }
+            const joints = new Set();
+            for (const ch of frameChains) { joints.add(ch[0]); joints.add(ch[ch.length - 1]); }
+            const jl = Array.from(joints);
+            const nj = jl.length + extraBeams.length;       // + bola di ujung balok tambahan
+            while (frameJoints.length < nj) {
+                frameJoints.push(newFrameMesh(frameBallGeo));
+            }
+            // utilisasi per balok (dihaluskan untuk tampilan saja)
+            const allow = FEM.frameAllow, jointU = new Map();
+            for (let c = 0; c < frameChains.length; c++) {
+                const raw = (frameSigma[c] || 0) / allow;
+                frameUtilSm[c] = (frameUtilSm[c] === undefined) ? raw : frameUtilSm[c] * 0.85 + raw * 0.15;
+                const ch = frameChains[c];
+                for (const e of [ch[0], ch[ch.length - 1]]) jointU.set(e, Math.max(jointU.get(e) || 0, frameUtilSm[c]));
+            }
+            frameUtilSm.length = frameChains.length;
+            for (let c = 0; c < frameMeshes.length; c++) {
+                const mesh = frameMeshes[c];
+                if (c >= frameChains.length) { mesh.visible = false; continue; }
+                paint(mesh, frameUtilSm[c]);
+                const ch = frameChains[c], a = 3 * ch[0], b = 3 * ch[ch.length - 1];
+                placeBeam(mesh, pos[a], pos[a + 1], pos[a + 2], pos[b], pos[b + 1], pos[b + 2], r);
+            }
+            for (let k = 0; k < extraMeshes.length; k++) {
+                if (k >= extraBeams.length) { extraMeshes[k].visible = false; continue; }
+                paint(extraMeshes[k], 0);
+                const e = extraBeams[k];
+                placeBeam(extraMeshes[k], e[0], e[1], e[2], e[3], e[4], e[5], r);
+            }
+            for (let k = 0; k < frameJoints.length; k++) {
+                const m = frameJoints[k];
+                if (k >= nj) { m.visible = false; continue; }
+                let x, y, z;
+                if (k < jl.length) { const j = 3 * jl[k]; x = pos[j]; y = pos[j + 1]; z = pos[j + 2]; paint(m, jointU.get(jl[k]) || 0); }
+                else { paint(m, 0); const e = extraBeams[k - jl.length]; x = e[3]; y = e[4]; z = e[5]; }
+                m.visible = true; m.position.set(x, y, z); m.scale.set(r, r, r);
             }
         }
+        // ---- FRAME_RENDER_END ----
 
         function updateVisuals() {
             const positions = posAttr.array;
@@ -1255,7 +1467,8 @@
                 m.position.set(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]);
             }
 
-            if (trussMesh.visible) updateTruss(physicsConfig.stiffness * FEM.E0);
+            frameGroup.visible = frameConfig.enabled && frameConfig.visible && frameChains.length > 0;
+            if (frameGroup.visible) updateFrame();
 
             // Panel evaluasi (Pa -> MPa)
             const vmMPa = smoothVM * PA2MPA;
@@ -1263,12 +1476,15 @@
             document.getElementById('eval-s1').innerText = (smoothS1 * PA2MPA).toFixed(3);
             document.getElementById('eval-eps').innerText = (smoothEps * 100).toFixed(2);
             document.getElementById('bar-stress').style.width = Math.min(100, vmMPa / FEM.sigmaAllow * 100) + '%';
-            document.getElementById('legend-min').innerText = '0.000 MPa (Biru)';
-            document.getElementById('legend-max').innerText = (ceilPa * PA2MPA).toFixed(3) + ' MPa (Merah)';
+            document.getElementById('legend-min').innerText = '0.000 MPa (Biru dongker)';
+            document.getElementById('legend-max').innerText = (ceilPa * PA2MPA).toFixed(3) + ' MPa (Maroon)';
             const rowBar = document.getElementById('row-bar-stress');
-            if (bars.length > 0) {
+            if (frameConfig.enabled && frameChains.length > 0) {
                 rowBar.classList.remove('hidden');
-                document.getElementById('eval-bar').innerText = (smoothBar * PA2MPA).toFixed(3);
+                const pct = Math.min(999, smoothBar / FEM.frameAllow * 100);
+                document.getElementById('eval-bar').innerText = (smoothBar * PA2MPA).toFixed(1);
+                document.getElementById('eval-bar-pct').innerText = '(' + pct.toFixed(0) + '% izin)';
+                document.getElementById('bar-frame').style.width = Math.min(100, pct) + '%';
             } else rowBar.classList.add('hidden');
         }
 
@@ -1277,8 +1493,7 @@
         // Reset penuh: anchor, pemberat, batang buatan, kamera
         function resetAll() {
             for (let i = 0; i < N; i++) { removeAnchor(i); if (extra[i] > 0) toggleMass(i); }
-            bars.length = 0;
-            document.getElementById('bar-count').innerText = '0';
+            frameDirty = true;
             femResetState();
             setDefaultAnchors();
             resetSmoothing();
@@ -1290,6 +1505,7 @@
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
+            if (frameDirty) { buildFrame(); document.getElementById('bar-count').innerText = String(frameChains.length); }
 
             if (!femFrame()) { // divergen -> pulihkan posisi otomatis, konfigurasi tetap
                 console.warn('FEM divergen, posisi di-reset.');
@@ -1385,12 +1601,6 @@
         document.getElementById('val-E').innerText = (physicsConfig.stiffness * FEM.E0 * 1e-6).toFixed(1);
         document.getElementById('lbl-allow').innerText = FEM.sigmaAllow.toFixed(1);
 
-        document.getElementById('ctrl-mode').addEventListener('change', (e) => {
-            interactionMode = e.target.value;
-            drawStartIndex = -1;
-            tempDrawLine.visible = false;
-        });
-
         document.getElementById('ctrl-extramass').addEventListener('input', (e) => {
             extraMassValue = parseFloat(e.target.value);
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
@@ -1411,13 +1621,14 @@
         });
         document.getElementById('view-surface').addEventListener('change', (e) => { clothMesh.visible = e.target.checked; });
         document.getElementById('view-wireframe').addEventListener('change', (e) => { clothMaterial.wireframe = e.target.checked; });
-        document.getElementById('view-truss').addEventListener('change', (e) => { trussMesh.visible = e.target.checked; });
         document.getElementById('view-weaving').addEventListener('change', (e) => { weavingConfig.visible = e.target.checked; });
 
-        document.getElementById('btn-clear-bars').addEventListener('click', () => {
-            bars.length = 0;
-            document.getElementById('bar-count').innerText = '0';
+        document.getElementById('frame-enabled').addEventListener('change', (e) => { frameConfig.enabled = e.target.checked; frameDirty = true; });
+        document.getElementById('ctrl-connect').addEventListener('input', (e) => {
+            frameConfig.connect = parseFloat(e.target.value);
+            document.getElementById('val-connect').innerText = frameConfig.connect.toFixed(1);
         });
+        document.getElementById('frame-visible').addEventListener('change', (e) => { frameConfig.visible = e.target.checked; });
 
         document.getElementById('btn-reset').addEventListener('click', () => {
             physicsConfig.upwardForce = 1.5;
@@ -1425,9 +1636,10 @@
             trussConfig.thickness = 0.05;
             weavingConfig = { pattern: 'plain', density: 20, offset: 0.1, visible: true };
             extraMassValue = 0.5;
-            interactionMode = 'drag';
-            drawStartIndex = -1;
-            tempDrawLine.visible = false;
+            frameConfig.enabled = false; frameConfig.visible = true;
+            frameDirty = true;
+            document.getElementById('frame-enabled').checked = false;
+            document.getElementById('frame-visible').checked = true;
 
             const setv = (id, v, txt) => { document.getElementById(id).value = v; };
             setv('ctrl-force', 1.5); document.getElementById('val-force').innerText = '1.5';
@@ -1437,17 +1649,15 @@
             setv('ctrl-pattern', 'plain'); document.getElementById('hint-swarm').classList.add('hidden');
             setv('ctrl-density', 20); document.getElementById('val-density').innerText = '20';
             setv('ctrl-offset', 0.1); document.getElementById('val-offset').innerText = '0.1';
-            setv('ctrl-mode', 'drag');
             setv('ctrl-truss-size', 0.05); document.getElementById('val-truss-size').innerText = '0.05';
+            frameConfig.connect = 7.0; setv('ctrl-connect', 7.0); document.getElementById('val-connect').innerText = '7.0';
 
             document.getElementById('view-surface').checked = true;
             document.getElementById('view-wireframe').checked = false;
-            document.getElementById('view-truss').checked = false;
             document.getElementById('view-stress').checked = true;
             document.getElementById('view-weaving').checked = true;
             clothMesh.visible = true;
             clothMaterial.wireframe = false;
-            trussMesh.visible = false;
 
             resetAll();
         });
@@ -1492,7 +1702,7 @@
             if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0 && distance < 20) {
                 lastTapTime = 0; // reset agar tidak terjadi triple tap
 
-                if (interactionMode !== 'draw') {
+                {
                     updateMouse(event);
                     raycaster.setFromCamera(mouse, camera);
 
@@ -1518,33 +1728,11 @@
             raycaster.setFromCamera(mouse, camera);
 
             // Shift+Klik: tambah/kurang massa
-            if (event.shiftKey && interactionMode === 'drag') {
+            if (event.shiftKey) {
                 const clothHits = raycastCloth();
                 if (clothHits.length > 0) {
                     const ci = getClosestParticle(clothHits[0].point);
                     if (ci >= 0) toggleMass(ci);
-                }
-                return;
-            }
-
-            // Mode menggambar batang
-            if (interactionMode === 'draw') {
-                const hits = raycastCloth();
-                if (hits.length > 0) {
-                    const hitPoint = hits[0].point;
-                    drawStartIndex = getClosestParticle(hitPoint);
-                    if (drawStartIndex >= 0) {
-                        controls.enabled = false;
-                        tempDrawLine.visible = true;
-                        const p = tempDrawLine.geometry.attributes.position.array;
-                        p[0] = pos[3 * drawStartIndex]; p[1] = pos[3 * drawStartIndex + 1]; p[2] = pos[3 * drawStartIndex + 2];
-                        p[3] = hitPoint.x; p[4] = hitPoint.y; p[5] = hitPoint.z;
-                        tempDrawLine.geometry.attributes.position.needsUpdate = true;
-                        dragPlane.setFromNormalAndCoplanarPoint(
-                            camera.getWorldDirection(new THREE.Vector3()).negate(),
-                            new THREE.Vector3(pos[3 * drawStartIndex], pos[3 * drawStartIndex + 1], pos[3 * drawStartIndex + 2])
-                        );
-                    }
                 }
                 return;
             }
@@ -1562,18 +1750,7 @@
         });
 
         renderer.domElement.addEventListener('pointermove', (event) => {
-            if (interactionMode === 'draw' && drawStartIndex >= 0) {
-                updateMouse(event);
-                raycaster.setFromCamera(mouse, camera);
-                if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
-                    const p = tempDrawLine.geometry.attributes.position.array;
-                    p[3] = intersectPoint.x; p[4] = intersectPoint.y; p[5] = intersectPoint.z;
-                    tempDrawLine.geometry.attributes.position.needsUpdate = true;
-                }
-                return;
-            }
-
-            if (draggedIndex >= 0 && interactionMode === 'drag') {
+            if (draggedIndex >= 0) {
                 updateMouse(event);
                 raycaster.setFromCamera(mouse, camera);
                 if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
@@ -1587,27 +1764,6 @@
         });
 
         renderer.domElement.addEventListener('pointerup', (event) => {
-            if (interactionMode === 'draw' && drawStartIndex >= 0) {
-                updateMouse(event);
-                raycaster.setFromCamera(mouse, camera);
-                if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
-                    const endIndex = getClosestParticle(intersectPoint, 2.5);
-                    if (endIndex >= 0 && endIndex !== drawStartIndex) {
-                        const a = drawStartIndex, b = endIndex;
-                        const exists = bars.some(s => (s[0] === a && s[1] === b) || (s[0] === b && s[1] === a));
-                        if (!exists) {
-                            const L0 = Math.hypot(pos[3 * a] - pos[3 * b], pos[3 * a + 1] - pos[3 * b + 1], pos[3 * a + 2] - pos[3 * b + 2]);
-                            if (L0 > 1e-6) bars.push([a, b, L0]); // panjang awal = jarak saat digambar (bebas tegangan)
-                            document.getElementById('bar-count').innerText = String(bars.length);
-                        }
-                    }
-                }
-                drawStartIndex = -1;
-                tempDrawLine.visible = false;
-                controls.enabled = true;
-                return;
-            }
-
             draggedIndex = -1;
             controls.enabled = true;
         });
