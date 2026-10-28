@@ -2,242 +2,253 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tensomatter - Form-Finding & Agent Swarm Winding</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tensomatter - Form-Finding & Winding (FEM)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #121316; color: #e2e8f0; }
-        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        :root { --accent: #16a34a; --accent-hover: #22c55e; --g1:#4ade80; --g2:#16a34a; --g3:#065f46; }
+        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; color: #e5e5e5;
+               background: #000; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; touch-action: none;
+               background: radial-gradient(ellipse 80% 70% at 50% 110%, rgba(22,163,74,0.22) 0%, rgba(6,95,70,0.08) 40%, #000 75%); }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; transition: opacity 0.3s ease; }
         .pointer-events-auto { pointer-events: auto; }
-        
-        /* Custom Scrollbar Styling */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(#4ade80,#065f46); border-radius: 4px; }
 
+        /* Panel kaca dengan border gradien hijau */
         .glass-panel {
-            background: rgba(20, 24, 33, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(160deg, rgba(10,28,18,0.82) 0%, rgba(0,0,0,0.88) 45%, rgba(0,0,0,0.92) 100%);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 28px rgba(22,163,74,0.12), inset 0 1px 0 rgba(74,222,128,0.18);
+        }
+        .glass-panel:not(.absolute):not(.fixed) { position: relative; }
+        .glass-panel::before {
+            content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+            background: linear-gradient(150deg, rgba(74,222,128,0.65), rgba(22,163,74,0.12) 40%, rgba(6,95,70,0.5));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
         }
 
-        input[type=range] {
-            accent-color: #3b82f6;
-        }
+        .text-accent { color: var(--accent); }
+        .bg-accent { background-color: var(--accent); }
+        /* Judul & heading bergradien */
+        .grad-text { background: linear-gradient(100deg, #bbf7d0 0%, #4ade80 35%, #16a34a 70%, #059669 100%);
+                     -webkit-background-clip: text; background-clip: text; color: transparent; }
+        h1.text-accent { font-size: 1.6rem; letter-spacing: -0.02em; filter: drop-shadow(0 0 14px rgba(22,163,74,0.45)); }
+        h2.text-accent { display:flex; align-items:center; gap:.5rem; }
+        h2.text-accent::before { content:''; width:4px; height:14px; border-radius:2px; background: linear-gradient(#4ade80,#065f46); box-shadow:0 0 8px rgba(74,222,128,.6); flex:none; }
 
-        /* Toast Animations */
-        .toast-enter { transform: translateY(100%); opacity: 0; }
-        .toast-show { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        .toast-exit { transform: translateY(100%); opacity: 0; transition: all 0.2s ease-in; }
+        /* Tombol gradien */
+        .btn-accent { background: linear-gradient(135deg, #4ade80 0%, #16a34a 55%, #047857 100%); color: #021208; font-weight: 700;
+                      box-shadow: 0 4px 16px rgba(22,163,74,0.35), inset 0 1px 0 rgba(255,255,255,0.35); transition: all .2s ease; }
+        .btn-accent:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 6px 22px rgba(34,197,94,0.5), inset 0 1px 0 rgba(255,255,255,0.45); }
+        .btn-accent:active { transform: translateY(0); }
+        .hover-accent { transition: all .2s ease; }
+        .hover-accent:hover { background: linear-gradient(135deg,#4ade80,#16a34a 60%,#047857); color:#021208; border-color: transparent; box-shadow: 0 4px 16px rgba(22,163,74,.4); }
+
+        /* Slider gradien */
+        input[type=range] { -webkit-appearance:none; appearance:none; height:6px; border-radius:999px; outline:none;
+            background: linear-gradient(90deg, #065f46, #16a34a, #4ade80) !important; opacity:.9; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+            background: radial-gradient(circle at 35% 30%, #fff, #86efac 45%, #16a34a); border:2px solid #052e16; box-shadow:0 0 10px rgba(74,222,128,.8); cursor:pointer; }
+        input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%; background: radial-gradient(circle at 35% 30%, #fff, #86efac 45%, #16a34a); border:2px solid #052e16; box-shadow:0 0 10px rgba(74,222,128,.8); cursor:pointer; }
+        input[type=checkbox] { accent-color: #16a34a; }
+        select { background: linear-gradient(180deg,#0b1a12,#000) !important; border: 1px solid rgba(22,163,74,.35) !important; border-radius: .5rem; }
+        select:focus, button:focus-visible, input:focus-visible { outline: 2px solid rgba(74,222,128,.7); outline-offset: 1px; }
+        select option, select optgroup { background: #050a07; color: #e5e5e5; }
+        .bg-neutral-900\/70 { background: linear-gradient(135deg, rgba(22,163,74,0.10), rgba(0,0,0,0.5)) !important; border: 1px solid rgba(22,163,74,.18); }
+        .border-neutral-700 { border-color: rgba(22,163,74,.22) !important; }
+        .border-neutral-600 { border-color: rgba(22,163,74,.3) !important; }
     </style>
 </head>
 <body>
-
+    <!-- 3D Canvas -->
     <div id="canvas-container"></div>
 
+    <!-- UI Overlay -->
     <div id="ui-layer" class="flex justify-between p-4">
-        
+
         <!-- Left Sidebar: Controls -->
-        <div class="glass-panel w-84 h-full max-h-[calc(100vh-2rem)] rounded-2xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto ui-panel">
-            <!-- Header -->
-            <div class="p-5 border-b border-slate-700/60 sticky top-0 bg-[#141821]/95 z-20 backdrop-blur-md">
-                <div class="flex items-center justify-between">
-                    <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-indigo-400">Tensomatter</h1>
-                    <span class="text-[10px] bg-teal-500/20 text-teal-300 font-semibold px-2 py-0.5 rounded-full border border-teal-500/30">v2.6 Swarm FX</span>
+        <div class="glass-panel w-80 h-full max-h-[calc(100vh-2rem)] rounded-xl flex flex-col pointer-events-auto shadow-2xl overflow-y-auto ui-panel">
+            <div class="p-5 border-b border-neutral-700/50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-accent grad-text">Tensomatter</h1>
+                        <p class="text-xs text-neutral-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan dan Kamal Khairudin</p>
+                    </div>
+                    <button id="btn-reset" class="bg-neutral-900 border border-neutral-700 hover-accent text-white p-2 rounded-lg transition-colors shadow-md flex items-center justify-center shrink-0 ml-3" title="Reset ke Pengaturan Awal">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">oleh Galuh K Tedjawinata, Anastasia Maurina, Alvin F Komar, Amir Ramadhan & Kamal Khairudin</p>
             </div>
 
             <div class="p-5 flex-1 flex flex-col gap-6">
+                <!-- Section: Material & Form-Finding -->
                 <div>
-                    <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                        Parameter Material & Form-Finding
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                        Parameter Material (FEM)
                     </h2>
-                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+                    <div class="space-y-4">
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Gaya Tarik Vertikal (Tension)</span>
-                                <span id="val-force" class="text-blue-400 font-bold">1.5</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Beban Angkat Nodal (N)</span>
+                                <span id="val-force">1.5</span>
                             </div>
-                            <input type="range" id="ctrl-force" min="0" max="4" step="0.1" value="1.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-force" min="0" max="4" step="0.1" value="1.5" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Kekakuan Kain (Stiffness)</span>
-                                <span id="val-stiffness" class="text-blue-400 font-bold">0.8</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Kekakuan Kain (skala E<sub>0</sub>)</span>
+                                <span><span id="val-stiffness">0.8</span> <span class="text-neutral-400">(E = <span id="val-E">160.0</span> MPa)</span></span>
                             </div>
-                            <input type="range" id="ctrl-stiffness" min="0.1" max="2" step="0.1" value="0.8" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-stiffness" min="0.1" max="2" step="0.1" value="0.8" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
+                        <p class="text-[10px] text-neutral-400 leading-relaxed">Elemen CST membran: &nu; = 0.30, tebal 0.5 mm, &rho; = 1000 kg/m&sup3;. Satuan model: meter. Solver memakai dynamic relaxation (massa inersia fiktif), sehingga hasilnya adalah keseimbangan statik, bukan dinamika waktu nyata.</p>
+                    </div>
+                </div>
+
+                <!-- Section: Multi-Masa -->
+                <div>
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        Multi-Masa (Pemberat)
+                    </h2>
+                    <div class="space-y-4">
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Skala Gravitasi Simulasi</span>
-                                <span id="val-gravity" class="text-blue-400 font-bold">10.0</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Beban Tambahan (Kg)</span>
+                                <span id="val-extramass">0.5</span>
                             </div>
-                            <input type="range" id="ctrl-gravity" min="0" max="25" step="0.5" value="10.0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-extramass" min="0.1" max="3.0" step="0.1" value="0.5" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
 
+                <!-- Section: Weaving Generator -->
                 <div>
-                    <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                        Sistem Multi-Masa (Pemberat)
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        Generator Pola Weaving
                     </h2>
-                    <div class="bg-amber-950/20 p-3 rounded-xl border border-amber-500/20 space-y-4">
+                    <div class="space-y-4">
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Berat Per Titik (Kg)</span>
-                                <span id="val-extramass" class="text-amber-400 font-bold">0.5</span>
-                            </div>
-                            <input type="range" id="ctrl-extramass" min="0.1" max="25.0" step="0.1" value="0.5" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Preset Sebaran Massa Fast-Load</label>
-                            <div class="grid grid-cols-2 gap-1.5">
-                                <button id="btn-preset-center" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">🎯 Pusat (Center)</button>
-                                <button id="btn-preset-4points" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">❖ 4-Titik Simetris</button>
-                                <button id="btn-preset-ring" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">⭕ Cincin Perimeter</button>
-                                <button id="btn-preset-random" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-1.5 px-2 rounded-lg border border-slate-600/60 transition">🎲 Distribusi Acak</button>
-                            </div>
-                            <button id="btn-clear-masses" class="w-full mt-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-xs py-1.5 rounded-lg border border-rose-800/40 transition flex items-center justify-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                Hapus Semua Massa Ekstra
-                            </button>
-                        </div>
-
-                        <!-- Mass Stats Display -->
-                        <div class="flex justify-between items-center text-[11px] pt-1 border-t border-amber-500/20 text-slate-400">
-                            <span>Titik Massa Aktif: <strong id="stat-mass-count" class="text-amber-300">0</strong></span>
-                            <span>Total Beban: <strong id="stat-mass-total" class="text-amber-300">0.0 kg</strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h2 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                        Generator Pola Weaving & Winding
-                    </h2>
-                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Algoritma & Desain Anyaman</label>
-                            <select id="ctrl-pattern" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 focus:ring-2 focus:ring-teal-500 text-white outline-none">
-                                <optgroup label="Biomimetik (Achim Menges ICD/ITKE)">
-                                    <option value="menges_swarm" selected>Agent-Based Swarm (Berbasis Tegangan & Inersia)</option>
-                                    <option value="menges_coreless">Coreless Winding (Geometri Elytra Loop)</option>
-                                </optgroup>
+                            <label class="block text-xs mb-1">Desain Anyaman & Winding</label>
+                            <select id="ctrl-pattern" class="w-full bg-neutral-800 border border-neutral-600 rounded text-sm p-1.5 text-white">
                                 <optgroup label="Tekstil Tradisional">
                                     <option value="plain">Plain Weave (Anyaman Dasar 1/1)</option>
                                     <option value="twill">Twill Weave (Anyaman Kepar 2/1)</option>
                                     <option value="basket">Basket Weave (Anyaman Keranjang 2x2)</option>
                                     <option value="satin">Satin Weave (Anyaman Satin 4/1)</option>
                                 </optgroup>
+                                <optgroup label="Biomimetik (Achim Menges Style)">
+                                    <option value="menges_coreless">Coreless Winding (Geometri Elytra)</option>
+                                    <option value="menges_swarm">Agent-Based Swarm (Berbasis Stress)</option>
+                                </optgroup>
                             </select>
                         </div>
+                        <p id="hint-swarm" class="hidden text-[10px] text-neutral-400 leading-relaxed">Swarm: agen menelusuri arah tegangan utama hasil FEM, &sigma;<sub>1</sub> (cyan) dan &sigma;<sub>2</sub> (merah). Kepadatan = kerapatan jarak antar lintasan. Di zona tegangan isotropik (biaksial seimbang) arah tak terdefinisi, sehingga tidak ada lintasan.</p>
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Kepadatan Benang / Agen Swarm</span>
-                                <span id="val-density" class="text-teal-400 font-bold">24</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Kepadatan Benang / Agen</span>
+                                <span id="val-density">20</span>
                             </div>
-                            <input type="range" id="ctrl-density" min="6" max="60" step="2" value="24" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-density" min="5" max="50" step="1" value="20" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Sensitivitas Tegangan Agen Swarm</span>
-                                <span id="val-swarm-sens" class="text-teal-400 font-bold">1.2</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Amplitudo Gelombang (Offset)</span>
+                                <span id="val-offset">0.1</span>
                             </div>
-                            <input type="range" id="ctrl-swarm-sens" min="0.2" max="3.0" step="0.1" value="1.2" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Amplitudo Gelombang (Offset)</span>
-                                <span id="val-offset" class="text-teal-400 font-bold">0.10</span>
-                            </div>
-                            <input type="range" id="ctrl-offset" min="0.02" max="0.3" step="0.02" value="0.10" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-offset" min="0.02" max="0.3" step="0.02" value="0.1" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </div>
 
+                <!-- Section: Modifikasi Jaring (Truss) -->
                 <div>
-                    <h2 class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
-                        Modifikasi Truss & Interaksi
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                        Modifikasi Truss
                     </h2>
-                    <div class="space-y-4 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Mode Interaksi Kursor</label>
-                            <select id="ctrl-mode" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 focus:ring-2 focus:ring-pink-500 text-white outline-none">
+                            <label class="block text-xs mb-1">Mode Interaksi Kursor</label>
+                            <select id="ctrl-mode" class="w-full bg-neutral-800 border border-neutral-600 rounded text-sm p-1.5 text-white">
                                 <option value="drag">Geser Anchor & Tambah Massa</option>
                                 <option value="draw">Gambar Jaring Interaktif (Drag-Drop)</option>
                             </select>
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1 font-medium">
-                                <span class="text-slate-300">Ketebalan Jaring (Truss)</span>
-                                <span id="val-truss-size" class="text-pink-400 font-bold">0.05</span>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>Ketebalan Jaring (Truss)</span>
+                                <span id="val-truss-size">0.05</span>
                             </div>
-                            <input type="range" id="ctrl-truss-size" min="0.01" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="ctrl-truss-size" min="0.01" max="0.3" step="0.01" value="0.05" class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer">
                         </div>
+                        <p class="text-[10px] text-neutral-400 leading-relaxed">Batang hasil gambar adalah elemen batang FEM (kaku aksial EA, E sama dengan kain). Jari-jari fisik = 0.1 &times; nilai slider (tampilan visual diperbesar). Panjang awal = jarak saat digambar.</p>
+                        <button id="btn-clear-bars" class="w-full bg-neutral-900 border border-neutral-700 hover-accent text-white font-medium py-1.5 px-3 rounded-lg text-xs transition duration-200">
+                            Hapus Semua Batang Buatan (<span id="bar-count">0</span>)
+                        </button>
                     </div>
                 </div>
 
+                <!-- Section: View Options -->
                 <div>
-                    <h2 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3">Tampilan & Layer</h2>
-                    <div class="space-y-2.5 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-xs">
-                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input type="checkbox" id="view-surface" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
-                            <span>Permukaan Kain Membran</span>
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3">Tampilan & Interaksi</h2>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-surface" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Tampilkan Permukaan Kain</span>
                         </label>
-                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input type="checkbox" id="view-truss" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
-                            <span>Jaring Elemen Structural (Truss)</span>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-wireframe" class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Tampilkan Rangka (Wireframe)</span>
                         </label>
-                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input type="checkbox" id="view-stress" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
-                            <span>Peta Warna Tegangan (Stress Map)</span>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-truss" class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Tampilkan Jaring (Truss)</span>
                         </label>
-                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input type="checkbox" id="view-weaving" checked class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-4 h-4">
-                            <span>Pola Serat Swarm & Winding</span>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-stress" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Peta Warna Tegangan von Mises</span>
                         </label>
-                        <label class="flex items-center space-x-2.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input type="checkbox" id="view-masses" checked class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-500 w-4 h-4">
-                            <span>Tampilkan Visual Pemberat (Massa)</span>
+                        <label class="flex items-center space-x-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="view-weaving" checked class="rounded bg-neutral-800 border-neutral-600 text-accent">
+                            <span>Tampilkan Pola Weaving</span>
                         </label>
                     </div>
-
-                    <div class="mt-4 p-3 bg-slate-900/60 border border-slate-800 rounded-xl text-[11px] text-slate-300 space-y-1.5">
-                        <p class="font-semibold text-slate-200 border-b border-slate-800 pb-1 mb-1">Panduan Kontrol Interaktif:</p>
-                        <p><strong class="text-blue-400">Drag Anchor:</strong> Klik & tahan bola merah.</p>
-                        <p><strong class="text-green-400">Dbl-Klik Kain:</strong> Tambah titik tumpuan (Anchor).</p>
-                        <p><strong class="text-red-400">Dbl-Klik Anchor:</strong> Hapus tumpuan.</p>
-                        <p><strong class="text-amber-400">Shift + Klik Kain:</strong> Pasang / Lepas Pemberat (Massa).</p>
-                        <p><strong class="text-pink-400">Mode Gambar:</strong> Tarik garis untuk merangkai jaring.</p>
+                    <div class="mt-4 p-3 bg-neutral-900/70 border border-neutral-700 rounded-lg text-xs text-neutral-300 space-y-2 shadow-inner">
+                        <p><strong class="text-accent">Drag Anchor:</strong> Geser titik tumpu (3D).</p>
+                        <p><strong class="text-accent">Dbl-Tap/Klik Kain:</strong> Tambah titik anchor baru.</p>
+                        <p><strong class="text-red-300">Dbl-Tap/Klik Anchor:</strong> Hapus titik anchor.</p>
+                        <p><strong class="text-accent">Shift + Klik:</strong> Tambah/Hapus Pemberat (Masa).</p>
+                        <p><strong class="text-accent">Mode Gambar:</strong> Tarik garis antar titik untuk buat batang truss baru.</p>
                     </div>
                 </div>
 
+                <!-- Section: Export & Capture -->
                 <div>
-                    <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         Ekspor & Tangkap Gambar
                     </h2>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <button id="btn-export-obj" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
+                        <button id="btn-export-obj" class="btn-accent font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Export OBJ
                         </button>
-                        <button id="btn-export-stl" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
+                        <button id="btn-export-stl" class="btn-accent font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1 shadow-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Export STL
                         </button>
                     </div>
-                    <button id="btn-screenshot" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-3 rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-lg active:scale-95">
+                    <button id="btn-screenshot" class="w-full btn-accent font-medium py-2 px-3 rounded-lg text-xs transition duration-200 flex items-center justify-center gap-1.5 shadow-lg">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         Screenshot Fullscreen (.PNG)
                     </button>
@@ -245,74 +256,78 @@
             </div>
         </div>
 
+        <!-- Right Sidebar: Evaluation & Performance -->
         <div class="flex flex-col gap-4 pointer-events-auto w-72 ui-panel">
-            <div class="glass-panel p-5 rounded-2xl shadow-2xl space-y-4">
-                <h2 class="text-xs font-bold text-orange-400 uppercase tracking-wider border-b border-slate-700/60 pb-2 flex items-center justify-between">
-                    <span>Evaluasi Structural Co-Design</span>
-                    <span class="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
-                </h2>
-                
+            <div class="glass-panel p-5 rounded-xl shadow-2xl">
+                <h2 class="text-sm font-semibold text-accent uppercase tracking-wider mb-4 border-b border-neutral-700 pb-2">Evaluasi Performa (Co-Design)</h2>
+
                 <div class="space-y-4">
+                    <!-- Max von Mises -->
                     <div>
-                        <span class="text-[11px] text-slate-400 block mb-1">Tegangan Maksimum Permukaan</span>
-                        <div class="flex items-end gap-1.5">
-                            <span id="eval-stress" class="text-2xl font-bold text-white tracking-tight">0.00</span>
-                            <span class="text-xs text-slate-400 pb-1">MPa</span>
+                        <span class="text-xs text-neutral-400 block mb-1">Tegangan von Mises Maksimum</span>
+                        <div class="flex items-end gap-2">
+                            <span id="eval-stress" class="text-2xl font-bold text-white">0.000</span>
+                            <span class="text-xs text-neutral-400 pb-1">MPa</span>
                         </div>
-                        <div class="w-full bg-slate-800 h-1.5 mt-2 rounded-full overflow-hidden border border-slate-700">
-                            <div id="bar-stress" class="bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500 h-full w-0 transition-all duration-300"></div>
+                        <div class="w-full bg-neutral-700 h-1 mt-2 rounded overflow-hidden">
+                            <div id="bar-stress" class="bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 h-full w-0 transition-all duration-300"></div>
                         </div>
+                        <p class="text-[10px] text-neutral-500 mt-1">Batas acuan: <span id="lbl-allow">1.0</span> MPa</p>
                     </div>
 
-                    <div>
-                        <span class="text-[11px] text-slate-400 block mb-1">Radius Belokan Min. Weaving</span>
-                        <div class="flex items-end gap-1.5">
-                            <span id="eval-radius" class="text-2xl font-bold text-white tracking-tight">0.0</span>
-                            <span class="text-xs text-slate-400 pb-1">mm</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-[10px] text-neutral-400 block">&sigma;<sub>1</sub> maks (utama)</span>
+                            <span><span id="eval-s1" class="text-base font-bold text-white">0.000</span> <span class="text-[10px] text-neutral-400">MPa</span></span>
                         </div>
-                        <p id="msg-radius" class="text-[10px] mt-1 text-rose-400 hidden flex items-center gap-1">
-                            ⚠️ Warning: Lengkungan benang terlalu tajam!
-                        </p>
-                    </div>
-
-                    <div>
-                        <span class="text-[11px] text-slate-400 block mb-1">Defleksi Maks. Akibat Masa</span>
-                        <div class="flex items-end gap-1.5">
-                            <span id="eval-deflection" class="text-xl font-bold text-amber-300 tracking-tight">0.00</span>
-                            <span class="text-xs text-slate-400 pb-0.5">m</span>
+                        <div>
+                            <span class="text-[10px] text-neutral-400 block">Regangan maks</span>
+                            <span><span id="eval-eps" class="text-base font-bold text-white">0.00</span> <span class="text-[10px] text-neutral-400">%</span></span>
                         </div>
                     </div>
+                    <div id="row-bar-stress" class="hidden">
+                        <span class="text-[10px] text-neutral-400 block">&sigma; aksial batang buatan (maks)</span>
+                        <span><span id="eval-bar" class="text-base font-bold text-accent">0.000</span> <span class="text-[10px] text-neutral-400">MPa</span></span>
+                    </div>
 
-                    <div class="pt-3 border-t border-slate-700/60">
-                        <span class="text-[11px] text-slate-400 block mb-1">Kesiapan Analisis & Fabrikasi</span>
-                        <div class="flex items-center gap-2 mt-1 bg-slate-800/50 p-2 rounded-lg border border-slate-700/50">
-                            <div id="status-dot" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span id="eval-status" class="text-xs font-semibold text-emerald-400">Siap Fabrikasi</span>
+                    <!-- Min Radius -->
+                    <div>
+                        <span class="text-xs text-neutral-400 block mb-1">Radius Belokan Minimum Weaving</span>
+                        <div class="flex items-end gap-2">
+                            <span id="eval-radius" class="text-2xl font-bold text-white">0.0</span>
+                            <span class="text-xs text-neutral-400 pb-1">cm</span>
+                        </div>
+                        <p id="msg-radius" class="text-[10px] mt-1 text-red-400 hidden">Peringatan: Radius benang terlalu tajam!</p>
+                    </div>
+
+                    <!-- Integration Readiness -->
+                    <div class="pt-2 border-t border-neutral-700">
+                        <span class="text-xs text-neutral-400 block mb-1">Kesiapan Analisis Anyaman</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div id="status-dot" class="w-3 h-3 rounded-full bg-accent animate-pulse"></div>
+                            <span id="eval-status" class="text-sm font-semibold text-accent">Siap Fabrikasi</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stress Legend -->
-            <div class="glass-panel p-4 rounded-2xl shadow-xl mt-auto space-y-2">
-                <h3 class="text-[11px] font-semibold text-slate-300">Skala Peta Tegangan (Stress Map)</h3>
-                <div class="w-full h-3 rounded-full bg-gradient-to-r from-slate-200 via-amber-300 to-rose-600 border border-slate-700"></div>
-                <div class="flex justify-between text-[10px] text-slate-400">
-                    <span>Relaksasi / Netral</span>
-                    <span>Tegang (Tension)</span>
+            <!-- Legend -->
+            <div class="glass-panel p-4 rounded-xl shadow-xl mt-auto">
+                <h3 class="text-xs font-semibold text-neutral-300 mb-2">Legenda Tegangan von Mises</h3>
+                <div class="w-full h-3 rounded bg-gradient-to-r from-blue-600 via-green-400 via-yellow-400 to-red-600"></div>
+                <div class="flex justify-between text-[10px] font-medium text-neutral-300 mt-1">
+                    <span id="legend-min">0.000 MPa (Biru)</span>
+                    <span id="legend-max" class="text-right">0.000 MPa (Merah)</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Toggle UI Button -->
-    <button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800/90 hover:bg-slate-700 text-white px-4 py-2.5 rounded-full shadow-2xl backdrop-blur-md border border-slate-600/80 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer active:scale-95">
-        <svg id="icon-eye" class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+    <button id="btn-toggle-ui" class="fixed bottom-6 left-1/2 -tranneutral-x-1/2 z-50 bg-black/80 hover-accent text-white p-3 rounded-full shadow-lg backdrop-blur-md border border-[#16a34a] transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer">
+        <svg id="icon-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
         <span id="text-toggle-ui">Hide Menu</span>
     </button>
-
-    <!-- Notification Toast Container -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -320,27 +335,9 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <script>
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const bgClass = type === 'success' ? 'bg-emerald-900/90 border-emerald-500/50 text-emerald-200' :
-                            type === 'error' ? 'bg-rose-900/90 border-rose-500/50 text-rose-200' :
-                            'bg-slate-800/90 border-slate-600/50 text-slate-200';
-
-            toast.className = `glass-panel ${bgClass} px-4 py-3 rounded-xl border text-xs font-medium shadow-2xl toast-enter flex items-center gap-2 pointer-events-auto`;
-            toast.innerHTML = `<span>${message}</span>`;
-            
-            container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.add('toast-show'));
-
-            setTimeout(() => {
-                toast.classList.remove('toast-show');
-                toast.classList.add('toast-exit');
-                setTimeout(() => toast.remove(), 250);
-            }, 3000);
-        }
-
+        // =====================================================================
+        // 0. UI TOGGLE
+        // =====================================================================
         const btnToggleUI = document.getElementById('btn-toggle-ui');
         const uiLayer = document.getElementById('ui-layer');
         const textToggleUI = document.getElementById('text-toggle-ui');
@@ -360,16 +357,526 @@
             }
         });
 
+        // =====================================================================
+        // 1. KONFIGURASI & INTI FEM (tanpa ketergantungan THREE)
+        // =====================================================================
+        // Satuan: meter, kilogram, detik, Pascal.
+        //
+        // Membran : elemen segitiga CST (Constant Strain Triangle), non-linear geometris
+        //   F  = Ds * Dm^-1                       gradien deformasi (3x2)
+        //   E  = 1/2 (F^T F - I)                  regangan Green-Lagrange (2x2)
+        //   S  = C : E  (plane stress)            tegangan Piola-Kirchhoff II
+        //   P  = F S                              tegangan Piola-Kirchhoff I
+        //   f  = -A0 * t * P * Dm^-T              gaya nodal internal
+        //   s  = (1/J) F S F^T                    tegangan Cauchy (tegangan sebenarnya)
+        // Batang  : elemen truss linear-elastis, f = (EA / L0) (L - L0) sepanjang batang
+        // Massa   : lumped di simpul (+ pemberat tambahan)
+        // Waktu   : integrasi eksplisit (symplectic Euler), dt dari kriteria CFL
+
+        const DIMS = 12;              // panjang sisi kain (m)
+        const SEGMENTS = 35;          // resolusi grid
+        const GRID_RES = SEGMENTS;
+        const H = DIMS / SEGMENTS;    // panjang sisi sel (m)
+        const H_MIN = H / Math.SQRT2; // tinggi segitiga terpendek -> dasar dt kritis
+
+        const FEM = {
+            nu: 0.3,            // rasio Poisson
+            rho: 1000,          // massa jenis (kg/m3)
+            t: 0.0005,          // tebal membran (m)
+            E0: 200e6,          // modulus referensi (Pa); E = stiffness * E0
+            massScale: 10,      // pengali massa INERSIA fiktif (dynamic relaxation): mempercepat konvergensi
+                                // ke keseimbangan statik; beban gravitasi tetap memakai massa nyata
+            g: 9.81,
+            dragGlobal: 4.0,    // redaman viskos global (1/s)
+            edgeDampRatio: 0.1, // redaman antar-simpul (meredam mode frekuensi tinggi)
+            cflSafety: 0.25,    // faktor keamanan dt terhadap batas stabilitas
+            frameTime: 1 / 60,  // waktu simulasi per frame (s)
+            maxSub: 40,         // batas substep per frame
+            anchorVmax: 6.0,    // laju maks. perpindahan anchor (m/s)
+            barRadiusScale: 0.1,// jari-jari fisik batang = 0.1 * slider ketebalan
+            sigmaAllow: 20.0    // tegangan acuan untuk bar indikator (MPa)
+        };
+
+        let physicsConfig = { upwardForce: 1.5, stiffness: 0.8 };
+        let trussConfig = { thickness: 0.05 };
+
+        // ---- FEM_CORE_START ----
+        const NV = SEGMENTS + 1;
+        const N = NV * NV;
+        let T = 0;
+
+        const pos = new Float64Array(3 * N);
+        const orig = new Float64Array(3 * N);
+        const vel = new Float64Array(3 * N);
+        const frc = new Float64Array(3 * N);
+        const mass = new Float64Array(N);     // massa membran (lumped)
+        const extra = new Float64Array(N);    // pemberat tambahan (kg)
+        const nodeArea = new Float64Array(N);
+        const pinned = new Uint8Array(N);
+        const tgt = new Float64Array(3 * N);  // target posisi anchor yang sedang digeser
+        const hasTgt = new Uint8Array(N);
+        const nodeVM = new Float64Array(N);   // von Mises nodal (Pa), rata-rata berbobot luas
+        // Medan arah tegangan utama (koordinat material X-Z), disimpan sebagai tensor struktur
+        // (a11, a12, a22) per simpul agar arah tak-berorientasi (+w == -w) bisa dirata-ratakan.
+        const ten = [new Float64Array(3 * N), new Float64Array(3 * N)]; // [0] = sigma1, [1] = sigma2
+        const tenW = new Float64Array(N);
+        const nodeAn = new Float64Array(N);   // anisotropi tegangan nodal (0 = isotropik, 1 = uniaksial)
+
+        let tris, Minv, A0, edges, edgeRest;
+        const bars = [];                      // batang buatan: [a, b, L0]
+        const stats = { maxVM: 0, maxS1: 0, maxEps: 0, maxBar: 0 };
+
+        const idx = (u, v) => u + v * NV;
+
+        // Eigenvektor ternormalisasi (koord. material) dari M = S C / J untuk nilai eigen lam.
+        // Catatan: jika M w = lam w maka F w adalah arah utama tegangan Cauchy pada permukaan terdeformasi.
+        let _wx = 1, _wz = 0;
+        function eigvec(M00, M01, M10, M11, lam) {
+            const x1 = M01, z1 = lam - M00, x2 = lam - M11, z2 = M10;
+            const n1 = x1 * x1 + z1 * z1, n2 = x2 * x2 + z2 * z2;
+            let wx, wz, n;
+            if (n1 >= n2) { wx = x1; wz = z1; n = n1; } else { wx = x2; wz = z2; n = n2; }
+            if (n < 1e-30) { _wx = 1; _wz = 0; return false; }
+            const inv = 1 / Math.sqrt(n);
+            _wx = wx * inv; _wz = wz * inv;
+            return true;
+        }
+        const smT = [new Float64Array(3 * N), new Float64Array(3 * N)];
+        const smA = new Float64Array(N);
+        // Haluskan medan arah & anisotropi: rata-rata dengan 4 tetangga grid (menekan derau antar-elemen)
+        function smoothTensors(passes) {
+            for (let ps = 0; ps < passes; ps++) {
+                for (let k = 0; k < 2; k++) smT[k].set(ten[k]);
+                smA.set(nodeAn);
+                for (let v = 0; v < NV; v++) {
+                    for (let u = 0; u < NV; u++) {
+                        const i = idx(u, v);
+                        let cnt = 0, a0 = 0, a1 = 0, a2 = 0, b0 = 0, b1 = 0, b2 = 0, an = 0;
+                        const add = (n) => {
+                            a0 += smT[0][3 * n]; a1 += smT[0][3 * n + 1]; a2 += smT[0][3 * n + 2];
+                            b0 += smT[1][3 * n]; b1 += smT[1][3 * n + 1]; b2 += smT[1][3 * n + 2];
+                            an += smA[n]; cnt++;
+                        };
+                        if (u > 0) add(idx(u - 1, v)); if (u < SEGMENTS) add(idx(u + 1, v));
+                        if (v > 0) add(idx(u, v - 1)); if (v < SEGMENTS) add(idx(u, v + 1));
+                        const j = 3 * i;
+                        ten[0][j] = 0.5 * smT[0][j] + 0.5 * a0 / cnt; ten[0][j + 1] = 0.5 * smT[0][j + 1] + 0.5 * a1 / cnt; ten[0][j + 2] = 0.5 * smT[0][j + 2] + 0.5 * a2 / cnt;
+                        ten[1][j] = 0.5 * smT[1][j] + 0.5 * b0 / cnt; ten[1][j + 1] = 0.5 * smT[1][j + 1] + 0.5 * b1 / cnt; ten[1][j + 2] = 0.5 * smT[1][j + 2] + 0.5 * b2 / cnt;
+                        nodeAn[i] = 0.5 * smA[i] + 0.5 * an / cnt;
+                    }
+                }
+            }
+        }
+        function addTen(k, n, w, x, z) {
+            const T = ten[k], j = 3 * n;
+            T[j] += w * x * x; T[j + 1] += w * x * z; T[j + 2] += w * z * z;
+        }
+
+        function buildFEM() {
+            for (let v = 0; v < NV; v++) {
+                for (let u = 0; u < NV; u++) {
+                    const i = idx(u, v);
+                    pos[3 * i] = (u / SEGMENTS) * DIMS - DIMS / 2;
+                    pos[3 * i + 1] = 0;
+                    pos[3 * i + 2] = (v / SEGMENTS) * DIMS - DIMS / 2;
+                }
+            }
+            orig.set(pos);
+
+            const triList = [];
+            for (let v = 0; v < SEGMENTS; v++) {
+                for (let u = 0; u < SEGMENTS; u++) {
+                    const a = idx(u, v), b = idx(u + 1, v), c = idx(u + 1, v + 1), d = idx(u, v + 1);
+                    // diagonal bergantian -> mengurangi bias arah mesh
+                    if ((u + v) % 2 === 0) triList.push(a, b, c, a, c, d);
+                    else triList.push(a, b, d, b, c, d);
+                }
+            }
+            T = triList.length / 3;
+            tris = new Uint32Array(triList);
+            Minv = new Float64Array(4 * T);
+            A0 = new Float64Array(T);
+
+            mass.fill(0); nodeArea.fill(0);
+            const edgeSet = new Map();
+            for (let t = 0; t < T; t++) {
+                const a = tris[3 * t], b = tris[3 * t + 1], c = tris[3 * t + 2];
+                // konfigurasi acuan (rest) = bidang X-Z
+                const ma = orig[3 * b] - orig[3 * a],     mb = orig[3 * c] - orig[3 * a];
+                const mc = orig[3 * b + 2] - orig[3 * a + 2], md = orig[3 * c + 2] - orig[3 * a + 2];
+                const det = ma * md - mb * mc;
+                A0[t] = 0.5 * Math.abs(det);
+                Minv[4 * t] = md / det;       // Minv[0][0]
+                Minv[4 * t + 1] = -mb / det;  // Minv[0][1]
+                Minv[4 * t + 2] = -mc / det;  // Minv[1][0]
+                Minv[4 * t + 3] = ma / det;   // Minv[1][1]
+                for (const n of [a, b, c]) {
+                    nodeArea[n] += A0[t] / 3;
+                    mass[n] += FEM.rho * FEM.t * A0[t] / 3;
+                }
+                for (const [p, q] of [[a, b], [b, c], [c, a]]) {
+                    const lo = Math.min(p, q), hi = Math.max(p, q);
+                    edgeSet.set(lo * N + hi, [lo, hi]);
+                }
+            }
+            edges = new Uint32Array(edgeSet.size * 2);
+            edgeRest = new Float64Array(edgeSet.size);
+            let k = 0;
+            for (const [lo, hi] of edgeSet.values()) {
+                edgeRest[k >> 1] = Math.hypot(orig[3 * lo] - orig[3 * hi], orig[3 * lo + 1] - orig[3 * hi + 1], orig[3 * lo + 2] - orig[3 * hi + 2]);
+                edges[k++] = lo; edges[k++] = hi;
+            }
+        }
+
+        // Gaya internal membran; bila withStress, hitung juga tegangan & regangan.
+        function elementForces(E, withStress) {
+            const nu = FEM.nu, kk = E / (1 - nu * nu), tk = FEM.t;
+            if (withStress) {
+                nodeVM.fill(0); nodeAn.fill(0); tenW.fill(0); ten[0].fill(0); ten[1].fill(0);
+                stats.maxVM = 0; stats.maxS1 = 0; stats.maxEps = 0; stats.maxBar = 0;
+            }
+
+            for (let t = 0; t < T; t++) {
+                const a = 3 * tris[3 * t], b = 3 * tris[3 * t + 1], c = 3 * tris[3 * t + 2];
+                const e1x = pos[b] - pos[a], e1y = pos[b + 1] - pos[a + 1], e1z = pos[b + 2] - pos[a + 2];
+                const e2x = pos[c] - pos[a], e2y = pos[c + 1] - pos[a + 1], e2z = pos[c + 2] - pos[a + 2];
+                const m00 = Minv[4 * t], m01 = Minv[4 * t + 1], m10 = Minv[4 * t + 2], m11 = Minv[4 * t + 3];
+
+                // F = [F0 F1] (kolom)
+                const f0x = e1x * m00 + e2x * m10, f0y = e1y * m00 + e2y * m10, f0z = e1z * m00 + e2z * m10;
+                const f1x = e1x * m01 + e2x * m11, f1y = e1y * m01 + e2y * m11, f1z = e1z * m01 + e2z * m11;
+
+                const C00 = f0x * f0x + f0y * f0y + f0z * f0z;
+                const C11 = f1x * f1x + f1y * f1y + f1z * f1z;
+                const C01 = f0x * f1x + f0y * f1y + f0z * f1z;
+
+                const E00 = 0.5 * (C00 - 1), E11 = 0.5 * (C11 - 1), E01 = 0.5 * C01;
+                const S00 = kk * (E00 + nu * E11);
+                const S11 = kk * (E11 + nu * E00);
+                const S01 = kk * (1 - nu) * E01;
+
+                // P = F S
+                const p0x = f0x * S00 + f1x * S01, p0y = f0y * S00 + f1y * S01, p0z = f0z * S00 + f1z * S01;
+                const p1x = f0x * S01 + f1x * S11, p1y = f0y * S01 + f1y * S11, p1z = f0z * S01 + f1z * S11;
+
+                const w = -A0[t] * tk;
+                const fbx = w * (p0x * m00 + p1x * m01), fby = w * (p0y * m00 + p1y * m01), fbz = w * (p0z * m00 + p1z * m01);
+                const fcx = w * (p0x * m10 + p1x * m11), fcy = w * (p0y * m10 + p1y * m11), fcz = w * (p0z * m10 + p1z * m11);
+
+                frc[b] += fbx; frc[b + 1] += fby; frc[b + 2] += fbz;
+                frc[c] += fcx; frc[c + 1] += fcy; frc[c + 2] += fcz;
+                frc[a] -= fbx + fcx; frc[a + 1] -= fby + fcy; frc[a + 2] -= fbz + fcz;
+
+                if (withStress) {
+                    // Tegangan Cauchy: nilai eigen (1/J) S C = nilai eigen F S F^T / J
+                    const J = Math.sqrt(Math.max(C00 * C11 - C01 * C01, 1e-12));
+                    const M00 = (S00 * C00 + S01 * C01) / J, M01 = (S00 * C01 + S01 * C11) / J;
+                    const M10 = (S01 * C00 + S11 * C01) / J, M11 = (S01 * C01 + S11 * C11) / J;
+                    const tr = M00 + M11, dt2 = M00 * M11 - M01 * M10;
+                    const disc = Math.sqrt(Math.max(tr * tr / 4 - dt2, 0));
+                    const s1 = tr / 2 + disc, s2 = tr / 2 - disc;
+                    const vm = Math.sqrt(Math.max(s1 * s1 - s1 * s2 + s2 * s2, 0));
+
+                    // regangan utama maks = stretch maks - 1 (dari eigen C)
+                    const trC = C00 + C11, dC = C00 * C11 - C01 * C01;
+                    const lam2 = trC / 2 + Math.sqrt(Math.max(trC * trC / 4 - dC, 0));
+                    const eps = Math.sqrt(lam2) - 1;
+
+                    if (vm > stats.maxVM) stats.maxVM = vm;
+                    if (s1 > stats.maxS1) stats.maxS1 = s1;
+                    if (eps > stats.maxEps) stats.maxEps = eps;
+
+                    const wa = A0[t] / 3;
+                    const na = a / 3, nb = b / 3, nc = c / 3;
+                    nodeVM[na] += vm * wa; nodeVM[nb] += vm * wa; nodeVM[nc] += vm * wa;
+
+                    // arah tegangan utama: bobot lebih besar pada elemen yang tegangannya anisotropik
+                    const anis = (s1 - s2) / (Math.abs(s1) + Math.abs(s2) + 1e-9);
+                    const wg = wa * (0.05 + anis);
+                    nodeAn[na] += anis * wa; nodeAn[nb] += anis * wa; nodeAn[nc] += anis * wa;
+                    tenW[na] += wg; tenW[nb] += wg; tenW[nc] += wg;
+                    eigvec(M00, M01, M10, M11, s1);
+                    addTen(0, na, wg, _wx, _wz); addTen(0, nb, wg, _wx, _wz); addTen(0, nc, wg, _wx, _wz);
+                    eigvec(M00, M01, M10, M11, s2);
+                    addTen(1, na, wg, _wx, _wz); addTen(1, nb, wg, _wx, _wz); addTen(1, nc, wg, _wx, _wz);
+                }
+            }
+            if (withStress) {
+                for (let i = 0; i < N; i++) {
+                    nodeVM[i] /= nodeArea[i];
+                    nodeAn[i] /= nodeArea[i];
+                    const w = tenW[i], j = 3 * i;
+                    for (let k = 0; k < 2; k++) {
+                        const T = ten[k];
+                        if (w > 0) { T[j] /= w; T[j + 1] /= w; T[j + 2] /= w; }
+                        else { T[j] = 0.5; T[j + 1] = 0; T[j + 2] = 0.5; }
+                    }
+                }
+                smoothTensors(2);
+            }
+        }
+
+        // Luas penampang fisik batang buatan (m2)
+        function barArea() {
+            const r = FEM.barRadiusScale * trussConfig.thickness;
+            return Math.PI * r * r;
+        }
+
+        // Gaya aksial batang buatan (elemen truss linear-elastis)
+        function barForces(E, withStress) {
+            const EA = E * barArea();
+            for (let k = 0; k < bars.length; k++) {
+                const a = 3 * bars[k][0], b = 3 * bars[k][1], L0 = bars[k][2];
+                const dx = pos[b] - pos[a], dy = pos[b + 1] - pos[a + 1], dz = pos[b + 2] - pos[a + 2];
+                const L = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                if (L < 1e-9) continue;
+                const eps = (L - L0) / L0;
+                const fm = EA * eps / L;                    // gaya aksial / panjang
+                frc[a] += fm * dx; frc[a + 1] += fm * dy; frc[a + 2] += fm * dz;
+                frc[b] -= fm * dx; frc[b + 1] -= fm * dy; frc[b + 2] -= fm * dz;
+                if (withStress) { const s = Math.abs(E * eps); if (s > stats.maxBar) stats.maxBar = s; }
+            }
+        }
+
+        // dt kritis akibat kekakuan batang: dt < 2/omega, omega^2 = k (1/ma + 1/mb)
+        function barDtCrit(E) {
+            if (bars.length === 0) return Infinity;
+            const EA = E * barArea();
+            let w2 = 0;
+            for (let k = 0; k < bars.length; k++) {
+                const a = bars[k][0], b = bars[k][1];
+                const kk = EA / bars[k][2];
+                const v = kk * (1 / ((mass[a] + extra[a]) * FEM.massScale) + 1 / ((mass[b] + extra[b]) * FEM.massScale));
+                if (v > w2) w2 = v;
+            }
+            return FEM.cflSafety * 2 / Math.sqrt(w2);
+        }
+
+        // Satu langkah waktu eksplisit
+        function femStep(dt, E, withStress, c) {
+            frc.fill(0);
+
+            // anchor mengejar target dengan laju terbatas (perpindahan tumpuan kuasi-statik,
+            // bukan lompatan tiba-tiba yang memicu gelombang kejut dan divergensi)
+            const maxMove = FEM.anchorVmax * dt;
+            for (let i = 0; i < N; i++) {
+                if (!pinned[i] || !hasTgt[i]) continue;
+                const j = 3 * i;
+                const dx = tgt[j] - pos[j], dy = tgt[j + 1] - pos[j + 1], dz = tgt[j + 2] - pos[j + 2];
+                const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                if (d <= maxMove) { pos[j] = tgt[j]; pos[j + 1] = tgt[j + 1]; pos[j + 2] = tgt[j + 2]; hasTgt[i] = 0; }
+                else { const s = maxMove / d; pos[j] += dx * s; pos[j + 1] += dy * s; pos[j + 2] += dz * s; }
+            }
+
+            // beban luar: tekanan angkat setara (upwardForce per sel interior) - berat sendiri & pemberat
+            const pUp = physicsConfig.upwardForce / (H * H);
+            for (let i = 0; i < N; i++) {
+                if (pinned[i]) continue;
+                frc[3 * i + 1] += pUp * nodeArea[i] - (mass[i] + extra[i]) * FEM.g;
+            }
+
+            elementForces(E, withStress);
+            barForces(E, withStress);
+
+            // redaman antar-simpul sepanjang sisi elemen
+            const kd = FEM.edgeDampRatio * (FEM.rho * FEM.massScale * FEM.t * H * H) * c / H;
+            for (let k = 0; k < edges.length; k += 2) {
+                const p = 3 * edges[k], q = 3 * edges[k + 1];
+                const dx = kd * (vel[p] - vel[q]), dy = kd * (vel[p + 1] - vel[q + 1]), dz = kd * (vel[p + 2] - vel[q + 2]);
+                frc[p] -= dx; frc[p + 1] -= dy; frc[p + 2] -= dz;
+                frc[q] += dx; frc[q + 1] += dy; frc[q + 2] += dz;
+            }
+
+            const drag = Math.exp(-FEM.dragGlobal * dt);
+            for (let i = 0; i < N; i++) {
+                const j = 3 * i;
+                if (pinned[i]) { vel[j] = vel[j + 1] = vel[j + 2] = 0; continue; }
+                const im = dt / ((mass[i] + extra[i]) * FEM.massScale);
+                vel[j] = (vel[j] + frc[j] * im) * drag;
+                vel[j + 1] = (vel[j + 1] + frc[j + 1] * im) * drag;
+                vel[j + 2] = (vel[j + 2] + frc[j + 2] * im) * drag;
+                pos[j] += vel[j] * dt; pos[j + 1] += vel[j + 1] * dt; pos[j + 2] += vel[j + 2] * dt;
+            }
+        }
+
+        // Satu frame: substep sesuai kriteria CFL. Mengembalikan false bila simulasi divergen.
+        function femFrame() {
+            const E = physicsConfig.stiffness * FEM.E0;
+            const c = Math.sqrt(E / (FEM.rho * FEM.massScale * (1 - FEM.nu * FEM.nu))); // kecepatan gelombang efektif (m/s)
+            const dtCrit = Math.min(FEM.cflSafety * H_MIN / c, barDtCrit(E));
+            let sub = Math.ceil(FEM.frameTime / dtCrit);
+            if (sub > FEM.maxSub) sub = FEM.maxSub;
+            const dt = Math.min(dtCrit, FEM.frameTime / sub);
+            for (let s = 0; s < sub; s++) femStep(dt, E, s === sub - 1, c);
+
+            for (let i = 0; i < 3 * N; i++) if (!Number.isFinite(pos[i])) return false;
+            return true;
+        }
+
+        function femResetState() {
+            pos.set(orig); vel.fill(0); frc.fill(0); hasTgt.fill(0);
+        }
+        // ---- FEM_CORE_END ----
+
+        // ---- SWARM_CORE_START ----
+        // AGEN SWARM = lintasan tegangan utama (stress trajectories / isostatic lines).
+        // Tiap agen menelusuri arah sigma1 (family 0) atau sigma2 (family 1) di permukaan terdeformasi,
+        // dengan integrasi RK2 dalam koordinat grid (u,v) dan panjang busur tetap di ruang 3D.
+        // Jarak antar-agen dijaga (Jobard-Lefer): agen berhenti bila terlalu dekat lintasan lain,
+        // sehingga tidak menumpuk di titik tegangan puncak. Deterministik (tanpa Math.random).
+        const swTmp = { x: 1, z: 0, anis: 0, st: 0 };
+        const swP0 = [0, 0, 0], swP1 = [0, 0, 0];
+        const SW_MIN_COHERENCE = 0.02;   // koherensi arah minimum (tensor struktur)
+        const SW_MIN_STRESS_ANIS = 0.04; // anisotropi tegangan minimum (isotropik -> arah tak terdefinisi)
+        const SW_MAX_TURN_COS = Math.cos(35 * Math.PI / 180); // agen berhenti bila arah berbelok > 35 derajat per langkah
+
+        function swSurf(u, v, out) {
+            u = Math.max(0, Math.min(GRID_RES, u)); v = Math.max(0, Math.min(GRID_RES, v));
+            const u0 = Math.min(GRID_RES - 1, Math.floor(u)), v0 = Math.min(GRID_RES - 1, Math.floor(v));
+            const mu = u - u0, mv = v - v0;
+            const i00 = 3 * idx(u0, v0), i10 = 3 * idx(u0 + 1, v0), i01 = 3 * idx(u0, v0 + 1), i11 = 3 * idx(u0 + 1, v0 + 1);
+            for (let k = 0; k < 3; k++) {
+                out[k] = (pos[i00 + k] * (1 - mu) + pos[i10 + k] * mu) * (1 - mv) + (pos[i01 + k] * (1 - mu) + pos[i11 + k] * mu) * mv;
+            }
+        }
+
+        // Arah utama di (u,v); true bila terdefinisi. (px,pz) = arah sebelumnya (untuk orientasi), NaN bila tak ada.
+        function swDir(fam, u, v, px, pz) {
+            u = Math.max(0, Math.min(GRID_RES, u)); v = Math.max(0, Math.min(GRID_RES, v));
+            const u0 = Math.min(GRID_RES - 1, Math.floor(u)), v0 = Math.min(GRID_RES - 1, Math.floor(v));
+            const mu = u - u0, mv = v - v0;
+            const n00 = idx(u0, v0), n10 = idx(u0 + 1, v0), n01 = idx(u0, v0 + 1), n11 = idx(u0 + 1, v0 + 1);
+            const w00 = (1 - mu) * (1 - mv), w10 = mu * (1 - mv), w01 = (1 - mu) * mv, w11 = mu * mv;
+            const T = ten[fam];
+            const a = T[3 * n00] * w00 + T[3 * n10] * w10 + T[3 * n01] * w01 + T[3 * n11] * w11;
+            const b = T[3 * n00 + 1] * w00 + T[3 * n10 + 1] * w10 + T[3 * n01 + 1] * w01 + T[3 * n11 + 1] * w11;
+            const c = T[3 * n00 + 2] * w00 + T[3 * n10 + 2] * w10 + T[3 * n01 + 2] * w01 + T[3 * n11 + 2] * w11;
+            const st = nodeAn[n00] * w00 + nodeAn[n10] * w10 + nodeAn[n01] * w01 + nodeAn[n11] * w11;
+            const tr = a + c, df = a - c, r = Math.sqrt(df * df + 4 * b * b);
+            swTmp.anis = tr > 1e-12 ? r / tr : 0;
+            swTmp.st = st;
+            if (swTmp.anis < SW_MIN_COHERENCE || st < SW_MIN_STRESS_ANIS) return false;
+            const th = 0.5 * Math.atan2(2 * b, df);
+            let x = Math.cos(th), z = Math.sin(th);
+            if (px === px && x * px + z * pz < 0) { x = -x; z = -z; } // jaga kesinambungan arah
+            swTmp.x = x; swTmp.z = z;
+            return true;
+        }
+
+        // Kembalikan array garis; tiap garis = Float64Array [u0,v0,u1,v1,...] (koordinat grid).
+        // nd = kepadatan (5..50): jarak antar lintasan ~ GRID_RES / nd.
+        function swarmLines(fam, nd) {
+            const dSep = Math.max(0.35, GRID_RES / nd * 0.9);  // jarak seed antar lintasan (satuan grid)
+            const dTest = 0.5 * dSep;                          // jarak henti terhadap lintasan lain
+            const ds = 0.8 * H;                                // panjang langkah (m) di permukaan 3D
+            const MAX_STEPS = 260, MAX_LINES = 500, MAX_SEEDS = 20000;
+            const cs = dSep, nc = Math.ceil(GRID_RES / cs) + 3;
+            const head = new Int32Array(nc * nc).fill(-1);
+            const pu = [], pv = [], pn = [];
+
+            const close = (u, v, r) => {
+                const cx = Math.floor(u / cs) + 1, cy = Math.floor(v / cs) + 1, r2 = r * r;
+                for (let ox = -1; ox <= 1; ox++) {
+                    for (let oy = -1; oy <= 1; oy++) {
+                        const gx = cx + ox, gy = cy + oy;
+                        if (gx < 0 || gy < 0 || gx >= nc || gy >= nc) continue;
+                        for (let k = head[gx * nc + gy]; k >= 0; k = pn[k]) {
+                            const du = pu[k] - u, dv = pv[k] - v;
+                            if (du * du + dv * dv < r2) return true;
+                        }
+                    }
+                }
+                return false;
+            };
+            const insert = (u, v) => {
+                const cx = Math.floor(u / cs) + 1, cy = Math.floor(v / cs) + 1;
+                const cell = cx * nc + cy;
+                pu.push(u); pv.push(v); pn.push(head[cell]); head[cell] = pu.length - 1;
+            };
+
+            // telusuri satu arah dari (u,v) dengan arah awal (dx,dz); hasil di out (u,v berurutan)
+            const trace = (u, v, dx, dz, out) => {
+                let x = u, y = v;
+                for (let step = 0; step < MAX_STEPS; step++) {
+                    swSurf(x, y, swP0); swSurf(x + dx * 0.2, y + dz * 0.2, swP1);
+                    const sp = Math.hypot(swP1[0] - swP0[0], swP1[1] - swP0[1], swP1[2] - swP0[2]) / 0.2;
+                    if (sp < 1e-6) break;
+                    const dl = Math.max(0.05, Math.min(1.2, ds / sp));   // langkah dalam satuan grid
+                    if (!swDir(fam, x + dx * dl * 0.5, y + dz * dl * 0.5, dx, dz)) break; // titik tengah (RK2)
+                    const mx = swTmp.x, mz = swTmp.z;
+                    if (mx * dx + mz * dz < SW_MAX_TURN_COS) break;   // arah tak koheren (dekat singularitas / isotropik)
+                    const nx = x + mx * dl, ny = y + mz * dl;
+                    if (nx < 0 || nx > GRID_RES || ny < 0 || ny > GRID_RES) {
+                        // potong tepat di perpotongan segmen dengan tepi kain (bukan clamp per koordinat)
+                        let tt = 1;
+                        if (nx < 0) tt = Math.min(tt, (0 - x) / (nx - x));
+                        if (nx > GRID_RES) tt = Math.min(tt, (GRID_RES - x) / (nx - x));
+                        if (ny < 0) tt = Math.min(tt, (0 - y) / (ny - y));
+                        if (ny > GRID_RES) tt = Math.min(tt, (GRID_RES - y) / (ny - y));
+                        tt = Math.max(0, Math.min(1, tt));
+                        out.push(Math.max(0, Math.min(GRID_RES, x + (nx - x) * tt)), Math.max(0, Math.min(GRID_RES, y + (ny - y) * tt)));
+                        break;
+                    }
+                    if (close(nx, ny, dTest)) break;
+                    out.push(nx, ny);
+                    x = nx; y = ny; dx = mx; dz = mz;
+                }
+            };
+
+            const seeds = [];
+            for (let i = 1; i <= 3; i++) for (let j = 1; j <= 3; j++) seeds.push([GRID_RES * i / 4, GRID_RES * j / 4]);
+            seeds.sort((p, q) => Math.hypot(p[0] - GRID_RES / 2, p[1] - GRID_RES / 2) - Math.hypot(q[0] - GRID_RES / 2, q[1] - GRID_RES / 2));
+
+            const lines = [];
+            for (let si = 0; si < seeds.length && lines.length < MAX_LINES; si++) {
+                const u = seeds[si][0], v = seeds[si][1];
+                if (u < 0 || u > GRID_RES || v < 0 || v > GRID_RES) continue;
+                if (close(u, v, dSep)) continue;
+                if (!swDir(fam, u, v, NaN, NaN)) continue;
+                const d0x = swTmp.x, d0z = swTmp.z;
+                const fwd = [], bwd = [];
+                trace(u, v, d0x, d0z, fwd);
+                trace(u, v, -d0x, -d0z, bwd);
+                const n = fwd.length / 2 + bwd.length / 2 + 1;
+                if (n < 6) continue;
+                const line = new Float64Array(2 * n);
+                let k = 0;
+                for (let i = bwd.length - 2; i >= 0; i -= 2) { line[k++] = bwd[i]; line[k++] = bwd[i + 1]; }
+                line[k++] = u; line[k++] = v;
+                for (let i = 0; i < fwd.length; i += 2) { line[k++] = fwd[i]; line[k++] = fwd[i + 1]; }
+                for (let i = 0; i < n; i++) insert(line[2 * i], line[2 * i + 1]);
+                lines.push(line);
+
+                // seed baru: sisi kiri/kanan lintasan pada jarak dSep
+                if (seeds.length < MAX_SEEDS) {
+                    for (let i = 1; i < n - 1; i += 4) {
+                        let tx = line[2 * i + 2] - line[2 * i - 2], tz = line[2 * i + 3] - line[2 * i - 1];
+                        const tl = Math.hypot(tx, tz);
+                        if (tl < 1e-9) continue;
+                        tx /= tl; tz /= tl;
+                        seeds.push([line[2 * i] - tz * dSep, line[2 * i + 1] + tx * dSep]);
+                        seeds.push([line[2 * i] + tz * dSep, line[2 * i + 1] - tx * dSep]);
+                    }
+                }
+            }
+            return lines;
+        }
+        // ---- SWARM_CORE_END ----
+
+        // =====================================================================
+        // 2. SCENE THREE.JS
+        // =====================================================================
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x121316, 0.018);
+        scene.fog = new THREE.FogExp2(0x000000, 0.02);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 16, 26);
+        camera.position.set(0, 15, 25);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x000000, 0);
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -377,453 +884,177 @@
         controls.dampingFactor = 0.05;
         controls.maxPolarAngle = Math.PI / 2 + 0.2;
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(12, 24, 12);
+        dirLight.position.set(10, 20, 10);
         scene.add(dirLight);
 
-        const dirLightBack = new THREE.DirectionalLight(0x38bdf8, 0.4);
-        dirLightBack.position.set(-12, -10, -12);
-        scene.add(dirLightBack);
-
-        const gridHelper = new THREE.GridHelper(24, 24, 0x334155, 0x1e293b);
+        const gridHelper = new THREE.GridHelper(20, 20, 0x16a34a, 0x12301d);
         gridHelper.position.y = -0.1;
         scene.add(gridHelper);
 
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         const dragPlane = new THREE.Plane();
-        let draggedParticle = null;
-        let intersectPoint = new THREE.Vector3();
+        let draggedIndex = -1;
+        const intersectPoint = new THREE.Vector3();
+
+        // ---- Anchor ----
         const anchorMeshes = [];
-        
-        const anchorGeo = new THREE.SphereGeometry(0.25, 16, 16);
-        const anchorMat = new THREE.MeshStandardMaterial({ color: 0xf87171, roughness: 0.2, metalness: 0.6 });
+        const anchorByIndex = new Array(N).fill(null);
+        const anchorGeo = new THREE.SphereGeometry(0.25);
+        const anchorMat = new THREE.MeshStandardMaterial({ color: 0xf87171, roughness: 0.3, metalness: 0.5 });
 
-        function createAnchor(particle) {
-            if (!particle || particle.pinned) return;
-            const anchor = new THREE.Mesh(anchorGeo, anchorMat);
-            anchor.position.copy(particle.position);
-            scene.add(anchor);
-            anchorMeshes.push(anchor);
-            particle.pinned = true;
-            particle.anchorMesh = anchor;
-            anchor.userData.particle = particle;
+        function createAnchor(i) {
+            if (pinned[i]) return;
+            // simpul bertumpu tidak boleh membawa pemberat
+            if (extra[i] > 0) toggleMass(i);
+            const m = new THREE.Mesh(anchorGeo, anchorMat);
+            m.position.set(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]);
+            m.userData.index = i;
+            scene.add(m);
+            anchorMeshes.push(m);
+            anchorByIndex[i] = m;
+            pinned[i] = 1;
         }
 
-        function removeAnchor(particle) {
-            if (!particle || !particle.pinned) return;
-            particle.pinned = false;
-            if (particle.anchorMesh) {
-                scene.remove(particle.anchorMesh);
-                const idx = anchorMeshes.indexOf(particle.anchorMesh);
-                if (idx > -1) anchorMeshes.splice(idx, 1);
-                particle.anchorMesh = null;
+        function removeAnchor(i) {
+            if (!pinned[i]) return;
+            pinned[i] = 0; hasTgt[i] = 0;
+            const m = anchorByIndex[i];
+            if (m) {
+                scene.remove(m);
+                const k = anchorMeshes.indexOf(m);
+                if (k > -1) anchorMeshes.splice(k, 1);
+                anchorByIndex[i] = null;
             }
         }
 
+        function setDefaultAnchors() {
+            createAnchor(idx(0, 0));
+            createAnchor(idx(SEGMENTS, 0));
+            createAnchor(idx(0, SEGMENTS));
+            createAnchor(idx(SEGMENTS, SEGMENTS));
+        }
+
+        // ---- Multi-massa ----
         const massMeshes = [];
+        const massByIndex = new Array(N).fill(null);
         let extraMassValue = 0.5;
-        const baseMassGeo = new THREE.SphereGeometry(1, 16, 16);
+        const massGeo = new THREE.SphereGeometry(0.15);
+        const massMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.4, metalness: 0.8 });
 
-        function getMassColor(massWeight) {
-            const t = Math.min(1, Math.max(0, (massWeight - 0.1) / 24.9));
-            const c = new THREE.Color();
-            c.setHSL(0.12 - t * 0.15, 0.9, 0.5);
-            return c;
-        }
-
-        function createMassMesh(particle) {
-            const scale = 0.10 + Math.pow(particle.extraMassValue / 25.0, 0.5) * 0.45;
-            const massMat = new THREE.MeshStandardMaterial({
-                color: getMassColor(particle.extraMassValue),
-                roughness: 0.3,
-                metalness: 0.7,
-                emissive: getMassColor(particle.extraMassValue),
-                emissiveIntensity: 0.2
-            });
-            const mesh = new THREE.Mesh(baseMassGeo, massMat);
-            mesh.scale.set(scale, scale, scale);
-            mesh.position.copy(particle.position);
-            mesh.visible = document.getElementById('view-masses').checked;
-            scene.add(mesh);
-            massMeshes.push(mesh);
-            particle.massMesh = mesh;
-        }
-
-        function removeMassMesh(particle) {
-            if (particle.massMesh) {
-                scene.remove(particle.massMesh);
-                const idx = massMeshes.indexOf(particle.massMesh);
-                if (idx > -1) massMeshes.splice(idx, 1);
-                particle.massMesh = null;
-            }
-        }
-
-        function toggleMass(particle, specificWeight = null) {
-            if (!particle || particle.pinned) return;
-
-            if (particle.hasExtraMass && specificWeight === null) {
-                particle.hasExtraMass = false;
-                particle.extraMassValue = 0;
-                particle.mass = physicsConfig.mass;
-                particle.invMass = 1 / particle.mass;
-                removeMassMesh(particle);
+        function toggleMass(i) {
+            if (pinned[i]) return;
+            if (extra[i] > 0) {
+                extra[i] = 0;
+                const m = massByIndex[i];
+                if (m) {
+                    scene.remove(m);
+                    const k = massMeshes.indexOf(m);
+                    if (k > -1) massMeshes.splice(k, 1);
+                    massByIndex[i] = null;
+                }
             } else {
-                const weight = specificWeight !== null ? specificWeight : extraMassValue;
-                particle.hasExtraMass = true;
-                particle.extraMassValue = weight;
-                particle.mass = physicsConfig.mass + weight;
-                particle.invMass = 1 / particle.mass;
-
-                if (particle.massMesh) {
-                    removeMassMesh(particle);
-                }
-                createMassMesh(particle);
+                extra[i] = extraMassValue;
+                const m = new THREE.Mesh(massGeo, massMat);
+                m.position.set(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]);
+                m.userData.index = i;
+                scene.add(m);
+                massMeshes.push(m);
+                massByIndex[i] = m;
             }
-            updateMassStats();
         }
 
-        function updateMassStats() {
-            let count = 0;
-            let total = 0;
-            particles.forEach(p => {
-                if (p.hasExtraMass) {
-                    count++;
-                    total += p.extraMassValue;
-                }
-            });
-            document.getElementById('stat-mass-count').innerText = count;
-            document.getElementById('stat-mass-total').innerText = total.toFixed(1) + ' kg';
-        }
+        // ---- Inisialisasi FEM + mesh kain (topologi sama persis dengan elemen FEM) ----
+        buildFEM();
+        setDefaultAnchors();
 
-        function clearAllMasses() {
-            particles.forEach(p => {
-                if (p.hasExtraMass) {
-                    p.hasExtraMass = false;
-                    p.extraMassValue = 0;
-                    p.mass = physicsConfig.mass;
-                    p.invMass = 1 / p.mass;
-                    removeMassMesh(p);
-                }
-            });
-            updateMassStats();
-            showToast('Semua massa tambahan dibersihkan', 'info');
-        }
+        const clothGeometry = new THREE.BufferGeometry();
+        const posAttr = new THREE.BufferAttribute(new Float32Array(3 * N), 3);
+        const colAttr = new THREE.BufferAttribute(new Float32Array(3 * N), 3);
+        clothGeometry.setAttribute('position', posAttr);
+        clothGeometry.setAttribute('color', colAttr);
+        clothGeometry.setIndex(new THREE.BufferAttribute(tris, 1));
 
-        function applyPresetCenterMass() {
-            clearAllMasses();
-            const mid = Math.floor(GRID_RES / 2);
-            for (let v = mid - 2; v <= mid + 2; v++) {
-                for (let u = mid - 2; u <= mid + 2; u++) {
-                    if (gridMap[v] && gridMap[v][u]) {
-                        toggleMass(gridMap[v][u], extraMassValue);
-                    }
-                }
-            }
-            showToast('Preset Massa Terpusat diterapkan', 'success');
-        }
+        const clothMaterial = new THREE.MeshStandardMaterial({
+            side: THREE.DoubleSide, vertexColors: true, roughness: 0.8, metalness: 0.1, wireframe: false
+        });
+        const clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
+        clothMesh.frustumCulled = false;
+        scene.add(clothMesh);
 
-        function applyPreset4Points() {
-            clearAllMasses();
-            const offset = Math.floor(GRID_RES * 0.28);
-            const corners = [
-                [offset, offset],
-                [GRID_RES - offset, offset],
-                [offset, GRID_RES - offset],
-                [GRID_RES - offset, GRID_RES - offset]
-            ];
-            corners.forEach(([u, v]) => {
-                for (let dv = -1; dv <= 1; dv++) {
-                    for (let du = -1; du <= 1; du++) {
-                        if (gridMap[v + dv] && gridMap[v + dv][u + du]) {
-                            toggleMass(gridMap[v + dv][u + du], extraMassValue * 1.2);
-                        }
-                    }
-                }
-            });
-            showToast('Preset 4-Titik Simetris diterapkan', 'success');
-        }
+        // ---- Truss (visual jaring FEM + batang buatan) ----
+        const MAX_TRUSSES = 15000;
+        const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.3 });
+        const trussMesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(1, 1, 1, 5), trussMaterial, MAX_TRUSSES);
+        trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        trussMesh.frustumCulled = false;
+        trussMesh.visible = false;
+        scene.add(trussMesh);
 
-        function applyPresetRingMass() {
-            clearAllMasses();
-            const mid = GRID_RES / 2;
-            const radius = GRID_RES * 0.35;
-            for (let v = 0; v <= GRID_RES; v++) {
-                for (let u = 0; u <= GRID_RES; u++) {
-                    const dist = Math.hypot(u - mid, v - mid);
-                    if (Math.abs(dist - radius) < 1.4) {
-                        toggleMass(gridMap[v][u], extraMassValue);
-                    }
-                }
-            }
-            showToast('Preset Massa Perimeter Cincin diterapkan', 'success');
-        }
-
-        function applyPresetRandomMass() {
-            clearAllMasses();
-            const totalPoints = Math.floor(GRID_RES * GRID_RES * 0.08);
-            for (let i = 0; i < totalPoints; i++) {
-                const u = Math.floor(Math.random() * (GRID_RES - 2)) + 1;
-                const v = Math.floor(Math.random() * (GRID_RES - 2)) + 1;
-                const randomWeight = Number((0.2 + Math.random() * extraMassValue * 1.5).toFixed(1));
-                toggleMass(gridMap[v][u], randomWeight);
-            }
-            showToast('Preset Massa Acak diterapkan', 'success');
-        }
-
-        const DIMS = 10;
-        const EXT_DIMS = DIMS * 1.2;
-        const GRID_RES = 35;
-        
-        let physicsConfig = {
-            upwardForce: 1.5,
-            stiffness: 0.8,
-            mass: 0.1,
-            gravity: 10.0,
-            damping: 0.95
-        };
-
-        let weavingConfig = {
-            pattern: 'menges_swarm',
-            density: 24,
-            swarmSensitivity: 1.2,
-            offset: 0.10,
-            visible: true
-        };
-
-        let trussConfig = {
-            thickness: 0.05
-        };
+        // Garis sementara saat mode gambar
+        const tempDrawLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+            new THREE.LineBasicMaterial({ color: 0x16a34a })
+        );
+        tempDrawLine.visible = false;
+        scene.add(tempDrawLine);
 
         let interactionMode = 'drag';
-        let drawStartParticle = null;
-        let tempDrawLine = null;
-        let dummyObj = new THREE.Object3D();
-        let dummyColor = new THREE.Color();
-        const MAX_TRUSSES = 15000;
+        let drawStartIndex = -1;
 
-        class Particle {
-            constructor(x, y, z, mass) {
-                this.position = new THREE.Vector3(x, y, z);
-                this.previous = new THREE.Vector3(x, y, z);
-                this.original = new THREE.Vector3(x, y, z);
-                this.acceleration = new THREE.Vector3(0, 0, 0);
-                this.mass = mass;
-                this.invMass = 1 / mass;
-                this.pinned = false;
-                this.stress = 0; 
-                this.index = 0;
-                this.hasExtraMass = false;
-                this.extraMassValue = 0;
-                this.massMesh = null;
-            }
-            addForce(force) {
-                this.acceleration.addScaledVector(force, this.invMass);
-            }
-            integrate(sqTimeStep) {
-                if (this.pinned) return;
-                const newPos = this.position.clone()
-                    .sub(this.previous)
-                    .multiplyScalar(physicsConfig.damping)
-                    .add(this.position)
-                    .add(this.acceleration.clone().multiplyScalar(sqTimeStep));
-                this.previous.copy(this.position);
-                this.position.copy(newPos);
-                this.acceleration.set(0, 0, 0);
-            }
-        }
-
-        const particles = [];
-        const constraints = [];
-        let gridMap = [];
-        let clothGeometry, clothMesh;
-        let trussMesh;
-
-        function initSimulation() {
-            anchorMeshes.forEach(m => scene.remove(m));
-            massMeshes.forEach(m => scene.remove(m));
-            anchorMeshes.length = 0;
-            massMeshes.length = 0;
-            particles.length = 0;
-            constraints.length = 0;
-
-            if (clothMesh) {
-                scene.remove(clothMesh);
-                if (clothGeometry) clothGeometry.dispose();
-            }
-            if (trussMesh) {
-                scene.remove(trussMesh);
-                if (trussMesh.geometry) trussMesh.geometry.dispose();
-            }
-            draggedParticle = null;
-
-            const cellDist = EXT_DIMS / GRID_RES;
-            gridMap = Array(GRID_RES + 1).fill(null).map(() => Array(GRID_RES + 1).fill(null));
-            let pIndex = 0;
-
-            for (let v = 0; v <= GRID_RES; v++) {
-                for (let u = 0; u <= GRID_RES; u++) {
-                    const x = (u / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
-                    const z = (v / GRID_RES) * EXT_DIMS - EXT_DIMS / 2;
-                    
-                    const p = new Particle(x, 0, z, physicsConfig.mass);
-                    p.index = pIndex++;
-                    p.u = u;
-                    p.v = v;
-                    particles.push(p);
-                    gridMap[v][u] = p;
-                }
-            }
-
-            for (let v = 0; v <= GRID_RES; v++) {
-                for (let u = 0; u <= GRID_RES; u++) {
-                    const p = gridMap[v][u];
-                    if (!p) continue;
-                    
-                    const right = u < GRID_RES ? gridMap[v][u + 1] : null;
-                    const bottom = v < GRID_RES ? gridMap[v + 1][u] : null;
-                    const br = (v < GRID_RES && u < GRID_RES) ? gridMap[v + 1][u + 1] : null;
-                    const bl = (v < GRID_RES && u > 0) ? gridMap[v + 1][u - 1] : null;
-
-                    if (right) constraints.push([p, right, cellDist]);
-                    if (bottom) constraints.push([p, bottom, cellDist]);
-                    if (br) constraints.push([p, br, cellDist * 1.414]);
-                    if (bl) constraints.push([p, bl, cellDist * 1.414]);
-                }
-            }
-
-            createAnchor(gridMap[0][0]);
-            createAnchor(gridMap[0][GRID_RES]);
-            createAnchor(gridMap[GRID_RES][0]);
-            createAnchor(gridMap[GRID_RES][GRID_RES]);
-
-            const indices = [];
-            for (let v = 0; v < GRID_RES; v++) {
-                for (let u = 0; u < GRID_RES; u++) {
-                    const p00 = gridMap[v][u];
-                    const p10 = gridMap[v][u + 1];
-                    const p01 = gridMap[v + 1][u];
-                    const p11 = gridMap[v + 1][u + 1];
-                    
-                    indices.push(p00.index, p01.index, p10.index);
-                    indices.push(p10.index, p01.index, p11.index);
-                }
-            }
-
-            clothGeometry = new THREE.BufferGeometry();
-            clothGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(particles.length * 3), 3));
-            clothGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(particles.length * 3), 3));
-            clothGeometry.setIndex(indices);
-
-            const clothMaterial = new THREE.MeshStandardMaterial({
-                side: THREE.DoubleSide, vertexColors: true, roughness: 0.75, metalness: 0.15
-            });
-            clothMesh = new THREE.Mesh(clothGeometry, clothMaterial);
-            scene.add(clothMesh);
-
-            const trussMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.4 });
-            const cylinderGeo = new THREE.CylinderGeometry(1, 1, 1, 6);
-            
-            trussMesh = new THREE.InstancedMesh(cylinderGeo, trussMaterial, MAX_TRUSSES);
-            trussMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-            if (trussMesh.instanceColor) trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
-            scene.add(trussMesh);
-
-            if (!tempDrawLine) {
-                const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
-                const lineMat = new THREE.LineBasicMaterial({ color: 0xf472b6, linewidth: 3 });
-                tempDrawLine = new THREE.Line(lineGeo, lineMat);
-                tempDrawLine.visible = false;
-                scene.add(tempDrawLine);
-            }
-
-            clothMesh.visible = document.getElementById('view-surface').checked;
-            trussMesh.visible = document.getElementById('view-truss').checked;
-            updateMassStats();
-        }
-
-        let weavingGroup = new THREE.Group();
+        // =====================================================================
+        // 3. WEAVING GENERATOR (ANYAMAN PARAMETRIK)
+        // =====================================================================
+        let weavingConfig = { pattern: 'plain', density: 20, offset: 0.1, visible: true };
+        const weavingGroup = new THREE.Group();
         scene.add(weavingGroup);
 
-        const warpMaterial = new THREE.LineBasicMaterial({ color: 0x06b6d4, linewidth: 2, transparent: true, opacity: 0.95 });
-        const weftMaterial = new THREE.LineBasicMaterial({ color: 0xf43f5e, linewidth: 2, transparent: true, opacity: 0.95 });
+        const warpMaterial = new THREE.LineBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.9 });
+        const weftMaterial = new THREE.LineBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.9 });
+
+        // Tegangan von Mises pembanding untuk pewarnaan (Pa); diperbarui tiap frame
+        let ceilPa = 100;
 
         function getSurfacePointAndNormal(u_float, v_float) {
             u_float = Math.max(0, Math.min(GRID_RES, u_float));
             v_float = Math.max(0, Math.min(GRID_RES, v_float));
-
-            const u0 = Math.floor(u_float);
-            const u1 = Math.min(GRID_RES, u0 + 1);
-            const v0 = Math.floor(v_float);
-            const v1 = Math.min(GRID_RES, v0 + 1);
-
-            const mu = u_float - u0;
-            const mv = v_float - v0;
-
-            const p00 = gridMap[v0][u0].position;
-            const p10 = gridMap[v0][u1].position;
-            const p01 = gridMap[v1][u0].position;
-            const p11 = gridMap[v1][u1].position;
-
-            const p0 = new THREE.Vector3().lerpVectors(p00, p10, mu);
-            const p1 = new THREE.Vector3().lerpVectors(p01, p11, mu);
-            const pos = new THREE.Vector3().lerpVectors(p0, p1, mv);
-            
-            const vu = new THREE.Vector3().subVectors(p10, p00);
-            const vv = new THREE.Vector3().subVectors(p01, p00);
-            let norm = new THREE.Vector3().crossVectors(vv, vu).normalize();
+            const u0 = Math.min(GRID_RES - 1, Math.floor(u_float));
+            const v0 = Math.min(GRID_RES - 1, Math.floor(v_float));
+            const mu = u_float - u0, mv = v_float - v0;
+            const i00 = 3 * idx(u0, v0), i10 = 3 * idx(u0 + 1, v0), i01 = 3 * idx(u0, v0 + 1), i11 = 3 * idx(u0 + 1, v0 + 1);
+            const q = (k) => (pos[i00 + k] * (1 - mu) + pos[i10 + k] * mu) * (1 - mv) + (pos[i01 + k] * (1 - mu) + pos[i11 + k] * mu) * mv;
+            const p = new THREE.Vector3(q(0), q(1), q(2));
+            const vu = new THREE.Vector3(pos[i10] - pos[i00], pos[i10 + 1] - pos[i00 + 1], pos[i10 + 2] - pos[i00 + 2]);
+            const vv = new THREE.Vector3(pos[i01] - pos[i00], pos[i01 + 1] - pos[i00 + 1], pos[i01 + 2] - pos[i00 + 2]);
+            const norm = new THREE.Vector3().crossVectors(vv, vu).normalize();
             if (norm.y < 0) norm.negate();
             if (norm.lengthSq() === 0) norm.set(0, 1, 0);
-
-            return { pos, norm };
+            return { pos: p, norm };
         }
 
-        function getSurfaceStressAndMass(u_float, v_float) {
-            u_float = Math.max(0, Math.min(GRID_RES, u_float));
-            v_float = Math.max(0, Math.min(GRID_RES, v_float));
-
-            const u0 = Math.floor(u_float);
-            const u1 = Math.min(GRID_RES, u0 + 1);
-            const v0 = Math.floor(v_float);
-            const v1 = Math.min(GRID_RES, v0 + 1);
-
-            const mu = u_float - u0;
-            const mv = v_float - v0;
-
-            const getNodeVal = (vIdx, uIdx) => {
-                const node = gridMap[vIdx][uIdx];
-                const massVal = node.hasExtraMass ? (node.extraMassValue * 4.0) : 0;
-                return node.stress * 100 + massVal;
-            };
-
-            const s00 = getNodeVal(v0, u0);
-            const s10 = getNodeVal(v0, u1);
-            const s01 = getNodeVal(v1, u0);
-            const s11 = getNodeVal(v1, u1);
-
-            const val = (1 - mu) * (1 - mv) * s00 + mu * (1 - mv) * s10 + (1 - mu) * mv * s01 + mu * mv * s11;
-            
-            // Gradient in UV space
-            const du = (s10 - s00) * (1 - mv) + (s11 - s01) * mv;
-            const dv = (s01 - s00) * (1 - mu) + (s11 - s10) * mu;
-
-            return { val, gradU: du, gradV: dv };
+        // Titik di permukaan pada koordinat grid (u,v), digeser sepanjang normal
+        function swarmPoint(u, v, off) {
+            const r = getSurfacePointAndNormal(u, v);
+            return r.pos.add(r.norm.multiplyScalar(off));
         }
 
         function generateWeaving() {
-            while (weavingGroup.children.length > 0) weavingGroup.remove(weavingGroup.children[0]); 
+            while (weavingGroup.children.length > 0) {
+                const ch = weavingGroup.children[0];
+                weavingGroup.remove(ch);
+                if (ch.geometry) ch.geometry.dispose();
+            }
             if (!weavingConfig.visible) return;
 
-            const N = weavingConfig.density;
+            const Nd = weavingConfig.density;
             const offset = weavingConfig.offset;
             const pattern = weavingConfig.pattern;
             let minBendRadius = 9999;
-            
-            const createStrand = (points, isWarp) => {
-                if (points.length < 2) return;
+
+            // Radius belokan minimum dari deretan titik (dipakai strand biasa dan kurva swarm)
+            const measureBend = (points) => {
                 for (let i = 1; i < points.length - 1; i++) {
                     const v1 = new THREE.Vector3().subVectors(points[i], points[i - 1]);
                     const v2 = new THREE.Vector3().subVectors(points[i + 1], points[i]);
@@ -834,6 +1065,10 @@
                         if (bendR < minBendRadius) minBendRadius = bendR;
                     }
                 }
+            };
+
+            const createStrand = (points, isWarp) => {
+                measureBend(points);
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
                 weavingGroup.add(new THREE.Line(geometry, isWarp ? warpMaterial : weftMaterial));
             };
@@ -847,309 +1082,236 @@
             };
 
             const resolution = 4;
-            const steps = N * resolution;
+            const steps = Nd * resolution;
 
-            if (pattern === 'menges_swarm') {
-                /* 
-                 * STABLE BIOMIMETIC AGENT-BASED FIBER WINDING ALGORITHM:
-                 * - Continuous (u, v) floating coordinates.
-                 * - Deterministic seeding based on perimeter anchor points (No frame flickering).
-                 * - Vector field steering driven by stress gradients + extra mass attraction.
-                 * - Smooth angular momentum constraints (Achim Menges style coreless filament paths).
-                 */
-                const totalAgents = N;
-                const stepsPerAgent = 50;
-                const stepLength = 0.65; // Movement distance in grid UV space per step
-                const sensitivity = weavingConfig.swarmSensitivity;
-
-                for (let ag = 0; ag < totalAgents; ag++) {
-                    const strandPts = [];
-                    
-                    // Deterministic perimeter spawn point
-                    const perimeterRatio = ag / totalAgents;
-                    let u, v, initialHeading;
-
-                    if (perimeterRatio < 0.25) {
-                        // Top Edge
-                        u = (perimeterRatio / 0.25) * GRID_RES;
-                        v = 0;
-                        initialHeading = Math.PI / 2; // Move downward
-                    } else if (perimeterRatio < 0.5) {
-                        // Right Edge
-                        u = GRID_RES;
-                        v = ((perimeterRatio - 0.25) / 0.25) * GRID_RES;
-                        initialHeading = Math.PI; // Move left
-                    } else if (perimeterRatio < 0.75) {
-                        // Bottom Edge
-                        u = (1 - (perimeterRatio - 0.5) / 0.25) * GRID_RES;
-                        v = GRID_RES;
-                        initialHeading = -Math.PI / 2; // Move upward
-                    } else {
-                        // Left Edge
-                        u = 0;
-                        v = (1 - (perimeterRatio - 0.75) / 0.25) * GRID_RES;
-                        initialHeading = 0; // Move right
-                    }
-
-                    let heading = initialHeading;
-                    let dirX = Math.cos(heading);
-                    let dirY = Math.sin(heading);
-
-                    for (let step = 0; step < stepsPerAgent; step++) {
-                        // 1. Get continuous surface point and surface normal
-                        let { pos, norm } = getSurfacePointAndNormal(u, v);
-                        
-                        // Fiber height offset with subtle weave elevation
-                        const wavePhase = Math.sin(step * 0.4 + ag);
-                        const strandOffset = offset * (0.6 + 0.4 * wavePhase);
-                        strandPts.push(pos.clone().add(norm.clone().multiplyScalar(strandOffset)));
-
-                        // 2. Query stress field and gradient vector at current (u, v)
-                        const stressData = getSurfaceStressAndMass(u, v);
-                        
-                        let targetDirX = dirX;
-                        let targetDirY = dirY;
-
-                        if (Math.hypot(stressData.gradU, stressData.gradV) > 0.001) {
-                            // Steer towards higher stress / mass concentrations
-                            targetDirX = stressData.gradU * sensitivity;
-                            targetDirY = stressData.gradV * sensitivity;
-
-                            const len = Math.hypot(targetDirX, targetDirY);
-                            if (len > 0) {
-                                targetDirX /= len;
-                                targetDirY /= len;
-                            }
-                        }
-
-                        // 3. Apply smooth steering momentum (Blend 82% previous direction, 18% target direction)
-                        dirX = dirX * 0.82 + targetDirX * 0.18;
-                        dirY = dirY * 0.82 + targetDirY * 0.18;
-
-                        const len = Math.hypot(dirX, dirY);
-                        if (len > 0) {
-                            dirX /= len;
-                            dirY /= len;
-                        }
-
-                        // 4. Update agent position in continuous UV space
-                        u += dirX * stepLength;
-                        v += dirY * stepLength;
-
-                        // Boundary reflection/bounce to keep agents within grid bounds
-                        if (u < 0) { u = 0; dirX = Math.abs(dirX); }
-                        if (u > GRID_RES) { u = GRID_RES; dirX = -Math.abs(dirX); }
-                        if (v < 0) { v = 0; dirY = Math.abs(dirY); }
-                        if (v > GRID_RES) { v = GRID_RES; dirY = -Math.abs(dirY); }
-                    }
-
-                    createStrand(strandPts, ag % 2 === 0);
-                }
-
-            } else if (pattern === 'menges_coreless') {
+            if (pattern === 'menges_coreless') {
                 const numEdgePts = GRID_RES * 4;
                 const getEdgeUV = (index) => {
-                    let i = index % numEdgePts;
-                    if (i < GRID_RES) return {u: i, v: 0};
-                    if (i < GRID_RES * 2) return {u: GRID_RES, v: i - GRID_RES};
-                    if (i < GRID_RES * 3) return {u: GRID_RES - (i - GRID_RES * 2), v: GRID_RES};
-                    return {u: 0, v: GRID_RES - (i - GRID_RES * 3)};
+                    const i = index % numEdgePts;
+                    if (i < GRID_RES) return { u: i, v: 0 };
+                    if (i < GRID_RES * 2) return { u: GRID_RES, v: i - GRID_RES };
+                    if (i < GRID_RES * 3) return { u: GRID_RES - (i - GRID_RES * 2), v: GRID_RES };
+                    return { u: 0, v: GRID_RES - (i - GRID_RES * 3) };
                 };
-                
-                let strandPts1 = [];
-                let strandPts2 = [];
-                let jump = Math.floor(numEdgePts * 0.37); 
+
+                const strandPts1 = [], strandPts2 = [];
+                const jump = Math.floor(numEdgePts * 0.37);
                 let currIdx = 0;
-                
-                for (let i = 0; i < N * 4; i++) {
-                    let uv1 = getEdgeUV(currIdx);
-                    let uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
-                    
+
+                for (let i = 0; i < Nd * 4; i++) {
+                    const uv1 = getEdgeUV(currIdx);
+                    const uv2 = getEdgeUV((currIdx + jump) % numEdgePts);
                     for (let s = 0; s <= 20; s++) {
-                        let t = s / 20;
-                        let u = uv1.u + (uv2.u - uv1.u) * t;
-                        let v = uv1.v + (uv2.v - uv1.v) * t;
-                        let {pos, norm} = getSurfacePointAndNormal(u, v);
-                        strandPts1.push(pos.clone().add(norm.multiplyScalar(0.08)));
-                        strandPts2.push(pos.clone().add(norm.multiplyScalar(0.12)));
+                        const t = s / 20;
+                        const u = uv1.u + (uv2.u - uv1.u) * t;
+                        const v = uv1.v + (uv2.v - uv1.v) * t;
+                        const { pos: sp, norm } = getSurfacePointAndNormal(u, v);
+                        strandPts1.push(sp.clone().add(norm.clone().multiplyScalar(0.08)));
+                        strandPts2.push(sp.clone().add(norm.clone().multiplyScalar(0.12)));
                     }
                     currIdx = (currIdx + jump) % numEdgePts;
                 }
-                createStrand(strandPts1, true); 
-                createStrand(strandPts2, false); 
+                createStrand(strandPts1, true);
+                createStrand(strandPts2, false);
 
+            } else if (pattern === 'menges_swarm') {
+                // Agen menelusuri arah tegangan utama: sigma1 (cyan) dan sigma2 (merah),
+                // dirender sebagai kurva spline Catmull-Rom (bukan polyline bersudut).
+                const SW_OFFSET = 0.06;
+                for (let fam = 0; fam < 2; fam++) {
+                    const lines = swarmLines(fam, Nd);
+                    const segs = [];
+                    for (const ln of lines) {
+                        const n = ln.length / 2;
+                        const ctrl = [];
+                        for (let i = 0; i < n; i += 2) ctrl.push(swarmPoint(ln[2 * i], ln[2 * i + 1], SW_OFFSET));
+                        if ((n - 1) % 2 !== 0) ctrl.push(swarmPoint(ln[2 * (n - 1)], ln[2 * (n - 1) + 1], SW_OFFSET));
+                        if (ctrl.length < 3) continue;
+                        const curve = new THREE.CatmullRomCurve3(ctrl, false, 'centripetal');
+                        const smooth = curve.getPoints(Math.max(8, (ctrl.length - 1) * 4));
+                        measureBend(smooth);
+                        for (let i = 0; i < smooth.length - 1; i++) {
+                            segs.push(smooth[i].x, smooth[i].y, smooth[i].z, smooth[i + 1].x, smooth[i + 1].y, smooth[i + 1].z);
+                        }
+                    }
+                    if (segs.length > 0) {
+                        const g = new THREE.BufferGeometry();
+                        g.setAttribute('position', new THREE.Float32BufferAttribute(segs, 3));
+                        weavingGroup.add(new THREE.LineSegments(g, fam === 0 ? warpMaterial : weftMaterial));
+                    }
+                }
             } else {
-                // Traditional Weaving (Plain, Twill, Basket, Satin)
-                for (let wt = 0; wt <= N; wt++) {
+                for (let wt = 0; wt <= Nd; wt++) {
                     const strandPts = [];
-                    const u_base = (wt / N) * GRID_RES;
+                    const u_base = (wt / Nd) * GRID_RES;
                     for (let s = 0; s <= steps; s++) {
                         const v_base = (s / steps) * GRID_RES;
-                        const { pos, norm } = getSurfacePointAndNormal(u_base, v_base);
-                        const state = getWeaveState(pattern, wt, Math.floor(v_base / (GRID_RES / N)));
-                        strandPts.push(pos.clone().add(norm.multiplyScalar(offset * state)));
+                        const { pos: sp, norm } = getSurfacePointAndNormal(u_base, v_base);
+                        const state = getWeaveState(pattern, wt, Math.floor(v_base / (GRID_RES / Nd)));
+                        strandPts.push(sp.clone().add(norm.multiplyScalar(offset * state)));
                     }
                     createStrand(strandPts, true);
                 }
-
-                for (let wt = 0; wt <= N; wt++) {
+                for (let wt = 0; wt <= Nd; wt++) {
                     const strandPts = [];
-                    const v_base = (wt / N) * GRID_RES;
+                    const v_base = (wt / Nd) * GRID_RES;
                     for (let s = 0; s <= steps; s++) {
                         const u_base = (s / steps) * GRID_RES;
-                        const { pos, norm } = getSurfacePointAndNormal(u_base, v_base);
-                        const state = getWeaveState(pattern, Math.floor(u_base / (GRID_RES / N)), wt);
-                        strandPts.push(pos.clone().add(norm.multiplyScalar(-offset * state)));
+                        const { pos: sp, norm } = getSurfacePointAndNormal(u_base, v_base);
+                        const state = getWeaveState(pattern, Math.floor(u_base / (GRID_RES / Nd)), wt);
+                        strandPts.push(sp.clone().add(norm.multiplyScalar(-offset * state)));
                     }
                     createStrand(strandPts, false);
                 }
             }
 
-            // Update Weaving Evaluation UI
-            document.getElementById('eval-radius').innerText = minBendRadius === 9999 ? "0.0" : minBendRadius.toFixed(1);
-            if (minBendRadius < 0.2 && minBendRadius > 0) {
+            const radiusCm = minBendRadius === 9999 ? 0 : minBendRadius * 100; // m -> cm
+            document.getElementById('eval-radius').innerText = radiusCm.toFixed(1);
+            if (minBendRadius < 0.2) { // ambang 20 cm
                 document.getElementById('msg-radius').classList.remove('hidden');
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-rose-500 animate-pulse";
-                document.getElementById('eval-status').innerText = "Resiko Patah (Kritis)";
-                document.getElementById('eval-status').className = "text-xs font-semibold text-rose-400";
+                document.getElementById('status-dot').className = 'w-3 h-3 rounded-full bg-red-500 animate-pulse';
+                document.getElementById('eval-status').innerText = 'Risiko Patah';
+                document.getElementById('eval-status').className = 'text-sm font-semibold text-red-400';
             } else {
                 document.getElementById('msg-radius').classList.add('hidden');
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
-                document.getElementById('eval-status').innerText = "Siap Fabrikasi";
-                document.getElementById('eval-status').className = "text-xs font-semibold text-emerald-400";
+                document.getElementById('status-dot').className = 'w-3 h-3 rounded-full bg-accent animate-pulse';
+                document.getElementById('eval-status').innerText = 'Siap Fabrikasi';
+                document.getElementById('eval-status').className = 'text-sm font-semibold text-accent';
             }
         }
 
-        let globalMaxStress = 0;
+        // =====================================================================
+        // 4. LOOP SIMULASI & VISUALISASI
+        // =====================================================================
+        const PA2MPA = 1e-6;
+        let smoothVM = 0, smoothS1 = 0, smoothEps = 0, smoothBar = 0;
+        let frameCount = 0;
+        const tempColor = new THREE.Color();
+        const dummyObj = new THREE.Object3D();
+        const UP = new THREE.Vector3(0, 1, 0);
+        const tdir = new THREE.Vector3();
 
-        function simulate() {
-            const timeStep = 0.015;
-            const sqTimeStep = timeStep * timeStep;
-            
-            let maxDeflection = 0;
+        function setStressColor(color, rel) {
+            color.setHSL((1 - Math.max(0, Math.min(1, rel))) * 0.66, 1.0, 0.5); // biru (0) -> merah (maks)
+        }
 
-            // 1. Force Integration
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                if (p.pinned) continue;
-
-                const netForce = new THREE.Vector3(0, 0, 0);
-                
-                netForce.y += physicsConfig.upwardForce;
-                netForce.x += (Math.random() - 0.5) * 0.02;
-                netForce.z += (Math.random() - 0.5) * 0.02;
-                
-                netForce.y -= p.mass * physicsConfig.gravity;
-
-                p.addForce(netForce);
-                p.integrate(sqTimeStep);
-                p.stress = 0;
-
-                const deflection = Math.abs(p.position.y);
-                if (deflection > maxDeflection) maxDeflection = deflection;
+        function updateTruss(E) {
+            let k = 0;
+            const th = trussConfig.thickness;
+            const put = (a, b, L0) => {
+                if (k >= MAX_TRUSSES) return;
+                const ja = 3 * a, jb = 3 * b;
+                const dx = pos[jb] - pos[ja], dy = pos[jb + 1] - pos[ja + 1], dz = pos[jb + 2] - pos[ja + 2];
+                const L = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                if (L < 1e-9) return;
+                dummyObj.position.set((pos[ja] + pos[jb]) / 2, (pos[ja + 1] + pos[jb + 1]) / 2, (pos[ja + 2] + pos[jb + 2]) / 2);
+                tdir.set(dx / L, dy / L, dz / L);
+                dummyObj.quaternion.setFromUnitVectors(UP, tdir);
+                dummyObj.scale.set(th, L, th);
+                dummyObj.updateMatrix();
+                trussMesh.setMatrixAt(k, dummyObj.matrix);
+                // tegangan aksial sisi elemen = E * regangan (indikator), dibandingkan dengan acuan peta tegangan
+                setStressColor(tempColor, (E * (L - L0) / L0) / ceilPa);
+                trussMesh.setColorAt(k, tempColor);
+                k++;
+            };
+            for (let e = 0; e < edgeRest.length; e++) put(edges[2 * e], edges[2 * e + 1], edgeRest[e]);
+            for (let b = 0; b < bars.length; b++) put(bars[b][0], bars[b][1], bars[b][2]);
+            trussMesh.count = k;
+            trussMesh.instanceMatrix.needsUpdate = true;
+            if (trussMesh.instanceColor) {
+                trussMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+                trussMesh.instanceColor.needsUpdate = true;
             }
+        }
 
-            // 2. Relaxation Constraints & Stress Map Mapping
-            let currentMaxStress = 0;
-            const relaxationIterations = 5;
-            
-            for (let i = 0; i < relaxationIterations; i++) {
-                for (let j = 0; j < constraints.length; j++) {
-                    const [p1, p2, restDist] = constraints[j];
-                    const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
-                    const currentDist = diff.length();
-                    
-                    if (currentDist === 0) continue;
+        function updateVisuals() {
+            const positions = posAttr.array;
+            const colors = colAttr.array;
+            const useStress = document.getElementById('view-stress').checked;
+            ceilPa = Math.max(smoothVM, 100); // lantai 100 Pa (0.0001 MPa) agar peta tidak noise
 
-                    const correction = diff.multiplyScalar(1 - restDist / currentDist).multiplyScalar(0.5 * physicsConfig.stiffness);
-                    
-                    if (!p1.pinned) p1.position.add(correction);
-                    if (!p2.pinned) p2.position.sub(correction);
-
-                    const strain = Math.abs(currentDist - restDist) / restDist;
-                    p1.stress += strain;
-                    p2.stress += strain;
-                    
-                    if (strain > currentMaxStress) currentMaxStress = strain;
-                }
-            }
-
-            globalMaxStress = globalMaxStress * 0.9 + currentMaxStress * 0.1;
-
-            // 3. Update WebGL Cloth Buffers
-            const positions = clothGeometry.attributes.position.array;
-            const colorAttr = clothGeometry.attributes.color.array;
-            const useStressLines = document.getElementById('view-stress').checked;
-
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                const idx3 = p.index * 3;
-                positions[idx3] = p.position.x;
-                positions[idx3 + 1] = p.position.y;
-                positions[idx3 + 2] = p.position.z;
-
-                if (useStressLines) {
-                    const avgStress = p.stress / 4; 
-                    const tensionIntensity = Math.min(1, avgStress * 15);
-                    
-                    colorAttr[idx3] = 1.0; 
-                    colorAttr[idx3 + 1] = 1.0 - tensionIntensity; 
-                    colorAttr[idx3 + 2] = 1.0 - tensionIntensity; 
+            for (let i = 0; i < N; i++) {
+                positions[3 * i] = pos[3 * i];
+                positions[3 * i + 1] = pos[3 * i + 1];
+                positions[3 * i + 2] = pos[3 * i + 2];
+                if (useStress) {
+                    setStressColor(tempColor, nodeVM[i] / ceilPa);
+                    colors[3 * i] = tempColor.r; colors[3 * i + 1] = tempColor.g; colors[3 * i + 2] = tempColor.b;
                 } else {
-                    colorAttr[idx3] = 0.9;
-                    colorAttr[idx3 + 1] = 0.9;
-                    colorAttr[idx3 + 2] = 0.9;
-                }
-                
-                if (p.hasExtraMass && p.massMesh) {
-                    p.massMesh.position.copy(p.position);
+                    colors[3 * i] = colors[3 * i + 1] = colors[3 * i + 2] = 0.9;
                 }
             }
-
-            clothGeometry.attributes.position.needsUpdate = true;
-            clothGeometry.attributes.color.needsUpdate = true;
+            posAttr.needsUpdate = true;
+            colAttr.needsUpdate = true;
             clothGeometry.computeVertexNormals();
 
-            // 4. Update Instanced Truss Mesh
-            if (trussMesh && trussMesh.visible) {
-                trussMesh.count = constraints.length; 
-                for (let j = 0; j < constraints.length; j++) {
-                    const [p1, p2, restDist] = constraints[j];
-                    const diff = new THREE.Vector3().subVectors(p2.position, p1.position);
-                    const currentDist = diff.length();
-                    
-                    if (currentDist === 0) continue;
-
-                    const mid = new THREE.Vector3().addVectors(p1.position, p2.position).multiplyScalar(0.5);
-                    dummyObj.position.copy(mid);
-                    dummyObj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), diff.clone().normalize());
-                    dummyObj.scale.set(trussConfig.thickness, currentDist, trussConfig.thickness);
-                    dummyObj.updateMatrix();
-                    trussMesh.setMatrixAt(j, dummyObj.matrix);
-                    
-                    const strain = Math.abs(currentDist - restDist) / restDist;
-                    const tensionIntensity = Math.min(1, strain * 15);
-                    dummyColor.setRGB(1.0, 1.0 - tensionIntensity, 1.0 - tensionIntensity);
-                    trussMesh.setColorAt(j, dummyColor);
-                }
-                trussMesh.instanceMatrix.needsUpdate = true;
-                if (trussMesh.instanceColor) trussMesh.instanceColor.needsUpdate = true;
+            for (const m of anchorMeshes) {
+                const i = m.userData.index;
+                m.position.set(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]);
+            }
+            for (const m of massMeshes) {
+                const i = m.userData.index;
+                m.position.set(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]);
             }
 
-            const displayStress = (globalMaxStress * 100).toFixed(2);
-            document.getElementById('eval-stress').innerText = displayStress;
-            document.getElementById('bar-stress').style.width = Math.min(100, globalMaxStress * 500) + '%';
-            document.getElementById('eval-deflection').innerText = maxDeflection.toFixed(2);
+            if (trussMesh.visible) updateTruss(physicsConfig.stiffness * FEM.E0);
+
+            // Panel evaluasi (Pa -> MPa)
+            const vmMPa = smoothVM * PA2MPA;
+            document.getElementById('eval-stress').innerText = vmMPa.toFixed(3);
+            document.getElementById('eval-s1').innerText = (smoothS1 * PA2MPA).toFixed(3);
+            document.getElementById('eval-eps').innerText = (smoothEps * 100).toFixed(2);
+            document.getElementById('bar-stress').style.width = Math.min(100, vmMPa / FEM.sigmaAllow * 100) + '%';
+            document.getElementById('legend-min').innerText = '0.000 MPa (Biru)';
+            document.getElementById('legend-max').innerText = (ceilPa * PA2MPA).toFixed(3) + ' MPa (Merah)';
+            const rowBar = document.getElementById('row-bar-stress');
+            if (bars.length > 0) {
+                rowBar.classList.remove('hidden');
+                document.getElementById('eval-bar').innerText = (smoothBar * PA2MPA).toFixed(3);
+            } else rowBar.classList.add('hidden');
+        }
+
+        function resetSmoothing() { smoothVM = smoothS1 = smoothEps = smoothBar = 0; }
+
+        // Reset penuh: anchor, pemberat, batang buatan, kamera
+        function resetAll() {
+            for (let i = 0; i < N; i++) { removeAnchor(i); if (extra[i] > 0) toggleMass(i); }
+            bars.length = 0;
+            document.getElementById('bar-count').innerText = '0';
+            femResetState();
+            setDefaultAnchors();
+            resetSmoothing();
+            camera.position.set(0, 15, 25);
+            controls.target.set(0, 0, 0);
+            controls.update();
         }
 
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
-            simulate();
-            generateWeaving();
+
+            if (!femFrame()) { // divergen -> pulihkan posisi otomatis, konfigurasi tetap
+                console.warn('FEM divergen, posisi di-reset.');
+                femResetState();
+                resetSmoothing();
+            } else {
+                // penghalusan hanya untuk tampilan angka (bukan memanipulasi fisika)
+                smoothVM = smoothVM * 0.9 + stats.maxVM * 0.1;
+                smoothS1 = smoothS1 * 0.9 + stats.maxS1 * 0.1;
+                smoothEps = smoothEps * 0.9 + stats.maxEps * 0.1;
+                smoothBar = smoothBar * 0.9 + stats.maxBar * 0.1;
+            }
+            updateVisuals();
+
+            if (frameCount % 3 === 0) generateWeaving();
+            frameCount++;
             renderer.render(scene, camera);
         }
 
+        // =====================================================================
+        // 5. EKSPOR & SCREENSHOT
+        // =====================================================================
         function downloadBlob(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1161,48 +1323,31 @@
         }
 
         function exportToOBJ() {
-            if (typeof THREE.OBJExporter === 'undefined') {
-                showToast('Modul OBJExporter belum siap', 'error');
-                return;
-            }
-            
+            if (typeof THREE.OBJExporter === 'undefined') return alert('Pustaka OBJExporter belum siap.');
             const exporter = new THREE.OBJExporter();
             const exportGroup = new THREE.Group();
-
-            if (clothMesh && clothMesh.visible) exportGroup.add(clothMesh.clone());
-            if (weavingGroup && weavingGroup.visible) exportGroup.add(weavingGroup.clone());
-
+            if (clothMesh.visible) exportGroup.add(clothMesh.clone());
+            if (weavingGroup.visible) exportGroup.add(weavingGroup.clone());
             const result = exporter.parse(exportGroup);
-            const blob = new Blob([result], { type: 'text/plain' });
-            downloadBlob(blob, 'tensomatter_form_finding.obj');
-            showToast('Model 3D disalin ke tensomatter_form_finding.obj', 'success');
+            downloadBlob(new Blob([result], { type: 'text/plain' }), 'tensomatter_form_finding.obj');
         }
 
         function exportToSTL() {
-            if (typeof THREE.STLExporter === 'undefined') {
-                showToast('Modul STLExporter belum siap', 'error');
-                return;
-            }
-
+            if (typeof THREE.STLExporter === 'undefined') return alert('Pustaka STLExporter belum siap.');
             const exporter = new THREE.STLExporter();
-            const exportTarget = (clothMesh && clothMesh.visible) ? clothMesh : scene;
+            const exportTarget = clothMesh.visible ? clothMesh : scene;
             const result = exporter.parse(exportTarget, { binary: true });
-            const blob = new Blob([result], { type: 'application/octet-stream' });
-            downloadBlob(blob, 'tensomatter_form_finding.stl');
-            showToast('Model 3D disalin ke tensomatter_form_finding.stl', 'success');
+            downloadBlob(new Blob([result], { type: 'application/octet-stream' }), 'tensomatter_form_finding.stl');
         }
 
         function takeScreenshot() {
             renderer.render(scene, camera);
-            const dataUrl = renderer.domElement.toDataURL('image/png');
-            
             const link = document.createElement('a');
-            link.href = dataUrl;
+            link.href = renderer.domElement.toDataURL('image/png');
             link.download = 'tensomatter_screenshot_' + new Date().toISOString().slice(0, 10) + '.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Tangkapan layar resolusi tinggi berhasil diunduh', 'success');
         }
 
         document.getElementById('btn-export-obj').addEventListener('click', exportToOBJ);
@@ -1215,222 +1360,257 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        const bindSlider = (id, varName, configObj, displayId, isFloat = true) => {
+        // =====================================================================
+        // 6. KONTROL UI
+        // =====================================================================
+        const bindSlider = (id, varName, configObj, displayId) => {
             const el = document.getElementById(id);
             const disp = document.getElementById(displayId);
             el.addEventListener('input', (e) => {
-                const val = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
+                const val = parseFloat(e.target.value);
                 configObj[varName] = val;
-                disp.innerText = isFloat ? val.toFixed(1) : val;
+                disp.innerText = val.toFixed(1);
             });
         };
-
         bindSlider('ctrl-force', 'upwardForce', physicsConfig, 'val-force');
         bindSlider('ctrl-stiffness', 'stiffness', physicsConfig, 'val-stiffness');
-        bindSlider('ctrl-gravity', 'gravity', physicsConfig, 'val-gravity');
         bindSlider('ctrl-truss-size', 'thickness', trussConfig, 'val-truss-size');
+        document.getElementById('val-truss-size').innerText = trussConfig.thickness.toFixed(2);
+        document.getElementById('ctrl-truss-size').addEventListener('input', (e) => {
+            document.getElementById('val-truss-size').innerText = parseFloat(e.target.value).toFixed(2);
+        });
+        document.getElementById('ctrl-stiffness').addEventListener('input', (e) => {
+            document.getElementById('val-E').innerText = (parseFloat(e.target.value) * FEM.E0 * 1e-6).toFixed(1);
+        });
+        document.getElementById('val-E').innerText = (physicsConfig.stiffness * FEM.E0 * 1e-6).toFixed(1);
+        document.getElementById('lbl-allow').innerText = FEM.sigmaAllow.toFixed(1);
 
         document.getElementById('ctrl-mode').addEventListener('change', (e) => {
             interactionMode = e.target.value;
-            drawStartParticle = null;
-            if (tempDrawLine) tempDrawLine.visible = false;
+            drawStartIndex = -1;
+            tempDrawLine.visible = false;
         });
 
         document.getElementById('ctrl-extramass').addEventListener('input', (e) => {
             extraMassValue = parseFloat(e.target.value);
             document.getElementById('val-extramass').innerText = extraMassValue.toFixed(1);
+            for (let i = 0; i < N; i++) if (extra[i] > 0) extra[i] = extraMassValue;
         });
-
-        document.getElementById('btn-preset-center').addEventListener('click', applyPresetCenterMass);
-        document.getElementById('btn-preset-4points').addEventListener('click', applyPreset4Points);
-        document.getElementById('btn-preset-ring').addEventListener('click', applyPresetRingMass);
-        document.getElementById('btn-preset-random').addEventListener('click', applyPresetRandomMass);
-        document.getElementById('btn-clear-masses').addEventListener('click', clearAllMasses);
 
         document.getElementById('ctrl-density').addEventListener('input', (e) => {
             weavingConfig.density = parseInt(e.target.value);
             document.getElementById('val-density').innerText = weavingConfig.density;
         });
-        document.getElementById('ctrl-swarm-sens').addEventListener('input', (e) => {
-            weavingConfig.swarmSensitivity = parseFloat(e.target.value);
-            document.getElementById('val-swarm-sens').innerText = weavingConfig.swarmSensitivity.toFixed(1);
-        });
         document.getElementById('ctrl-offset').addEventListener('input', (e) => {
             weavingConfig.offset = parseFloat(e.target.value);
             document.getElementById('val-offset').innerText = weavingConfig.offset.toFixed(2);
         });
-
         document.getElementById('ctrl-pattern').addEventListener('change', (e) => {
             weavingConfig.pattern = e.target.value;
+            document.getElementById('hint-swarm').classList.toggle('hidden', e.target.value !== 'menges_swarm');
+        });
+        document.getElementById('view-surface').addEventListener('change', (e) => { clothMesh.visible = e.target.checked; });
+        document.getElementById('view-wireframe').addEventListener('change', (e) => { clothMaterial.wireframe = e.target.checked; });
+        document.getElementById('view-truss').addEventListener('change', (e) => { trussMesh.visible = e.target.checked; });
+        document.getElementById('view-weaving').addEventListener('change', (e) => { weavingConfig.visible = e.target.checked; });
+
+        document.getElementById('btn-clear-bars').addEventListener('click', () => {
+            bars.length = 0;
+            document.getElementById('bar-count').innerText = '0';
         });
 
-        document.getElementById('view-surface').addEventListener('change', (e) => {
-            if (clothMesh) clothMesh.visible = e.target.checked;
-        });
-        document.getElementById('view-truss').addEventListener('change', (e) => {
-            if (trussMesh) trussMesh.visible = e.target.checked;
-        });
-        document.getElementById('view-weaving').addEventListener('change', (e) => {
-            weavingConfig.visible = e.target.checked;
-        });
-        document.getElementById('view-masses').addEventListener('change', (e) => {
-            const isVisible = e.target.checked;
-            massMeshes.forEach(m => m.visible = isVisible);
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            physicsConfig.upwardForce = 1.5;
+            physicsConfig.stiffness = 0.8;
+            trussConfig.thickness = 0.05;
+            weavingConfig = { pattern: 'plain', density: 20, offset: 0.1, visible: true };
+            extraMassValue = 0.5;
+            interactionMode = 'drag';
+            drawStartIndex = -1;
+            tempDrawLine.visible = false;
+
+            const setv = (id, v, txt) => { document.getElementById(id).value = v; };
+            setv('ctrl-force', 1.5); document.getElementById('val-force').innerText = '1.5';
+            setv('ctrl-stiffness', 0.8); document.getElementById('val-stiffness').innerText = '0.8';
+            document.getElementById('val-E').innerText = (0.8 * FEM.E0 * 1e-6).toFixed(1);
+            setv('ctrl-extramass', 0.5); document.getElementById('val-extramass').innerText = '0.5';
+            setv('ctrl-pattern', 'plain'); document.getElementById('hint-swarm').classList.add('hidden');
+            setv('ctrl-density', 20); document.getElementById('val-density').innerText = '20';
+            setv('ctrl-offset', 0.1); document.getElementById('val-offset').innerText = '0.1';
+            setv('ctrl-mode', 'drag');
+            setv('ctrl-truss-size', 0.05); document.getElementById('val-truss-size').innerText = '0.05';
+
+            document.getElementById('view-surface').checked = true;
+            document.getElementById('view-wireframe').checked = false;
+            document.getElementById('view-truss').checked = false;
+            document.getElementById('view-stress').checked = true;
+            document.getElementById('view-weaving').checked = true;
+            clothMesh.visible = true;
+            clothMaterial.wireframe = false;
+            trussMesh.visible = false;
+
+            resetAll();
         });
 
+        window.onload = () => { animate(); };
+
+        // =====================================================================
+        // 7. INTERAKSI (DRAG, TAMBAH/HAPUS ANCHOR, PEMBERAT, GAMBAR BATANG)
+        // =====================================================================
         function updateMouse(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         }
 
         function getClosestParticle(hitPoint, maxDist = 1.5) {
-            let closest = null;
-            let minDist = maxDist;
-            for (let i = 0; i < particles.length; i++) {
-                const d = particles[i].position.distanceTo(hitPoint);
-                if (d < minDist) { 
-                    minDist = d; 
-                    closest = particles[i]; 
-                }
+            let closest = -1;
+            let minD2 = maxDist * maxDist;
+            for (let i = 0; i < N; i++) {
+                const dx = pos[3 * i] - hitPoint.x, dy = pos[3 * i + 1] - hitPoint.y, dz = pos[3 * i + 2] - hitPoint.z;
+                const d2 = dx * dx + dy * dy + dz * dz;
+                if (d2 < minD2) { minD2 = d2; closest = i; }
             }
             return closest;
         }
 
+        function raycastCloth() {
+            clothGeometry.computeBoundingSphere(); // geometri berubah tiap frame
+            return raycaster.intersectObject(clothMesh);
+        }
+
+        // Deteksi double tap (mobile / mouse)
+        let lastTapTime = 0, lastTapClientX = 0, lastTapClientY = 0;
+        const DOUBLE_TAP_DELAY = 300;
+
         renderer.domElement.addEventListener('pointerdown', (event) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            const dx = event.clientX - lastTapClientX;
+            const dy = event.clientY - lastTapClientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0 && distance < 20) {
+                lastTapTime = 0; // reset agar tidak terjadi triple tap
+
+                if (interactionMode !== 'draw') {
+                    updateMouse(event);
+                    raycaster.setFromCamera(mouse, camera);
+
+                    const anchorHits = raycaster.intersectObjects(anchorMeshes);
+                    if (anchorHits.length > 0) {
+                        removeAnchor(anchorHits[0].object.userData.index);
+                        return;
+                    }
+                    const clothHits = raycastCloth();
+                    if (clothHits.length > 0) {
+                        const ci = getClosestParticle(clothHits[0].point);
+                        if (ci >= 0) createAnchor(ci);
+                    }
+                }
+                return;
+            } else {
+                lastTapTime = currentTime;
+                lastTapClientX = event.clientX;
+                lastTapClientY = event.clientY;
+            }
+
             updateMouse(event);
             raycaster.setFromCamera(mouse, camera);
 
+            // Shift+Klik: tambah/kurang massa
             if (event.shiftKey && interactionMode === 'drag') {
-                if (clothMesh) {
-                    const clothIntersects = raycaster.intersectObject(clothMesh);
-                    if (clothIntersects.length > 0) {
-                        const closestParticle = getClosestParticle(clothIntersects[0].point);
-                        if (closestParticle) toggleMass(closestParticle);
-                    }
+                const clothHits = raycastCloth();
+                if (clothHits.length > 0) {
+                    const ci = getClosestParticle(clothHits[0].point);
+                    if (ci >= 0) toggleMass(ci);
                 }
                 return;
             }
 
+            // Mode menggambar batang
             if (interactionMode === 'draw') {
-                if (clothMesh) {
-                    const intersects = raycaster.intersectObject(clothMesh);
-                    if (intersects.length > 0) {
-                        const hitPoint = intersects[0].point;
-                        drawStartParticle = getClosestParticle(hitPoint);
-                        if (drawStartParticle) {
-                            controls.enabled = false;
-                            tempDrawLine.visible = true;
-                            
-                            const positions = tempDrawLine.geometry.attributes.position.array;
-                            positions[0] = drawStartParticle.position.x;
-                            positions[1] = drawStartParticle.position.y;
-                            positions[2] = drawStartParticle.position.z;
-                            positions[3] = hitPoint.x;
-                            positions[4] = hitPoint.y;
-                            positions[5] = hitPoint.z;
-                            tempDrawLine.geometry.attributes.position.needsUpdate = true;
-                            
-                            dragPlane.setFromNormalAndCoplanarPoint(
-                                camera.getWorldDirection(new THREE.Vector3()).negate(),
-                                drawStartParticle.position
-                            );
-                        }
+                const hits = raycastCloth();
+                if (hits.length > 0) {
+                    const hitPoint = hits[0].point;
+                    drawStartIndex = getClosestParticle(hitPoint);
+                    if (drawStartIndex >= 0) {
+                        controls.enabled = false;
+                        tempDrawLine.visible = true;
+                        const p = tempDrawLine.geometry.attributes.position.array;
+                        p[0] = pos[3 * drawStartIndex]; p[1] = pos[3 * drawStartIndex + 1]; p[2] = pos[3 * drawStartIndex + 2];
+                        p[3] = hitPoint.x; p[4] = hitPoint.y; p[5] = hitPoint.z;
+                        tempDrawLine.geometry.attributes.position.needsUpdate = true;
+                        dragPlane.setFromNormalAndCoplanarPoint(
+                            camera.getWorldDirection(new THREE.Vector3()).negate(),
+                            new THREE.Vector3(pos[3 * drawStartIndex], pos[3 * drawStartIndex + 1], pos[3 * drawStartIndex + 2])
+                        );
                     }
                 }
                 return;
             }
 
-            const intersects = raycaster.intersectObjects(anchorMeshes);
-            if (intersects.length > 0) {
+            // Mode menggeser anchor
+            const hits = raycaster.intersectObjects(anchorMeshes);
+            if (hits.length > 0) {
                 controls.enabled = false;
-                draggedParticle = intersects[0].object.userData.particle;
-                
+                draggedIndex = hits[0].object.userData.index;
                 dragPlane.setFromNormalAndCoplanarPoint(
                     camera.getWorldDirection(new THREE.Vector3()).negate(),
-                    draggedParticle.position
+                    new THREE.Vector3(pos[3 * draggedIndex], pos[3 * draggedIndex + 1], pos[3 * draggedIndex + 2])
                 );
             }
         });
 
         renderer.domElement.addEventListener('pointermove', (event) => {
-            if (interactionMode === 'draw' && drawStartParticle) {
+            if (interactionMode === 'draw' && drawStartIndex >= 0) {
                 updateMouse(event);
                 raycaster.setFromCamera(mouse, camera);
-                raycaster.ray.intersectPlane(dragPlane, intersectPoint);
-                
-                const positions = tempDrawLine.geometry.attributes.position.array;
-                positions[3] = intersectPoint.x;
-                positions[4] = intersectPoint.y;
-                positions[5] = intersectPoint.z;
-                tempDrawLine.geometry.attributes.position.needsUpdate = true;
+                if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
+                    const p = tempDrawLine.geometry.attributes.position.array;
+                    p[3] = intersectPoint.x; p[4] = intersectPoint.y; p[5] = intersectPoint.z;
+                    tempDrawLine.geometry.attributes.position.needsUpdate = true;
+                }
                 return;
             }
 
-            if (draggedParticle && interactionMode === 'drag') {
+            if (draggedIndex >= 0 && interactionMode === 'drag') {
                 updateMouse(event);
                 raycaster.setFromCamera(mouse, camera);
-                raycaster.ray.intersectPlane(dragPlane, intersectPoint);
-                
-                draggedParticle.position.copy(intersectPoint);
-                draggedParticle.anchorMesh.position.copy(intersectPoint);
+                if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
+                    // anchor mengejar kursor dengan laju terbatas (lihat femStep)
+                    tgt[3 * draggedIndex] = intersectPoint.x;
+                    tgt[3 * draggedIndex + 1] = intersectPoint.y;
+                    tgt[3 * draggedIndex + 2] = intersectPoint.z;
+                    hasTgt[draggedIndex] = 1;
+                }
             }
         });
 
         renderer.domElement.addEventListener('pointerup', (event) => {
-            if (interactionMode === 'draw' && drawStartParticle) {
+            if (interactionMode === 'draw' && drawStartIndex >= 0) {
                 updateMouse(event);
                 raycaster.setFromCamera(mouse, camera);
-                raycaster.ray.intersectPlane(dragPlane, intersectPoint);
-                
-                const drawEndParticle = getClosestParticle(intersectPoint, 2.5);
-                
-                if (drawEndParticle && drawEndParticle !== drawStartParticle) {
-                    const dist = drawStartParticle.position.distanceTo(drawEndParticle.position);
-                    constraints.push([drawStartParticle, drawEndParticle, dist]);
-                    showToast('Jaring truss interaktif ditambahkan', 'info');
+                if (raycaster.ray.intersectPlane(dragPlane, intersectPoint)) {
+                    const endIndex = getClosestParticle(intersectPoint, 2.5);
+                    if (endIndex >= 0 && endIndex !== drawStartIndex) {
+                        const a = drawStartIndex, b = endIndex;
+                        const exists = bars.some(s => (s[0] === a && s[1] === b) || (s[0] === b && s[1] === a));
+                        if (!exists) {
+                            const L0 = Math.hypot(pos[3 * a] - pos[3 * b], pos[3 * a + 1] - pos[3 * b + 1], pos[3 * a + 2] - pos[3 * b + 2]);
+                            if (L0 > 1e-6) bars.push([a, b, L0]); // panjang awal = jarak saat digambar (bebas tegangan)
+                            document.getElementById('bar-count').innerText = String(bars.length);
+                        }
+                    }
                 }
-                
-                drawStartParticle = null;
+                drawStartIndex = -1;
                 tempDrawLine.visible = false;
                 controls.enabled = true;
                 return;
             }
 
-            draggedParticle = null;
+            draggedIndex = -1;
             controls.enabled = true;
         });
-
-        renderer.domElement.addEventListener('dblclick', (event) => {
-            if (interactionMode === 'draw') return;
-            
-            updateMouse(event);
-            raycaster.setFromCamera(mouse, camera);
-
-            const anchorIntersects = raycaster.intersectObjects(anchorMeshes);
-            if (anchorIntersects.length > 0) {
-                removeAnchor(anchorIntersects[0].object.userData.particle);
-                showToast('Anchor tumpuan dihapus', 'info');
-                return;
-            }
-
-            if (clothMesh) {
-                const clothIntersects = raycaster.intersectObject(clothMesh);
-                if (clothIntersects.length > 0) {
-                    const closestParticle = getClosestParticle(clothIntersects[0].point);
-                    if (closestParticle) {
-                        createAnchor(closestParticle);
-                        showToast('Anchor tumpuan baru ditambahkan', 'success');
-                    }
-                }
-            }
-        });
-
-        window.onload = () => {
-            initSimulation();
-            animate();
-            showToast('Tensomatter Swarm Fixed - Agen bergerak mulus & responsif', 'success');
-        };
-
     </script>
 </body>
 </html>
